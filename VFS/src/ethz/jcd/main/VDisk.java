@@ -29,9 +29,9 @@ public class VDisk
      * @param vDiskFile path to the VDisk file
      * @param size total size of the VDisk
      */
-    public VDisk( String vDiskFile, long size)
+    public VDisk( String vDiskFile, long size, long blockSize)
     {
-        util = new VUtil<LinkedList<Integer>>(vDiskFile);
+        util = new VUtil<LinkedList<Integer>>(vDiskFile, size, blockSize);
         // TODO
     }
 

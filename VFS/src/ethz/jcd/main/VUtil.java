@@ -38,7 +38,7 @@ public class VUtil<T extends List<Integer>>
         allocator = new Allocator<T>( this.loadFreeList() );
     }
 
-    public VUtil( String vDiskFile, long size )
+    public VUtil( String vDiskFile, long size, long blockSize )
     {
         // TODO Create VDisk file
 
