@@ -1,4 +1,4 @@
-package ethz.jcd.blocks;
+package ethz.jcd.main.blocks;
 
 import java.util.LinkedList;
 

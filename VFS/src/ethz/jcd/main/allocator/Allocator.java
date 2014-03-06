@@ -1,7 +1,7 @@
-package ethz.jcd.allocator;
+package ethz.jcd.main.allocator;
 
-import ethz.jcd.blocks.Block;
-import ethz.jcd.blocks.Inode;
+import ethz.jcd.main.blocks.Block;
+import ethz.jcd.main.blocks.Inode;
 
 import java.util.LinkedList;
 import java.util.List;

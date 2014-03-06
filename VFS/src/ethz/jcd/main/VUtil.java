@@ -1,8 +1,8 @@
-package ethz.jcd;
+package ethz.jcd.main;
 
-import ethz.jcd.allocator.Allocator;
-import ethz.jcd.blocks.Block;
-import ethz.jcd.blocks.Inode;
+import ethz.jcd.main.allocator.Allocator;
+import ethz.jcd.main.blocks.Block;
+import ethz.jcd.main.blocks.Inode;
 
 import java.io.File;
 import java.io.FileNotFoundException;

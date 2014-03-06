@@ -1,7 +1,7 @@
-package ethz.jcd.layer;
+package ethz.jcd.main.layer;
 
-import ethz.jcd.blocks.Inode;
-import ethz.jcd.visitor.VTypeVisitor;
+import ethz.jcd.main.blocks.Inode;
+import ethz.jcd.main.visitor.VTypeVisitor;
 
 import java.util.LinkedList;
 

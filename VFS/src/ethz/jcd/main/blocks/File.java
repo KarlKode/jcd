@@ -1,6 +1,6 @@
-package ethz.jcd.blocks;
+package ethz.jcd.main.blocks;
 
-import ethz.jcd.Config;
+import ethz.jcd.main.Config;
 
 /**
  * Created by phgamper on 3/6/14.

@@ -1,7 +1,7 @@
-package ethz.jcd.visitor;
+package ethz.jcd.main.visitor;
 
-import ethz.jcd.VUtil;
-import ethz.jcd.blocks.*;
+import ethz.jcd.main.VUtil;
+import ethz.jcd.main.blocks.*;
 
 /**
  * Created by phgamper on 3/6/14.

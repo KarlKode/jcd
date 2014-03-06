@@ -1,8 +1,8 @@
-package ethz.jcd;
+package ethz.jcd.main;
 
-import ethz.jcd.blocks.SuperBlock;
-import ethz.jcd.layer.VType;
-import ethz.jcd.visitor.CopyVisitor;
+import ethz.jcd.main.blocks.SuperBlock;
+import ethz.jcd.main.layer.VType;
+import ethz.jcd.main.visitor.CopyVisitor;
 import java.util.LinkedList;
 
 /**

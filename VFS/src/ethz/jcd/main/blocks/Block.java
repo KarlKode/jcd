@@ -1,6 +1,6 @@
-package ethz.jcd.blocks;
+package ethz.jcd.main.blocks;
 
-import ethz.jcd.visitor.BlockVisitor;
+import ethz.jcd.main.visitor.BlockVisitor;
 
 /**
  * Created by phgamper on 3/6/14.

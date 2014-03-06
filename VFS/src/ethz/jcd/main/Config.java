@@ -1,4 +1,4 @@
-package ethz.jcd;
+package ethz.jcd.main;
 
 /**
  * Created by phgamper on 3/6/14.

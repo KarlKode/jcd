@@ -1,9 +1,6 @@
-package ethz.jcd.visitor;
+package ethz.jcd.main.visitor;
 
-import ethz.jcd.blocks.*;
-import ethz.jcd.layer.VDirectory;
-import ethz.jcd.layer.VFile;
-import ethz.jcd.layer.VType;
+import ethz.jcd.main.blocks.*;
 
 /**
  * Created by phgamper on 3/6/14.
