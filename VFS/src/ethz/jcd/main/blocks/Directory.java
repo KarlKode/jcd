@@ -1,8 +1,5 @@
 package ethz.jcd.main.blocks;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class Directory extends Inode
 {
     protected BlockList<Inode> content = new BlockList<Inode>();

@@ -2,9 +2,6 @@ package ethz.jcd.main.blocks;
 
 import java.util.LinkedList;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class BlockList<T extends Block> extends Block
 {
     private LinkedList<T> blocks = new LinkedList<T>();

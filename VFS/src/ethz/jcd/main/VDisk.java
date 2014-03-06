@@ -5,9 +5,6 @@ import ethz.jcd.main.layer.VType;
 import ethz.jcd.main.visitor.CopyVisitor;
 import java.util.LinkedList;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class VDisk
 {
     private VUtil<LinkedList<Integer>> util;

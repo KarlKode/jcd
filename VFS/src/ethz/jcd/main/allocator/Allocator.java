@@ -6,9 +6,6 @@ import ethz.jcd.main.blocks.Inode;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class Allocator<T extends List<Integer>>
 {
     private T freeList;

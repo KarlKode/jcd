@@ -2,9 +2,6 @@ package ethz.jcd.main.blocks;
 
 import ethz.jcd.main.Config;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class File extends Inode
 {
     protected BlockList<Block> blocks = new BlockList<Block>();
