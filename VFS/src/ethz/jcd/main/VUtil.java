@@ -19,14 +19,15 @@ public class VUtil<T extends List<Integer>>
     private File vdisk;
 
     private Allocator<T> allocator;
+    private String vDiskFile;
 
-    public VUtil( )
+    public VUtil( String vDiskFile )
     {
-        vdisk = new File(Config.VFS_FILE_PATH);
+        this.vDiskFile = vDiskFile;
+        vdisk = new File(this.vDiskFile);
 
         try
         {
-            // TODO file erstelle wennsess nid git
             raf = new RandomAccessFile(vdisk, "rwd");
         }
         catch (FileNotFoundException e)
@@ -35,6 +36,13 @@ public class VUtil<T extends List<Integer>>
         }
 
         allocator = new Allocator<T>( this.loadFreeList() );
+    }
+
+    public VUtil( String vDiskFile, long size )
+    {
+        // TODO Create VDisk file
+
+        this(vDiskFile);
     }
 
     public T loadFreeList( )

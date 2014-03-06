@@ -10,9 +10,30 @@ import java.util.LinkedList;
  */
 public class VDisk
 {
-    private VUtil<LinkedList<Integer>> util = new VUtil<LinkedList<Integer>> ();
+    private VUtil<LinkedList<Integer>> util;
 
     private SuperBlock root = SuperBlock.getInstance();
+
+    /**
+     * Open an existing VDisk file that contains a valid VFS
+     * @param vDiskFile path to the VDisk file
+     */
+    public VDisk( String vDiskFile )
+    {
+        util = new VUtil<LinkedList<Integer>>(vDiskFile);
+        // TODO
+    }
+
+    /**
+     * Create a new VDisk
+     * @param vDiskFile path to the VDisk file
+     * @param size total size of the VDisk
+     */
+    public VDisk( String vDiskFile, long size)
+    {
+        util = new VUtil<LinkedList<Integer>>(vDiskFile);
+        // TODO
+    }
 
     /**
      * This method creates either an EMPTY directory or an Empty file.
