@@ -8,8 +8,14 @@ public class VDiskTest
 	private VDisk vdisk = new VDisk();
 
 	@Test
-	public void test() throws Exception
+	public void createTest()
     {
 
 	}
+
+    @Test
+    public void importTest( )
+    {
+
+    }
 }

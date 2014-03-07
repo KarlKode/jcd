@@ -6,6 +6,7 @@ import ethz.jcd.main.blocks.Inode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class VUtil<T extends List<Integer>>
     private File vdisk;
 
     private Allocator<T> allocator;
+
+    private VFSHeader header;
 
     public VUtil( )
     {
@@ -34,11 +37,49 @@ public class VUtil<T extends List<Integer>>
             e.printStackTrace();
         }
 
+        header = loadVFSHeader();
+
         allocator = new Allocator<T>( this.loadFreeList() );
+    }
+
+    public VFSHeader loadVFSHeader( )
+    {
+        byte[] header = new byte[Config.VFS_HEADER_LEN];
+
+        try
+        {
+            raf.read(header);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return new VFSHeader(header);
+    }
+
+    public void storeVFSHeader( )
+    {
+
     }
 
     public T loadFreeList( )
     {
+        byte[] flags = new byte[Config.VFS_BLOCK_SIZE];
+
+        try
+        {
+            raf.read(flags);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        for(int i = 0; i < Config.VFS_BLOCK_COUNT; i++)
+        {
+
+        }
         return null;
     }
 

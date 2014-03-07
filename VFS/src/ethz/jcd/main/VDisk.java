@@ -1,6 +1,9 @@
 package ethz.jcd.main;
 
+import ethz.jcd.main.blocks.Directory;
+import ethz.jcd.main.blocks.Inode;
 import ethz.jcd.main.blocks.SuperBlock;
+import ethz.jcd.main.layer.VDirectory;
 import ethz.jcd.main.layer.VType;
 import ethz.jcd.main.visitor.CopyVisitor;
 import java.util.LinkedList;
@@ -19,12 +22,13 @@ public class VDisk
      *
      * TODO mönd de no d inode blöck no irgend wie flage das me erkennt obs es directory isch oder es file
      *
-     * @param file - either a VDirectory or a VFile
+     * @param src - either a VDirectory or a VFile
+     * @param  dest - destination
      * @return - create Inode in the VFS
      */
-    public void create( VType file )
+    public void create( VType src, VDirectory dest )
     {
-        util.write( file.create( ) );
+        //util.write( src.create( ) );
     }
 
     public void delete( VType file )
@@ -32,12 +36,12 @@ public class VDisk
 
     }
 
-    public void move( VType file )
+    public void move( VType src, VType dest )
     {
 
     }
 
-    public void list( VType file )
+    public void list( VDirectory file )
     {
 
     }
@@ -46,16 +50,21 @@ public class VDisk
      * This method copies either a directory or a file. Note that the whole
      * structure is copied. There are no optimization like "copy on write".
      *
-     * @param file - either a VDirectory or a VFile
+     * @param src - source, either a VDirectory or a VFile
+     * @param  dest - destination
      */
-    public void copy( VType file )
+    public void copy( VType src, VDirectory dest )
     {
         CopyVisitor cv = new CopyVisitor();
 
-        cv.visit(file.getInode(), util);
+        Inode i = (Inode) cv.visit(src.getInode(), util);
+
+        Directory dir = (Directory) dest.getInode();
+        //dir.add(i);
+        util.write(dir);
     }
 
-    public void store( VType file )
+    public void store( VType src, VType dest )
     {
 
     }
