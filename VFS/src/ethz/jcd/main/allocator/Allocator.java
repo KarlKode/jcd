@@ -6,9 +6,6 @@ import ethz.jcd.main.blocks.Inode;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class Allocator<T extends List<Integer>>
 {
     private T freeList;
@@ -18,10 +15,11 @@ public class Allocator<T extends List<Integer>>
         freeList = init;
     }
 
-    public LinkedList<Block> allocate( Inode i )
+    public Block allocate( )
     {
         return null;
     }
+
     public void free( Block block )
     {
         // TODO entsprechend block typ halt s züügs freigeh ;-)
@@ -29,6 +27,6 @@ public class Allocator<T extends List<Integer>>
 
     public boolean isFree( Block block )
     {
-        return false;
+        return freeList.contains(block.getAddress());
     }
 }

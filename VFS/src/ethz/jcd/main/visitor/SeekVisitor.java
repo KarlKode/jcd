@@ -3,9 +3,6 @@ package ethz.jcd.main.visitor;
 import ethz.jcd.main.VUtil;
 import ethz.jcd.main.blocks.*;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class SeekVisitor implements BlockVisitor<Block, VUtil>
 {
     @Override

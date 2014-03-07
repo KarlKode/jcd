@@ -3,9 +3,6 @@ package ethz.jcd.main.layer;
 import ethz.jcd.main.blocks.Inode;
 import ethz.jcd.main.visitor.VTypeVisitor;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class VFile extends VType
 {
     protected int size;

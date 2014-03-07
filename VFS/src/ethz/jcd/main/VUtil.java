@@ -2,68 +2,60 @@ package ethz.jcd.main;
 
 import ethz.jcd.main.allocator.Allocator;
 import ethz.jcd.main.blocks.Block;
-import ethz.jcd.main.blocks.Inode;
+import ethz.jcd.main.blocks.SuperBlock;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.List;
+import java.util.LinkedList;
 
-/**
- * Created by phgamper on 3/6/14.
- */
-public class VUtil<T extends List<Integer>>
+public class VUtil
 {
     private RandomAccessFile raf;
 
-    private File vdisk;
+    private final String vDiskFile;
 
-    private Allocator<T> allocator;
+    private final SuperBlock root;
 
-    private VFSHeader header;
+    private final Allocator<LinkedList<Integer>> allocator;
 
-    public VUtil( )
+    public VUtil( String vDiskFile ) throws FileNotFoundException
     {
-        vdisk = new File(Config.VFS_FILE_PATH);
+        this.vDiskFile = vDiskFile;
+        File fp = new File(this.vDiskFile);
 
-        try
-        {
-            // TODO file erstelle wennsess nid git
-            raf = new RandomAccessFile(vdisk, "rwd");
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        raf = new RandomAccessFile(fp, "rwd");
 
-        header = loadVFSHeader();
+        root = loadSuperBlock();
 
-        allocator = new Allocator<T>( this.loadFreeList() );
+        allocator = new Allocator<LinkedList<Integer>>(this.loadFreeList());
     }
 
-    public VFSHeader loadVFSHeader( )
+    public VUtil( String vDiskFile, long size, long blockSize ) throws FileNotFoundException {
+        // TODO Create VDisk file
+
+        this(vDiskFile);
+    }
+
+    private SuperBlock loadSuperBlock( )
     {
-        byte[] header = new byte[Config.VFS_HEADER_LEN];
+        byte[] bytes = new byte[Config.VFS_SUPER_BLOCK_SIZE];
 
         try
         {
-            raf.read(header);
+            raf.read(bytes);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
 
-        return new VFSHeader(header);
+        return SuperBlock.getInstance(bytes);
     }
 
-    public void storeVFSHeader( )
-    {
-
-    }
-
-    public T loadFreeList( )
+    public LinkedList<Integer> loadFreeList( )
     {
         byte[] flags = new byte[Config.VFS_BLOCK_SIZE];
 
@@ -83,32 +75,33 @@ public class VUtil<T extends List<Integer>>
         return null;
     }
 
-    public void storeFreeList( T list )
+    public void storeFreeList( LinkedList<Integer> list )
     {
-
-    }
-
-    public Inode read( Integer blockAddress )
-    {
-        return null;
+        throw new NotImplementedException();
     }
 
     /**
      * This method writes a given Block in the VFS and returns the address
      * of the allocated Block
      *
-     * @param i Block to store in the VFS
+     * @param block Block to store in the VFS
      * @return blockAddress
      */
-    public Integer write( Block i )
+    public Integer write( Block block )
     {
         //TODO do mitem allocater platz mache, denn ineschriebe, write passiert den entsprechend Block type
 
-        return 0;
+        throw new NotImplementedException();
     }
 
-    public void seek( Integer blockAddress )
+    public Block read( Integer blockAddress )
     {
-
+        throw new NotImplementedException();
     }
+
+    public SuperBlock getRoot( )
+    {
+        return root;
+    }
+
 }

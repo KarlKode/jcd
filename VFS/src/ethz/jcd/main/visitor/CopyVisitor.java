@@ -4,7 +4,6 @@ import ethz.jcd.main.VUtil;
 import ethz.jcd.main.blocks.*;
 
 /**
- * Created by phgamper on 3/6/14.
  * <p/>
  * This visitor copies each block which could be reached from the given VFile / VDirectory.
  * Inode as return type is used to create the Block tree according to its given VType tree.

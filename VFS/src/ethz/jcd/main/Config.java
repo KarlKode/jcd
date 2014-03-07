@@ -5,11 +5,9 @@ package ethz.jcd.main;
  */
 public class Config
 {
-    public static final String VFS_FILE_PATH = "my_fancy_disk.vfs";
-
     public static final int VFS_BLOCK_SIZE = 1024;
 
     public static final int VFS_BLOCK_COUNT = 1024;
 
-    public static final int VFS_HEADER_LEN = 64;
+    public static final int VFS_SUPER_BLOCK_SIZE = 64;
 }

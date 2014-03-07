@@ -2,15 +2,33 @@ package ethz.jcd.main.blocks;
 
 import ethz.jcd.main.Config;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class File extends Inode
 {
     protected BlockList<Block> blocks = new BlockList<Block>();
 
+    public File( )
+    {
+
+    }
+
+    public File(int blockAddress)
+    {
+        super(blockAddress);
+    }
+
+    public File(byte[] bytes)
+    {
+        super(bytes);
+    }
+
+    public File(byte[] bytes, int blockAddress)
+    {
+        super(bytes, blockAddress);
+    }
+
     public int size( )
     {
+        // TODO: store the block size in the VDisk superblock
         return blocks.size() * Config.VFS_BLOCK_SIZE;
     }
 

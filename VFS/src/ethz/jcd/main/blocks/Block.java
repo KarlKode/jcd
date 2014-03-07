@@ -2,18 +2,38 @@ package ethz.jcd.main.blocks;
 
 import ethz.jcd.main.visitor.BlockVisitor;
 
-/**
- * Created by phgamper on 3/6/14.
- */
+import java.nio.ByteBuffer;
+
 public class Block
 {
+    protected byte[] bytes;
+
+    protected ByteBuffer block;
+
     protected int address;
 
-    public Block( ){}
+    public Block( ) { }
+
 
     public Block(int blockAddress)
     {
         address = blockAddress;
+    }
+
+    public Block(byte[] bytes)
+    {
+        this.bytes = bytes;
+
+        block = ByteBuffer.wrap(bytes);
+    }
+
+    public Block(byte[] bytes, int blockAddress)
+    {
+        address = blockAddress;
+
+        this.bytes = bytes;
+
+        block = ByteBuffer.wrap(bytes);
     }
 
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
@@ -29,5 +49,10 @@ public class Block
     public void setAddress(int address)
     {
         this.address = address;
+    }
+
+    public byte[] getBytes( )
+    {
+        return bytes;
     }
 }

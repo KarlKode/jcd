@@ -2,9 +2,6 @@ package ethz.jcd.main.visitor;
 
 import ethz.jcd.main.blocks.*;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public interface BlockVisitor<R, A>
 {
     public R visit(Block block, A arg);

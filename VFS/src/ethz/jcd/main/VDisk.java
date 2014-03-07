@@ -6,16 +6,37 @@ import ethz.jcd.main.blocks.SuperBlock;
 import ethz.jcd.main.layer.VDirectory;
 import ethz.jcd.main.layer.VType;
 import ethz.jcd.main.visitor.CopyVisitor;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class VDisk
 {
-    private VUtil<LinkedList<Integer>> util = new VUtil<LinkedList<Integer>> ();
+    private VUtil util;
 
     private SuperBlock root = SuperBlock.getInstance();
+
+    /**
+     * Open an existing VDisk file that contains a valid VFS
+     * @param vDiskFile path to the VDisk file
+     */
+    public VDisk( String vDiskFile ) throws FileNotFoundException {
+        util = new VUtil(vDiskFile);
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    /**
+     * Create a new VDisk
+     * @param vDiskFile path to the VDisk file
+     * @param size total size of the VDisk
+     */
+    public VDisk( String vDiskFile, long size, long blockSize) throws FileNotFoundException {
+        util = new VUtil(vDiskFile, size, blockSize);
+        // TODO
+        throw new NotImplementedException();
+    }
 
     /**
      * This method creates either an EMPTY directory or an Empty file.
@@ -28,22 +49,23 @@ public class VDisk
      */
     public void create( VType src, VDirectory dest )
     {
-        //util.write( src.create( ) );
+        util.write( src.create( ) );
+        throw new NotImplementedException();
     }
 
     public void delete( VType file )
     {
-
+        throw new NotImplementedException();
     }
 
     public void move( VType src, VType dest )
     {
-
+        throw new NotImplementedException();
     }
 
     public void list( VDirectory file )
     {
-
+        throw new NotImplementedException();
     }
 
     /**
@@ -66,16 +88,16 @@ public class VDisk
 
     public void store( VType src, VType dest )
     {
-
+        throw new NotImplementedException();
     }
 
     public void load( VType file )
     {
-
+        throw new NotImplementedException();
     }
 
     public void stats( )
     {
-
+        throw new NotImplementedException();
     }
 }

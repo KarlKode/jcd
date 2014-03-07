@@ -5,9 +5,6 @@ import ethz.jcd.main.visitor.VTypeVisitor;
 
 import java.util.LinkedList;
 
-/**
- * Created by phgamper on 3/6/14.
- */
 public class VDirectory extends VType
 {
     protected LinkedList<VType> content = new LinkedList<VType>();
