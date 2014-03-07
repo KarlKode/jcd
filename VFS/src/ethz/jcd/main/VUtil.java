@@ -1,8 +1,6 @@
 package ethz.jcd.main;
 
-import ethz.jcd.main.allocator.Allocator;
 import ethz.jcd.main.blocks.Block;
-import ethz.jcd.main.blocks.Inode;
 import ethz.jcd.main.exceptions.InvalidBlockSize;
 import ethz.jcd.main.exceptions.InvalidSize;
 import ethz.jcd.main.exceptions.VDiskCreationException;
@@ -12,7 +10,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.List;
 
 public class VUtil
 {
