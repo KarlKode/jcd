@@ -3,79 +3,49 @@ package ethz.jcd.main;
 import ethz.jcd.main.allocator.Allocator;
 import ethz.jcd.main.blocks.Block;
 import ethz.jcd.main.blocks.Inode;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.util.List;
 
-/**
- * Created by phgamper on 3/6/14.
- */
-public class VUtil<T extends List<Integer>>
+public class VUtil
 {
     private RandomAccessFile raf;
-
-    private File vdisk;
-
-    private Allocator<T> allocator;
     private String vDiskFile;
 
-    public VUtil( String vDiskFile )
-    {
+    public VUtil( String vDiskFile ) throws FileNotFoundException {
         this.vDiskFile = vDiskFile;
-        vdisk = new File(this.vDiskFile);
+        File fp = new File(this.vDiskFile);
 
-        try
-        {
-            raf = new RandomAccessFile(vdisk, "rwd");
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        raf = new RandomAccessFile(fp, "rwd");
 
-        allocator = new Allocator<T>( this.loadFreeList() );
+        throw new NotImplementedException();
     }
 
-    public VUtil( String vDiskFile, long size, long blockSize )
-    {
+    public VUtil( String vDiskFile, long size, long blockSize ) throws FileNotFoundException {
         // TODO Create VDisk file
 
         this(vDiskFile);
-    }
-
-    public T loadFreeList( )
-    {
-        return null;
-    }
-
-    public void storeFreeList( T list )
-    {
-
-    }
-
-    public Inode read( Integer blockAddress )
-    {
-        return null;
     }
 
     /**
      * This method writes a given Block in the VFS and returns the address
      * of the allocated Block
      *
-     * @param i Block to store in the VFS
+     * @param block Block to store in the VFS
      * @return blockAddress
      */
-    public Integer write( Block i )
+    public Integer write( Block block )
     {
         //TODO do mitem allocater platz mache, denn ineschriebe, write passiert den entsprechend Block type
 
-        return 0;
+        throw new NotImplementedException();
     }
 
-    public void seek( Integer blockAddress )
+    public Block read( Integer blockAddress )
     {
-
+        throw new NotImplementedException();
     }
 }
