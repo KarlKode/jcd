@@ -3,7 +3,13 @@ package ethz.jcd.main;
 import ethz.jcd.main.blocks.Directory;
 import ethz.jcd.main.blocks.Inode;
 import ethz.jcd.main.blocks.SuperBlock;
+<<<<<<< HEAD
 import ethz.jcd.main.layer.VDirectory;
+=======
+import ethz.jcd.main.exceptions.InvalidBlockSize;
+import ethz.jcd.main.exceptions.InvalidSize;
+import ethz.jcd.main.exceptions.VDiskCreationException;
+>>>>>>> 6a0ce169231ecbd989bb646903ce38863ac383e1
 import ethz.jcd.main.layer.VType;
 import ethz.jcd.main.visitor.CopyVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -32,7 +38,7 @@ public class VDisk
      * @param vDiskFile path to the VDisk file
      * @param size total size of the VDisk
      */
-    public VDisk( String vDiskFile, long size, long blockSize) throws FileNotFoundException {
+    public VDisk( String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSize, InvalidSize {
         util = new VUtil(vDiskFile, size, blockSize);
         // TODO
         throw new NotImplementedException();
