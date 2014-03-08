@@ -1,6 +1,6 @@
 package ethz.jcd.main.layer;
 
-import ethz.jcd.main.blocks.Inode;
+import ethz.jcd.main.blocks.InodeBlock;
 import ethz.jcd.main.visitor.VTypeVisitor;
 
 public class VFile extends VType
@@ -15,7 +15,7 @@ public class VFile extends VType
         return visitor.file(this, arg);
     }
 
-    public Inode create()
+    public InodeBlock create()
     {
         return null;
     }

@@ -2,26 +2,26 @@ package ethz.jcd.main.blocks;
 
 import ethz.jcd.main.Config;
 
-public class File extends Inode
+public class FileBlock extends InodeBlock
 {
     protected BlockList<Block> blocks = new BlockList<Block>();
 
-    public File(Block b)
+    public FileBlock(Block b)
     {
         this.address = b.address;
     }
 
-    public File(int blockAddress)
+    public FileBlock(int blockAddress)
     {
         super(blockAddress);
     }
 
-    public File(byte[] bytes)
+    public FileBlock(byte[] bytes)
     {
         super(bytes);
     }
 
-    public File(byte[] bytes, int blockAddress)
+    public FileBlock(byte[] bytes, int blockAddress)
     {
         super(bytes, blockAddress);
     }

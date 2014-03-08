@@ -1,8 +1,7 @@
 package ethz.jcd.main;
 
-import ethz.jcd.main.blocks.Directory;
-import ethz.jcd.main.blocks.Inode;
-import ethz.jcd.main.blocks.SuperBlock;
+import ethz.jcd.main.blocks.DirectoryBlock;
+import ethz.jcd.main.blocks.InodeBlock;
 import ethz.jcd.main.exceptions.InvalidBlockSize;
 import ethz.jcd.main.exceptions.InvalidSize;
 import ethz.jcd.main.exceptions.VDiskCreationException;
@@ -49,7 +48,7 @@ public class VDisk
      *
      * @param src  - either a VDirectory or a VFile
      * @param dest - destination
-     * @return - create Inode in the VFS
+     * @return - create InodeBlock in the VFS
      */
     public void create(VType src, VDirectory dest)
     {
@@ -83,9 +82,9 @@ public class VDisk
     {
         CopyVisitor cv = new CopyVisitor();
 
-        Inode i = (Inode) cv.visit(src.getInode(), util);
+        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), util);
 
-        Directory dir = (Directory) dest.getInode();
+        DirectoryBlock dir = (DirectoryBlock) dest.getInode();
         //dir.add(i);
         util.write(dir);
     }

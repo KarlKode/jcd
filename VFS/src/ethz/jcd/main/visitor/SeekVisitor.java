@@ -24,13 +24,13 @@ public class SeekVisitor implements BlockVisitor<Block, VUtil>
     }
 
     @Override
-    public Block directory(Directory block, VUtil arg)
+    public Block directory(DirectoryBlock block, VUtil arg)
     {
         return null;
     }
 
     @Override
-    public Block file(File block, VUtil arg)
+    public Block file(FileBlock block, VUtil arg)
     {
         return null;
     }

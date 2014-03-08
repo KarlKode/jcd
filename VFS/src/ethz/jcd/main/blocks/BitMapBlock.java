@@ -6,7 +6,8 @@ public class BitMapBlock extends Block
 {
     private BitSet bitMap;
 
-    public BitMapBlock(int blockAddress, byte[] bytes) {
+    public BitMapBlock(int blockAddress, byte[] bytes)
+    {
         super(blockAddress, bytes);
         bitMap = BitSet.valueOf(block);
     }
@@ -16,7 +17,8 @@ public class BitMapBlock extends Block
         return bitMap.nextClearBit(0);
     }
 
-    public void setUsed(int blockAddress) {
+    public void setUsed(int blockAddress)
+    {
         bitMap.set(blockAddress);
         bytes = bitMap.toByteArray();
     }

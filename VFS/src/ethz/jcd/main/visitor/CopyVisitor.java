@@ -6,7 +6,7 @@ import ethz.jcd.main.blocks.*;
 /**
  * <p/>
  * This visitor copies each block which could be reached from the given VFile / VDirectory.
- * Inode as return type is used to create the Block tree according to its given VType tree.
+ * InodeBlock as return type is used to create the Block tree according to its given VType tree.
  */
 public class CopyVisitor implements BlockVisitor<Block, VUtil>
 {
@@ -38,11 +38,11 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
     }
 
     @Override
-    public Block directory(Directory block, VUtil arg)
+    public Block directory(DirectoryBlock block, VUtil arg)
     {
-        Directory dir = new Directory();
+        DirectoryBlock dir = new DirectoryBlock();
 
-        BlockList<Inode> bl = (BlockList<Inode>) visit(block.getContent(), arg);
+        BlockList<InodeBlock> bl = (BlockList<InodeBlock>) visit(block.getContent(), arg);
 
         dir.setContent(bl);
 
@@ -52,17 +52,17 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
     }
 
     @Override
-    public Block file(File block, VUtil arg)
+    public Block file(FileBlock block, VUtil arg)
     {
-        File file = new File();
+        FileBlock fileBlock = new FileBlock();
 
         BlockList<Block> bl = (BlockList<Block>) visit(block.getBlocks(), arg);
 
-        file.setBlocks(bl);
+        fileBlock.setBlocks(bl);
 
-        file.setAddress(arg.write(file));
+        fileBlock.setAddress(arg.write(fileBlock));
 
-        return file;
+        return fileBlock;
     }
 
     @Override

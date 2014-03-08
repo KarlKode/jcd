@@ -2,7 +2,6 @@ package ethz.jcd.main;
 
 import ethz.jcd.main.blocks.BitMapBlock;
 import ethz.jcd.main.blocks.Block;
-import ethz.jcd.main.blocks.Directory;
 import ethz.jcd.main.blocks.SuperBlock;
 import ethz.jcd.main.exceptions.InvalidBlockSize;
 import ethz.jcd.main.exceptions.InvalidSize;
@@ -21,10 +20,10 @@ public class VUtil
     private SuperBlock superBlock;
     private BitMapBlock bitMapBlock;
 
-    public VUtil( String vDiskFile ) throws FileNotFoundException
+    public VUtil(String vDiskFile) throws FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
-        raf = new RandomAccessFile(vDiskFile, "rwd");
+        raf = new RandomAccessFile(this.vDiskFile, "rwd");
         init();
     }
 

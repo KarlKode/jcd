@@ -1,17 +1,17 @@
 package ethz.jcd.main.layer;
 
-import ethz.jcd.main.blocks.Inode;
+import ethz.jcd.main.blocks.InodeBlock;
 import ethz.jcd.main.visitor.VTypeVisitor;
 
 public abstract class VType
 {
     protected String name;
 
-    protected Inode inode;
+    protected InodeBlock inode;
 
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
-    public abstract Inode create();
+    public abstract InodeBlock create();
 
     public String getName()
     {
@@ -23,13 +23,13 @@ public abstract class VType
         this.name = name;
     }
 
-    public Inode getInode()
+    public InodeBlock getInode()
     {
         return inode;
     }
 
-    public void setInode(Inode inode)
+    public void setInode(InodeBlock inodeBlock)
     {
-        this.inode = inode;
+        this.inode = inodeBlock;
     }
 }

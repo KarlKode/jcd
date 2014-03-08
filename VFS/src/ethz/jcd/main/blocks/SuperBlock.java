@@ -2,7 +2,7 @@ package ethz.jcd.main.blocks;
 
 import ethz.jcd.main.Config;
 
-public class SuperBlock extends Directory
+public class SuperBlock extends DirectoryBlock
 {
     public static final int SUPER_BLOCK_SIZE = 64;
     public static int SUPER_BLOCK_ADDRESS = 0;
