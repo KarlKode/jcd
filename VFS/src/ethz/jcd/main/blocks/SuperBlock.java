@@ -6,38 +6,16 @@ public class SuperBlock extends Directory
 {
     public static final int SUPER_BLOCK_SIZE = 64;
     public static int SUPER_BLOCK_ADDRESS = 0;
-    private static SuperBlock instance;
 
     private int blockSize;
-
     private int blockCount;
-
-    public static SuperBlock getInstance(byte[] bytes)
-    {
-        if (instance == null)
-        {
-            instance = new SuperBlock(bytes);
-        }
-
-        return instance;
-    }
-
-    public static SuperBlock getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new SuperBlock();
-        }
-
-        return instance;
-    }
 
     private SuperBlock()
     {
         address = SUPER_BLOCK_ADDRESS;
     }
 
-    private SuperBlock(byte[] bytes)
+    public SuperBlock(byte[] bytes)
     {
         super(bytes);
 

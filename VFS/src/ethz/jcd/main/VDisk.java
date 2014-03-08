@@ -17,8 +17,6 @@ public class VDisk
 {
     private VUtil util;
 
-    private SuperBlock root = SuperBlock.getInstance();
-
     /**
      * Open an existing VDisk file that contains a valid VFS
      *

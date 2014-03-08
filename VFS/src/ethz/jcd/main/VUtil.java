@@ -81,7 +81,7 @@ public class VUtil
             e.printStackTrace();
         }
 
-        return SuperBlock.getInstance(bytes);
+        return new SuperBlock(bytes);
     }
 
     public Stack<Block> loadFreeList()
@@ -129,5 +129,10 @@ public class VUtil
     public Block read(Integer blockAddress)
     {
         throw new NotImplementedException();
+    }
+
+    public SuperBlock getSuperBlock()
+    {
+        return superBlock;
     }
 }
