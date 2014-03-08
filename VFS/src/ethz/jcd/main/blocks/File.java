@@ -6,9 +6,9 @@ public class File extends Inode
 {
     protected BlockList<Block> blocks = new BlockList<Block>();
 
-    public File( )
+    public File( Block b )
     {
-
+        this.address = b.address;
     }
 
     public File(int blockAddress)

@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
+import java.util.Stack;
 
 public class VUtil
 {
@@ -19,18 +20,18 @@ public class VUtil
 
     private final SuperBlock root;
 
-    private final Allocator<LinkedList<Integer>> allocator;
+    private final Allocator<Stack<Block>> allocator;
 
     public VUtil( String vDiskFile ) throws FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
         File fp = new File(this.vDiskFile);
 
-        raf = new RandomAccessFile(fp, "rwd");
+        raf = new RandomAccessFile(fp, "rw");
 
         root = loadSuperBlock();
 
-        allocator = new Allocator<LinkedList<Integer>>(this.loadFreeList());
+        allocator = new Allocator<Stack<Block>>(this.loadFreeList());
     }
 
     public VUtil( String vDiskFile, long size, long blockSize ) throws FileNotFoundException {
@@ -55,8 +56,12 @@ public class VUtil
         return SuperBlock.getInstance(bytes);
     }
 
-    public LinkedList<Integer> loadFreeList( )
+    public Stack<Block> loadFreeList( )
     {
+        Stack<Block> freeList = new Stack<Block>();
+
+        read(root.startOfFreeList());
+
         byte[] flags = new byte[Config.VFS_BLOCK_SIZE];
 
         try

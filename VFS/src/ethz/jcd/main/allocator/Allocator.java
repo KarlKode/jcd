@@ -1,12 +1,10 @@
 package ethz.jcd.main.allocator;
 
 import ethz.jcd.main.blocks.Block;
-import ethz.jcd.main.blocks.Inode;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Stack;
 
-public class Allocator<T extends List<Integer>>
+public class Allocator<T extends Stack<Block>>
 {
     private T freeList;
 
@@ -17,12 +15,12 @@ public class Allocator<T extends List<Integer>>
 
     public Block allocate( )
     {
-        return null;
+        return freeList.pop();
     }
 
     public void free( Block block )
     {
-        // TODO entsprechend block typ halt s züügs freigeh ;-)
+        freeList.push(block);
     }
 
     public boolean isFree( Block block )
