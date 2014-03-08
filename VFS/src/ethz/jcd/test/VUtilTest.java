@@ -3,17 +3,18 @@ package ethz.jcd.test;
 import ethz.jcd.main.Config;
 import ethz.jcd.main.VUtil;
 import ethz.jcd.main.blocks.SuperBlock;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class VUtilTest
 {
 
     @BeforeClass
-    public static void setUp( )
+    public static void setUp()
     {
     }
 
@@ -24,8 +25,8 @@ public class VUtilTest
 
         int blockCount = 512;
         int blockSize = 1024;
-        int freeListSize = (int) Math.ceil(blockCount/(blockSize * 8))*blockSize;
-        int disksize = Config.VFS_SUPER_BLOCK_SIZE + freeListSize  + blockCount * blockSize;
+        int freeListSize = (int) Math.ceil(blockCount / (blockSize * 8)) * blockSize;
+        int disksize = Config.VFS_SUPER_BLOCK_SIZE + freeListSize + blockCount * blockSize;
 
         SuperBlock root = vutil.getRoot();
 
@@ -42,13 +43,13 @@ public class VUtilTest
         //assertEquals(freelist, vutil.);
 
         //assertEquals(disksize, vutil.);
-     }
+    }
 
-	@Test
-	public void readTest()
+    @Test
+    public void readTest()
     {
 
-	}
+    }
 
     @Test
     public void writeTest()

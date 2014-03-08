@@ -12,7 +12,9 @@ public class Block
 
     protected int address;
 
-    public Block( ) { }
+    public Block()
+    {
+    }
 
 
     public Block(int blockAddress)
@@ -51,7 +53,7 @@ public class Block
         this.address = address;
     }
 
-    public byte[] getBytes( )
+    public byte[] getBytes()
     {
         return bytes;
     }

@@ -11,7 +11,7 @@ public abstract class VType
 
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
-    public abstract Inode create( );
+    public abstract Inode create();
 
     public String getName()
     {

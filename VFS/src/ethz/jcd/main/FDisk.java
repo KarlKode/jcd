@@ -15,8 +15,8 @@ public class FDisk
         try
         {
             RandomAccessFile raf = new RandomAccessFile(vDiskFile, "rw");
-            int freeListSize = (int) Math.ceil(blockCount/(blockSize * 8))*blockSize;
-            int disksize = Config.VFS_SUPER_BLOCK_SIZE + freeListSize  + blockCount * blockSize;
+            int freeListSize = (int) Math.ceil(blockCount / (blockSize * 8)) * blockSize;
+            int disksize = Config.VFS_SUPER_BLOCK_SIZE + freeListSize + blockCount * blockSize;
             raf.setLength(disksize);
 
             /**
@@ -34,18 +34,16 @@ public class FDisk
              */
             bytes = new byte[freeListSize];
             raf.write(bytes); //, Config.VFS_SUPER_BLOCK_SIZE, Config.VFS_SUPER_BLOCK_SIZE + freeListSize);
-        }
-        catch (FileNotFoundException e)
+        } catch (FileNotFoundException e)
         {
             e.printStackTrace();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args )
+    public static void main(String[] args)
     {
         FDisk.fdisk("/tmp/initTest.vdisk", 1024, 512);
 

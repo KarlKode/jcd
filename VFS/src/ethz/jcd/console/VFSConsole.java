@@ -5,8 +5,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.File;
 import java.util.Arrays;
 
-public class VFSConsole {
-    public static void main( String[] args )
+public class VFSConsole
+{
+    public static void main(String[] args)
     {
         quitWithUsageIfLessThan(args, 2);
 

@@ -1,4 +1,5 @@
 package ethz.jcd.main.exceptions;
 
-public class InvalidSize extends Exception {
+public class InvalidSize extends Exception
+{
 }

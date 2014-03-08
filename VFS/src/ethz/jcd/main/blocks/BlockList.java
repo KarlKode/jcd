@@ -11,12 +11,12 @@ public class BlockList<T extends Block> extends Block
         blocks.add(t);
     }
 
-    public int size( )
+    public int size()
     {
         return blocks.size();
     }
 
-    public LinkedList<T> list( )
+    public LinkedList<T> list()
     {
         return blocks;
     }

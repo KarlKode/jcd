@@ -15,7 +15,7 @@ public class VFile extends VType
         return visitor.file(this, arg);
     }
 
-    public Inode create( )
+    public Inode create()
     {
         return null;
     }

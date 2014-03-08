@@ -14,7 +14,7 @@ public class SuperBlock extends Directory
 
     public static SuperBlock getInstance(byte[] bytes)
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new SuperBlock(bytes);
         }
@@ -22,9 +22,9 @@ public class SuperBlock extends Directory
         return instance;
     }
 
-    public static SuperBlock getInstance( )
+    public static SuperBlock getInstance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new SuperBlock();
         }
@@ -32,7 +32,7 @@ public class SuperBlock extends Directory
         return instance;
     }
 
-    private SuperBlock( )
+    private SuperBlock()
     {
         address = SUPER_BLOCK_ADDRESS;
     }
@@ -54,7 +54,7 @@ public class SuperBlock extends Directory
      *
      * @return size of Block in bytes
      */
-    public int getBlockSize( )
+    public int getBlockSize()
     {
         return blockSize;
     }
@@ -65,7 +65,7 @@ public class SuperBlock extends Directory
      *
      * @return number of allocated Blocks
      */
-    public int getBlockCount( )
+    public int getBlockCount()
     {
         return blockCount;
     }
@@ -75,7 +75,7 @@ public class SuperBlock extends Directory
      *
      * @return byte offset of the freelists start point
      */
-    public int startOfFreeList( )
+    public int startOfFreeList()
     {
         return Config.VFS_SUPER_BLOCK_SIZE;
     }
@@ -83,22 +83,22 @@ public class SuperBlock extends Directory
     /**
      * This method returns the byte offset after the super block and
      * the freelist where the first block starts.
-     *
+     * <p/>
      * eg. VFS_SUPER_BLOCk_SIZE = 1024 bytes,  blockCount = 1024, blocksize = 512
-     *
-     *      => 1024 bits = 128 bytes for freelist needed
-     *
-     *      since the freelist is stored in blocks,
-     *
-     *      => ceil(128 bytes / blockSize) = blocksneeded = 1
-     *
-     *      => offset = superblock + blocksneeded * blockSize = 1516 bytes
+     * <p/>
+     * => 1024 bits = 128 bytes for freelist needed
+     * <p/>
+     * since the freelist is stored in blocks,
+     * <p/>
+     * => ceil(128 bytes / blockSize) = blocksneeded = 1
+     * <p/>
+     * => offset = superblock + blocksneeded * blockSize = 1516 bytes
      *
      * @return byte offset of the blocks start point
      */
-    public int startOfBlocks( )
+    public int startOfBlocks()
     {
         // TODO ev long oder double oder irgend was (possible int overflow)
-        return Config.VFS_SUPER_BLOCK_SIZE + (int) Math.ceil(blockCount/(blockSize * 8))*blockSize;
+        return Config.VFS_SUPER_BLOCK_SIZE + (int) Math.ceil(blockCount / (blockSize * 8)) * blockSize;
     }
 }

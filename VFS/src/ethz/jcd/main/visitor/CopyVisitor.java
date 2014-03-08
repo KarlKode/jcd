@@ -27,7 +27,7 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
     {
         BlockList<Block> bl = new BlockList<Block>();
 
-        for(Block b : block.list())
+        for (Block b : block.list())
         {
             bl.add(visit(b, arg));
         }

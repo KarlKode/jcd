@@ -14,7 +14,7 @@ public class VDirectory extends VType
         content.add(type);
     }
 
-    public LinkedList<VType> list( )
+    public LinkedList<VType> list()
     {
         return content;
     }

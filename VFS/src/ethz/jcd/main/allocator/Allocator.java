@@ -13,17 +13,17 @@ public class Allocator<T extends Stack<Block>>
         freeList = init;
     }
 
-    public Block allocate( )
+    public Block allocate()
     {
         return freeList.pop();
     }
 
-    public void free( Block block )
+    public void free(Block block)
     {
         freeList.push(block);
     }
 
-    public boolean isFree( Block block )
+    public boolean isFree(Block block)
     {
         return freeList.contains(block.getAddress());
     }

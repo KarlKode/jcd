@@ -2,7 +2,9 @@ package ethz.jcd.main.blocks;
 
 public abstract class Inode extends Block
 {
-    public Inode(){ }
+    public Inode()
+    {
+    }
 
     public Inode(int blockAddress)
     {
