@@ -4,8 +4,8 @@ import ethz.jcd.main.Config;
 
 public class SuperBlock extends Directory
 {
+    public static final int SUPER_BLOCK_SIZE = 64;
     public static int SUPER_BLOCK_ADDRESS = 0;
-
     private static SuperBlock instance;
 
     private int blockSize;

@@ -17,17 +17,16 @@ import java.util.Stack;
 
 public class VUtil
 {
-    private RandomAccessFile raf;
     private final String vDiskFile;
-    private final SuperBlock root;
-    private final Allocator<Stack<Block>> allocator;
+    private RandomAccessFile raf;
+    private Allocator<Stack<Block>> allocator;
+    private SuperBlock superBlock;
 
     public VUtil( String vDiskFile ) throws FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
         raf = new RandomAccessFile(vDiskFile, "rwd");
-
-        root = loadSuperBlock();
+        init();
 
         allocator = new Allocator<Stack<Block>>(this.loadFreeList());
     }
@@ -59,13 +58,21 @@ public class VUtil
             throw new VDiskCreationException();
         }
 
+        init();
+
         throw new NotImplementedException();
+    }
+
+    private void init()
+    {
+        superBlock = loadSuperBlock();
+        allocator = new Allocator<>(loadFreeList());
     }
 
     private SuperBlock loadSuperBlock()
     {
-        byte[] bytes = new byte[Config.VFS_SUPER_BLOCK_SIZE];
-
+        // Read the whole super block
+        byte[] bytes = new byte[SuperBlock.SUPER_BLOCK_SIZE];
         try
         {
             raf.read(bytes);
@@ -81,7 +88,7 @@ public class VUtil
     {
         Stack<Block> freeList = new Stack<Block>();
 
-        read(root.startOfFreeList());
+        read(superBlock.startOfFreeList());
 
         byte[] flags = new byte[Config.VFS_BLOCK_SIZE];
 
@@ -123,10 +130,4 @@ public class VUtil
     {
         throw new NotImplementedException();
     }
-
-    public SuperBlock getRoot()
-    {
-        return root;
-    }
-
 }
