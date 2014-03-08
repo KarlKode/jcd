@@ -19,7 +19,8 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
     @Override
     public Block block(Block block, VUtil arg)
     {
-        return new Block(arg.write(block));
+        arg.write(block);
+        return new Block(block.getAddress());
     }
 
     @Override
@@ -32,7 +33,7 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
             bl.add(visit(b, arg));
         }
 
-        bl.setAddress(arg.write(bl));
+        arg.write(bl);
 
         return bl;
     }
@@ -46,7 +47,7 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
 
         dir.setContent(bl);
 
-        dir.setAddress(arg.write(dir));
+        arg.write(dir);
 
         return dir;
     }
@@ -54,13 +55,13 @@ public class CopyVisitor implements BlockVisitor<Block, VUtil>
     @Override
     public Block file(FileBlock block, VUtil arg)
     {
-        FileBlock fileBlock = new FileBlock();
+        FileBlock fileBlock = new FileBlock(0);
 
         BlockList<Block> bl = (BlockList<Block>) visit(block.getBlocks(), arg);
 
         fileBlock.setBlocks(bl);
 
-        fileBlock.setAddress(arg.write(fileBlock));
+        arg.write(fileBlock);
 
         return fileBlock;
     }

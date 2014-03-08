@@ -7,15 +7,12 @@ import java.nio.ByteBuffer;
 public class Block
 {
     protected byte[] bytes;
-
     protected ByteBuffer block;
-
     protected int address;
 
     public Block()
     {
     }
-
 
     public Block(int blockAddress)
     {

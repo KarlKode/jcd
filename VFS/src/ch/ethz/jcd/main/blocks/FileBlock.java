@@ -23,7 +23,7 @@ public class FileBlock extends InodeBlock
 
     public FileBlock(byte[] bytes, int blockAddress)
     {
-        super(bytes, blockAddress);
+        super(blockAddress, bytes);
     }
 
     public int size()
