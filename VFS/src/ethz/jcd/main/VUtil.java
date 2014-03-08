@@ -1,7 +1,8 @@
 package ethz.jcd.main;
 
-import ethz.jcd.main.allocator.Allocator;
+import ethz.jcd.main.blocks.BitMapBlock;
 import ethz.jcd.main.blocks.Block;
+import ethz.jcd.main.blocks.Directory;
 import ethz.jcd.main.blocks.SuperBlock;
 import ethz.jcd.main.exceptions.InvalidBlockSize;
 import ethz.jcd.main.exceptions.InvalidSize;
@@ -12,23 +13,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.LinkedList;
-import java.util.Stack;
 
 public class VUtil
 {
     private final String vDiskFile;
     private RandomAccessFile raf;
-    private Allocator<Stack<Block>> allocator;
     private SuperBlock superBlock;
+    private BitMapBlock bitMapBlock;
 
     public VUtil( String vDiskFile ) throws FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
         raf = new RandomAccessFile(vDiskFile, "rwd");
         init();
-
-        allocator = new Allocator<Stack<Block>>(this.loadFreeList());
     }
 
     public VUtil(String vDiskFile, long size, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException
@@ -46,6 +43,7 @@ public class VUtil
             throw new InvalidBlockSize();
         }
 
+        // Create the VDisk file
         File fp = new File(this.vDiskFile);
         try
         {
@@ -58,6 +56,23 @@ public class VUtil
             throw new VDiskCreationException();
         }
 
+        // Create the superblock of the VDisk
+        SuperBlock newSuperBlock = new SuperBlock(new byte[blockSize]);
+        newSuperBlock.setBlockSize(blockSize);
+        newSuperBlock.setBlockCount((int) (size / blockSize));
+        write(newSuperBlock);
+
+        // Create the bit map of the VDisk
+        BitMapBlock newBitMapBlock = new BitMapBlock(newSuperBlock.getFirstBitMapBlock(), new byte[superBlock.getBlockSize()]);
+
+        // Set the superblock and the bitmap block as used
+        newBitMapBlock.setUsed(0);
+        newBitMapBlock.setUsed(1);
+        write(newBitMapBlock);
+
+        // Create the root directory block
+        // TODO
+
         init();
 
         throw new NotImplementedException();
@@ -66,7 +81,7 @@ public class VUtil
     private void init()
     {
         superBlock = loadSuperBlock();
-        allocator = new Allocator<>(loadFreeList());
+        bitMapBlock = loadBitMapBlock();
     }
 
     private SuperBlock loadSuperBlock()
@@ -84,32 +99,35 @@ public class VUtil
         return new SuperBlock(bytes);
     }
 
-    public Stack<Block> loadFreeList()
+    private BitMapBlock loadBitMapBlock()
     {
-        Stack<Block> freeList = new Stack<Block>();
-
-        read(superBlock.startOfFreeList());
-
-        byte[] flags = new byte[Config.VFS_BLOCK_SIZE];
-
-        try
-        {
-            raf.read(flags);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        for (int i = 0; i < Config.VFS_BLOCK_COUNT; i++)
-        {
-
-        }
-        return null;
+        int bitMapBlockAddress = superBlock.getFirstBitMapBlock();
+        return new BitMapBlock(bitMapBlockAddress, read(bitMapBlockAddress).getBytes());
     }
 
-    public void storeFreeList(LinkedList<Integer> list)
+    private Block allocateBlock()
     {
-        throw new NotImplementedException();
+        // Get the next free block and set it to used
+        int freeBlockAddress = bitMapBlock.getNextFreeBlockAddress();
+        bitMapBlock.setUsed(freeBlockAddress);
+
+        // Sync
+        write(bitMapBlock);
+
+        return new Block(freeBlockAddress);
+    }
+
+    private void freeBlock(Block block)
+    {
+        bitMapBlock.setFree(block.getAddress());
+
+        // Sync
+        write(bitMapBlock);
+    }
+
+    private long getBlockOffset(int blockAddress)
+    {
+        return ((long) blockAddress) * ((long) superBlock.getBlockSize());
     }
 
     /**
@@ -117,18 +135,34 @@ public class VUtil
      * of the allocated Block
      *
      * @param block Block to store in the VFS
-     * @return blockAddress
      */
-    public Integer write(Block block)
+    public void write(Block block)
     {
-        //TODO do mitem allocater platz mache, denn ineschriebe, write passiert den entsprechend Block type
-
-        throw new NotImplementedException();
+        try
+        {
+            raf.seek(getBlockOffset(block.getAddress()));
+            raf.write(block.getBytes());
+        } catch (IOException e)
+        {
+            // TODO exception handling
+            e.printStackTrace();
+        }
     }
 
-    public Block read(Integer blockAddress)
+    public Block read(int blockAddress)
     {
-        throw new NotImplementedException();
+        byte[] blockBytes = new byte[superBlock.getBlockSize()];
+        try
+        {
+            raf.seek(getBlockOffset(blockAddress));
+            raf.read(blockBytes);
+        } catch (IOException e)
+        {
+            // TODO exception handling
+            e.printStackTrace();
+        }
+
+        return new Block(blockAddress, blockBytes);
     }
 
     public SuperBlock getSuperBlock()

@@ -9,21 +9,22 @@ public class SuperBlock extends Directory
 
     private int blockSize;
     private int blockCount;
-
-    private SuperBlock()
-    {
-        address = SUPER_BLOCK_ADDRESS;
-    }
+    private int rootDirectoryBlock;
 
     public SuperBlock(byte[] bytes)
     {
         super(bytes);
 
-        blockSize = block.getInt(0);
-
-        blockCount = block.getInt(4);
-
         address = SUPER_BLOCK_ADDRESS;
+        blockSize = block.getInt(0);
+        blockCount = block.getInt(4);
+        rootDirectoryBlock = block.getInt(8);
+    }
+
+    public void setBlockSize(int blockSize)
+    {
+        this.blockSize = blockSize;
+        block.putInt(0, this.blockSize);
     }
 
     /**
@@ -37,6 +38,12 @@ public class SuperBlock extends Directory
         return blockSize;
     }
 
+    public void setBlockCount(int blockCount)
+    {
+        this.blockCount = blockCount;
+        block.putInt(4, this.blockSize);
+    }
+
     /**
      * This method reads the SuperBlock buffer to determine the number of Blocks
      * allocated in the VFS
@@ -48,14 +55,25 @@ public class SuperBlock extends Directory
         return blockCount;
     }
 
-    /**
-     * This method returns the byte offset where the freelist starts
-     *
-     * @return byte offset of the freelists start point
-     */
-    public int startOfFreeList()
+    public int getRootDirectoryBlock()
     {
-        return Config.VFS_SUPER_BLOCK_SIZE;
+        return rootDirectoryBlock;
+    }
+
+    public int getFirstBitMapBlock()
+    {
+        return 1;
+    }
+
+    public int getLastBitMapBlock()
+    {
+        // TODO: Calculate the real size of the bit map
+        return 1;
+    }
+
+    public int getFirstDataBlock()
+    {
+        return 2;
     }
 
     /**

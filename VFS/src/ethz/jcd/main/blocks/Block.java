@@ -29,7 +29,7 @@ public class Block
         block = ByteBuffer.wrap(bytes);
     }
 
-    public Block(byte[] bytes, int blockAddress)
+    public Block(int blockAddress, byte[] bytes)
     {
         address = blockAddress;
 

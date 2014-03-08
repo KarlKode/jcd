@@ -28,7 +28,7 @@ public class VUtilTest
         int freeListSize = (int) Math.ceil(blockCount / (blockSize * 8)) * blockSize;
         int disksize = Config.VFS_SUPER_BLOCK_SIZE + freeListSize + blockCount * blockSize;
 
-        SuperBlock root = vutil.getRoot();
+        SuperBlock root = vutil.getSuperBlock();
 
         assertEquals(blockSize, root.getBlockSize());
 

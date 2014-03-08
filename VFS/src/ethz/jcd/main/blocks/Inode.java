@@ -16,8 +16,8 @@ public abstract class Inode extends Block
         super(bytes);
     }
 
-    public Inode(byte[] bytes, int blockAddress)
+    public Inode(int blockAddress, byte[] bytes)
     {
-        super(bytes, blockAddress);
+        super(blockAddress, bytes);
     }
 }

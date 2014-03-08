@@ -18,9 +18,9 @@ public class Directory extends Inode
         super(bytes);
     }
 
-    public Directory(byte[] bytes, int blockAddress)
+    public Directory(int blockAddress, byte[] bytes)
     {
-        super(bytes, blockAddress);
+        super(blockAddress, bytes);
     }
 
     public BlockList<Inode> getContent()
