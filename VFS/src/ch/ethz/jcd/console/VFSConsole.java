@@ -134,6 +134,7 @@ public class VFSConsole
         quitWithUsageIfLessThan(arguments);
 
         String command = arguments[0];
+
         switch (command)
         {
             case "help":

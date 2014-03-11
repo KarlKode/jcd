@@ -1,10 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.Config;
-
 public class SuperBlock extends DirectoryBlock
 {
-    public static final int SUPER_BLOCK_SIZE = 64;
+    public static final int MIN_SUPER_BLOCK_SIZE = 16;
     public static int SUPER_BLOCK_ADDRESS = 0;
 
     private int blockSize;
@@ -74,27 +72,5 @@ public class SuperBlock extends DirectoryBlock
     public int getFirstDataBlock()
     {
         return 2;
-    }
-
-    /**
-     * This method returns the byte offset after the super block and
-     * the freelist where the first block starts.
-     * <p/>
-     * eg. VFS_SUPER_BLOCk_SIZE = 1024 bytes,  blockCount = 1024, blocksize = 512
-     * <p/>
-     * => 1024 bits = 128 bytes for freelist needed
-     * <p/>
-     * since the freelist is stored in blocks,
-     * <p/>
-     * => ceil(128 bytes / blockSize) = blocksneeded = 1
-     * <p/>
-     * => offset = superblock + blocksneeded * blockSize = 1516 bytes
-     *
-     * @return byte offset of the blocks start point
-     */
-    public int startOfBlocks()
-    {
-        // TODO ev long oder double oder irgend was (possible int overflow)
-        return Config.VFS_SUPER_BLOCK_SIZE + (int) Math.ceil(blockCount / (blockSize * 8)) * blockSize;
     }
 }

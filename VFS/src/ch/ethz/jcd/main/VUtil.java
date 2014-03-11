@@ -27,10 +27,9 @@ public class VUtil
         init();
     }
 
-    public VUtil(String vDiskFile, long size, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException
+    public VUtil(String vDiskFile, long size, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
-
         // Check size and blockSize for validity
         if (size <= 0 || size % blockSize != 0)
         {
@@ -50,15 +49,19 @@ public class VUtil
             {
                 throw new VDiskCreationException();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new VDiskCreationException();
         }
+
+        raf = new RandomAccessFile(this.vDiskFile, "rwd");
 
         // Create the superblock of the VDisk
         SuperBlock newSuperBlock = new SuperBlock(new byte[blockSize]);
         newSuperBlock.setBlockSize(blockSize);
         newSuperBlock.setBlockCount((int) (size / blockSize));
+        superBlock = newSuperBlock;
         write(newSuperBlock);
 
         // Create the bit map of the VDisk
@@ -74,7 +77,7 @@ public class VUtil
 
         init();
 
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     private void init()
@@ -85,8 +88,7 @@ public class VUtil
 
     private SuperBlock loadSuperBlock()
     {
-        // Read the whole super block
-        byte[] bytes = new byte[SuperBlock.SUPER_BLOCK_SIZE];
+        byte[] bytes = new byte[SuperBlock.MIN_SUPER_BLOCK_SIZE];
         try
         {
             raf.read(bytes);
@@ -94,8 +96,17 @@ public class VUtil
         {
             e.printStackTrace();
         }
-
-        return new SuperBlock(bytes);
+        SuperBlock block = new SuperBlock(bytes);
+        // Read the whole super block
+        bytes = new byte[block.getBlockSize()];
+        try
+        {
+            raf.read(bytes);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return block;
     }
 
     private BitMapBlock loadBitMapBlock()
@@ -108,18 +119,14 @@ public class VUtil
     {
         // Get the next free block and set it to used
         int freeBlockAddress = bitMapBlock.getNextFreeBlockAddress();
-        bitMapBlock.setUsed(freeBlockAddress);
-
         // Sync
         write(bitMapBlock);
-
         return new Block(freeBlockAddress);
     }
 
     private void freeBlock(Block block)
     {
         bitMapBlock.setFree(block.getAddress());
-
         // Sync
         write(bitMapBlock);
     }
@@ -141,7 +148,8 @@ public class VUtil
         {
             raf.seek(getBlockOffset(block.getAddress()));
             raf.write(block.getBytes());
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // TODO exception handling
             e.printStackTrace();
@@ -155,7 +163,8 @@ public class VUtil
         {
             raf.seek(getBlockOffset(blockAddress));
             raf.read(blockBytes);
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // TODO exception handling
             e.printStackTrace();

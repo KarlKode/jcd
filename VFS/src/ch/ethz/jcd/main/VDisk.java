@@ -34,7 +34,7 @@ public class VDisk
      * @param vDiskFile path to the VDisk file
      * @param size      total size of the VDisk
      */
-    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSize, InvalidSize
+    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSize, InvalidSize, FileNotFoundException
     {
         util = new VUtil(vDiskFile, size, blockSize);
         // TODO

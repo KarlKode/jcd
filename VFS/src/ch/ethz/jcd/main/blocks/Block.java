@@ -32,6 +32,8 @@ public class Block
 
         this.bytes = bytes;
 
+        //TODO bytes == null
+
         block = ByteBuffer.wrap(bytes);
     }
 

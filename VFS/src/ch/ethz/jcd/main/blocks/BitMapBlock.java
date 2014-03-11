@@ -10,11 +10,14 @@ public class BitMapBlock extends Block
     {
         super(blockAddress, bytes);
         bitMap = BitSet.valueOf(block);
+        this.setUsed(blockAddress);
     }
 
     public int getNextFreeBlockAddress()
     {
-        return bitMap.nextClearBit(0);
+        int next = bitMap.nextClearBit(0);
+        this.setUsed(next);
+        return next;
     }
 
     public void setUsed(int blockAddress)
@@ -27,5 +30,10 @@ public class BitMapBlock extends Block
     {
         bitMap.clear(blockAddress);
         bytes = bitMap.toByteArray();
+    }
+
+    public boolean isFree(int blockAddress)
+    {
+        return !bitMap.get(blockAddress);
     }
 }
