@@ -58,8 +58,12 @@ public class BitMapBlockTest
     }
 
     @Test
-    public void testMoreAddressesThenBlockSizeNeeded() throws Exception
+    public void testMoreAddressesThenBlockSizeNeeded()
     {
-        throw new ToDoException( );
+        BitMapBlock block = new BitMapBlock(1, new byte[4]);
+        block.setUsed(0);
+        block.setUsed(2);
+        block.setUsed(3);
+        assertEquals(4, block.getNextFreeBlockAddress());
     }
 }

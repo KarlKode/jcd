@@ -32,11 +32,7 @@ public class Block
     {
         address = blockAddress;
 
-        this.bytes = bytes;
-
-        //TODO bytes == null
-
-        block = ByteBuffer.wrap(bytes);
+        setBytes(bytes);
     }
 
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
@@ -59,9 +55,17 @@ public class Block
         return bytes;
     }
 
+    public void setBytes(byte[] bytes)
+    {
+        this.bytes = bytes;
+        if (bytes != null){
+            block = ByteBuffer.wrap(bytes);
+        }
+    }
+
     @Override
     public boolean equals( Object o )
     {
-        return (o instanceof Block) ? Arrays.equals(bytes, ((Block) o).bytes) && address == ((Block) o).address : false;
+        return (o instanceof Block) && Arrays.equals(bytes, ((Block) o).bytes) && address == ((Block) o).address;
     }
 }
