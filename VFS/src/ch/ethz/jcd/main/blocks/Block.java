@@ -30,11 +30,7 @@ public class Block
     {
         address = blockAddress;
 
-        this.bytes = bytes;
-
-        //TODO bytes == null
-
-        block = ByteBuffer.wrap(bytes);
+        setBytes(bytes);
     }
 
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
@@ -55,5 +51,14 @@ public class Block
     public byte[] getBytes()
     {
         return bytes;
+    }
+
+    public void setBytes(byte[] bytes)
+    {
+        this.bytes = bytes;
+        if (bytes != null)
+        {
+            block = ByteBuffer.wrap(bytes);
+        }
     }
 }
