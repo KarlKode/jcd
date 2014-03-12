@@ -39,7 +39,8 @@ public class BitMapBlock extends Block
      */
     public void setUsed(int blockAddress) throws BlockAddressOutOfBoundException
     {
-        if (!isValidBlockAddress(blockAddress)) {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new BlockAddressOutOfBoundException();
         }
         bitMap.set(blockAddress);
@@ -53,7 +54,8 @@ public class BitMapBlock extends Block
      */
     public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException
     {
-        if (!isValidBlockAddress(blockAddress)) {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new BlockAddressOutOfBoundException();
         }
         bitMap.clear(blockAddress);
@@ -77,7 +79,8 @@ public class BitMapBlock extends Block
      */
     public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException
     {
-        if (!isValidBlockAddress(blockAddress)) {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new BlockAddressOutOfBoundException();
         }
         return !bitMap.get(blockAddress);
@@ -85,6 +88,7 @@ public class BitMapBlock extends Block
 
     /**
      * Get the capacity of the BitMapBlock
+     *
      * @return maximum block address the BitMapBlock can store
      */
     public int capacity()
@@ -92,7 +96,8 @@ public class BitMapBlock extends Block
         return bytes.length * 8;
     }
 
-    private boolean isValidBlockAddress(int blockAddress) {
+    private boolean isValidBlockAddress(int blockAddress)
+    {
         return blockAddress < capacity();
     }
 }
