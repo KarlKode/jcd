@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.SuperBlock;
+import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
 
 /**
@@ -38,12 +39,15 @@ public class Allocator
     public Block allocate() throws DiskFullException
     {
         // Get the next free block and set it to used
-        int freeBlockAddress = bitMapBlock.allocateBlock();
-        //TODO add new BitMapBlock .. Full if Disk size is reached
-        if (freeBlockAddress >= vUtil.getSuperBlock().getBlockSize())
+        int freeBlockAddress = 0;
+        try
+        {
+            freeBlockAddress = bitMapBlock.allocateBlock();
+        } catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
+
         // Sync
         vUtil.write(bitMapBlock);
         return new Block(freeBlockAddress);
@@ -56,7 +60,14 @@ public class Allocator
      */
     public void free(Block block)
     {
-        bitMapBlock.setUnused(block.getAddress());
+        try
+        {
+            bitMapBlock.setUnused(block.getAddress());
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // TODO This should never happen!
+            e.printStackTrace();
+        }
         // Sync
         vUtil.write(bitMapBlock);
     }
@@ -69,7 +80,15 @@ public class Allocator
      */
     public boolean isFree(Block block)
     {
-        return bitMapBlock.isUnused(block.getAddress());
+        try
+        {
+            return bitMapBlock.isUnused(block.getAddress());
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -78,8 +97,16 @@ public class Allocator
     public void format()
     {
         bitMapBlock.clear();
-        bitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
-        bitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
+        try
+        {
+            bitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
+            bitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
+
         //TODO Root Directory Block Address
         vUtil.write(bitMapBlock);
     }

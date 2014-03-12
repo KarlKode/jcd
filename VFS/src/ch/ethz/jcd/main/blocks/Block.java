@@ -36,9 +36,7 @@ public class Block
      */
     public Block(byte[] bytes)
     {
-        this.bytes = bytes;
-
-        block = ByteBuffer.wrap(bytes);
+        setBytes(bytes);
     }
 
     /**
@@ -50,7 +48,6 @@ public class Block
     public Block(int blockAddress, byte[] bytes)
     {
         address = blockAddress;
-
         setBytes(bytes);
     }
 

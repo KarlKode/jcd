@@ -1,68 +1,94 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
 import org.junit.Test;
+
+import java.util.BitSet;
 
 import static org.junit.Assert.*;
 
 public class BitMapBlockTest
 {
     @Test
-    public void testNextFreeBlockAddress() throws Exception
+    public void testConstructor() throws Exception
     {
-        BitMapBlock block = new BitMapBlock(1, new byte[16]);
-        block.setUsed(0);
-        block.setUsed(3);
-        block.setUsed(4);
-        block.setUsed(5);
-        block.setUsed(7);
-        assertEquals(2, block.allocateBlock());
-        assertEquals(6, block.allocateBlock());
-        assertEquals(8, block.allocateBlock());
-        block.setUnused(5);
-        assertEquals(5, block.allocateBlock());
-        assertEquals(9, block.allocateBlock());
-        block.setUsed(11);
-        block.setUnused(9);
-        assertEquals(9, block.allocateBlock());
+        int blockAddress = 0;
+        byte[] bytes = new byte[16];
+
+        BitMapBlock block = new BitMapBlock(blockAddress, bytes);
+        assertEquals(blockAddress, block.getAddress());
+        assertEquals(bytes, block.getBytes());
+        assertTrue(block.isUnused(blockAddress));
+    }
+
+    @Test
+    public void testAllocateBlock() throws Exception
+    {
+        int[] usedBlocks = new int[] {0, 1, 3, 4};
+        BitSet bitSet = new BitSet();
+        for (int usedBlock : usedBlocks) {
+            bitSet.set(usedBlock);
+        }
+        BitMapBlock block = new BitMapBlock(0, bitSet.toByteArray());
+        int allocatedBlock = block.allocateBlock();
+
+        // Hardcoded
+        assertEquals(2, allocatedBlock);
+
+        // BitSet stuff
+        assertEquals(bitSet.nextClearBit(0), allocatedBlock);
+
+        assertFalse(block.isUnused(allocatedBlock));
     }
 
     @Test
     public void testSetUsed() throws Exception
     {
-        BitMapBlock block = new BitMapBlock(1, new byte[16]);
+        BitMapBlock block = new BitMapBlock(0, new byte[16]);
+
         block.setUsed(0);
-        block.setUsed(2);
-        assertTrue(block.isUnused(4));
-        assertTrue(block.isUnused(15));
         assertFalse(block.isUnused(0));
-        assertFalse(block.isUnused(1));
+
+        block.setUsed(2);
+        assertTrue(block.isUnused(1));
         assertFalse(block.isUnused(2));
     }
 
     @Test
     public void testSetFree() throws Exception
     {
-        BitMapBlock block = new BitMapBlock(1, new byte[16]);
+        BitMapBlock block = new BitMapBlock(0, new byte[16]);
+
+        // set used blocks
         block.setUsed(0);
+        block.setUsed(1);
         block.setUsed(2);
-        assertFalse(block.isUnused(0));
-        assertFalse(block.isUnused(1));
-        assertFalse(block.isUnused(2));
-        block.setUnused(0);
+
         block.setUnused(1);
-        block.setUnused(2);
-        assertTrue(block.isUnused(0));
+        assertFalse(block.isUnused(0));
         assertTrue(block.isUnused(1));
-        assertTrue(block.isUnused(2));
+        assertFalse(block.isUnused(2));
     }
 
-    @Test
-    public void testMoreAddressesThenBlockSizeNeeded()
+    @Test(expected = BlockAddressOutOfBoundException.class)
+    public void testBlockAddressOutOfBound0() throws Exception
     {
-        BitMapBlock block = new BitMapBlock(1, new byte[4]);
-        block.setUsed(0);
-        block.setUsed(2);
-        block.setUsed(3);
-        assertEquals(4, block.allocateBlock());
+        BitMapBlock block = new BitMapBlock(0, new byte[1]);
+        block.setUsed(8);
+        System.out.println(block.isUnused(8));
+    }
+
+    @Test(expected = BlockAddressOutOfBoundException.class)
+    public void testBlockAddressOutOfBound1() throws Exception
+    {
+        BitMapBlock block = new BitMapBlock(0, new byte[1]);
+        block.setUnused(8);
+    }
+
+    @Test(expected = BlockAddressOutOfBoundException.class)
+    public void testBlockAddressOutOfBound2() throws Exception
+    {
+        BitMapBlock block = new BitMapBlock(0, new byte[1]);
+        block.isUnused(8);
     }
 }

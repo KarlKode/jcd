@@ -1,5 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
+
 import java.util.BitSet;
 
 public class BitMapBlock extends Block
@@ -23,7 +25,7 @@ public class BitMapBlock extends Block
      *
      * @return block address of the newly allocated Block
      */
-    public int allocateBlock()
+    public int allocateBlock() throws BlockAddressOutOfBoundException
     {
         int newBlock = bitMap.nextClearBit(0);
         setUsed(newBlock);
@@ -35,8 +37,11 @@ public class BitMapBlock extends Block
      *
      * @param blockAddress block address of the Block that should be set as used
      */
-    public void setUsed(int blockAddress)
+    public void setUsed(int blockAddress) throws BlockAddressOutOfBoundException
     {
+        if (!isValidBlockAddress(blockAddress)) {
+            throw new BlockAddressOutOfBoundException();
+        }
         bitMap.set(blockAddress);
         bytes = bitMap.toByteArray();
     }
@@ -46,8 +51,11 @@ public class BitMapBlock extends Block
      *
      * @param blockAddress block address of the Block that should be set as unused
      */
-    public void setUnused(int blockAddress)
+    public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException
     {
+        if (!isValidBlockAddress(blockAddress)) {
+            throw new BlockAddressOutOfBoundException();
+        }
         bitMap.clear(blockAddress);
         bytes = bitMap.toByteArray();
     }
@@ -67,8 +75,24 @@ public class BitMapBlock extends Block
      * @param blockAddress block address of the Block that should be checked
      * @return true if the Block is not used
      */
-    public boolean isUnused(int blockAddress)
+    public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException
     {
+        if (!isValidBlockAddress(blockAddress)) {
+            throw new BlockAddressOutOfBoundException();
+        }
         return !bitMap.get(blockAddress);
+    }
+
+    /**
+     * Get the capacity of the BitMapBlock
+     * @return maximum block address the BitMapBlock can store
+     */
+    public int capacity()
+    {
+        return bytes.length * 8;
+    }
+
+    private boolean isValidBlockAddress(int blockAddress) {
+        return blockAddress < capacity();
     }
 }
