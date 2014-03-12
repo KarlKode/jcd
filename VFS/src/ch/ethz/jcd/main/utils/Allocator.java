@@ -9,7 +9,7 @@ import ch.ethz.jcd.main.exceptions.DiskFullException;
  * The Allocator provides an interface to allocate and free Blocks to
  * make sure that no where else BitMapBlock changes are needed to perform.
  * It keeps also the BitMapBlock in sync.
- *
+ * <p/>
  * Created by phgamper on 3/12/14.
  */
 public class Allocator
@@ -38,11 +38,11 @@ public class Allocator
     public Block allocate() throws DiskFullException
     {
         // Get the next free block and set it to used
-        int freeBlockAddress = bitMapBlock.getNextFreeBlockAddress();
+        int freeBlockAddress = bitMapBlock.allocateBlock();
         //TODO add new BitMapBlock .. Full if Disk size is reached
-        if(freeBlockAddress >= vUtil.getSuperBlock().getBlockSize())
+        if (freeBlockAddress >= vUtil.getSuperBlock().getBlockSize())
         {
-            throw new DiskFullException( );
+            throw new DiskFullException();
         }
         // Sync
         vUtil.write(bitMapBlock);
@@ -56,7 +56,7 @@ public class Allocator
      */
     public void free(Block block)
     {
-        bitMapBlock.setFree(block.getAddress());
+        bitMapBlock.setUnused(block.getAddress());
         // Sync
         vUtil.write(bitMapBlock);
     }
@@ -69,15 +69,15 @@ public class Allocator
      */
     public boolean isFree(Block block)
     {
-        return bitMapBlock.isFree(block.getAddress());
+        return bitMapBlock.isUnused(block.getAddress());
     }
 
     /**
      * This method clears and initialize the BitMapBlock.
      */
-    public void format( )
+    public void format()
     {
-        bitMapBlock.clear( );
+        bitMapBlock.clear();
         bitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
         bitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
         //TODO Root Directory Block Address

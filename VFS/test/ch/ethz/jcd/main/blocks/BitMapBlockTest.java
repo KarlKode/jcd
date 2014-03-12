@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.ToDoException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -16,15 +15,15 @@ public class BitMapBlockTest
         block.setUsed(4);
         block.setUsed(5);
         block.setUsed(7);
-        assertEquals(2, block.getNextFreeBlockAddress());
-        assertEquals(6, block.getNextFreeBlockAddress());
-        assertEquals(8, block.getNextFreeBlockAddress());
-        block.setFree(5);
-        assertEquals(5, block.getNextFreeBlockAddress());
-        assertEquals(9, block.getNextFreeBlockAddress());
+        assertEquals(2, block.allocateBlock());
+        assertEquals(6, block.allocateBlock());
+        assertEquals(8, block.allocateBlock());
+        block.setUnused(5);
+        assertEquals(5, block.allocateBlock());
+        assertEquals(9, block.allocateBlock());
         block.setUsed(11);
-        block.setFree(9);
-        assertEquals(9, block.getNextFreeBlockAddress());
+        block.setUnused(9);
+        assertEquals(9, block.allocateBlock());
     }
 
     @Test
@@ -33,11 +32,11 @@ public class BitMapBlockTest
         BitMapBlock block = new BitMapBlock(1, new byte[16]);
         block.setUsed(0);
         block.setUsed(2);
-        assertTrue(block.isFree(4));
-        assertTrue(block.isFree(15));
-        assertFalse(block.isFree(0));
-        assertFalse(block.isFree(1));
-        assertFalse(block.isFree(2));
+        assertTrue(block.isUnused(4));
+        assertTrue(block.isUnused(15));
+        assertFalse(block.isUnused(0));
+        assertFalse(block.isUnused(1));
+        assertFalse(block.isUnused(2));
     }
 
     @Test
@@ -46,15 +45,15 @@ public class BitMapBlockTest
         BitMapBlock block = new BitMapBlock(1, new byte[16]);
         block.setUsed(0);
         block.setUsed(2);
-        assertFalse(block.isFree(0));
-        assertFalse(block.isFree(1));
-        assertFalse(block.isFree(2));
-        block.setFree(0);
-        block.setFree(1);
-        block.setFree(2);
-        assertTrue(block.isFree(0));
-        assertTrue(block.isFree(1));
-        assertTrue(block.isFree(2));
+        assertFalse(block.isUnused(0));
+        assertFalse(block.isUnused(1));
+        assertFalse(block.isUnused(2));
+        block.setUnused(0);
+        block.setUnused(1);
+        block.setUnused(2);
+        assertTrue(block.isUnused(0));
+        assertTrue(block.isUnused(1));
+        assertTrue(block.isUnused(2));
     }
 
     @Test
@@ -64,6 +63,6 @@ public class BitMapBlockTest
         block.setUsed(0);
         block.setUsed(2);
         block.setUsed(3);
-        assertEquals(4, block.getNextFreeBlockAddress());
+        assertEquals(4, block.allocateBlock());
     }
 }
