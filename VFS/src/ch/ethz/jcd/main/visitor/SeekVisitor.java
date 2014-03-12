@@ -1,6 +1,6 @@
 package ch.ethz.jcd.main.visitor;
 
-import ch.ethz.jcd.main.VUtil;
+import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
 
 public class SeekVisitor implements BlockVisitor<Block, VUtil>

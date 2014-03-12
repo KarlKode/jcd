@@ -1,4 +1,4 @@
-package ch.ethz.jcd.main;
+package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
@@ -14,7 +14,9 @@ import java.io.FileNotFoundException;
 
 public class VDisk
 {
-    private VUtil util;
+    private VUtil vUtil;
+
+    private Allocator allocator;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -23,7 +25,8 @@ public class VDisk
      */
     public VDisk(String vDiskFile) throws FileNotFoundException
     {
-        util = new VUtil(vDiskFile);
+        vUtil = new VUtil(vDiskFile);
+        allocator = new Allocator(vUtil);
         // TODO
         throw new NotImplementedException();
     }
@@ -36,7 +39,8 @@ public class VDisk
      */
     public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSize, InvalidSize, FileNotFoundException
     {
-        util = new VUtil(vDiskFile, size, blockSize);
+        vUtil = new VUtil(vDiskFile, size, blockSize);
+        allocator = new Allocator(vUtil);
         // TODO
         throw new NotImplementedException();
     }
@@ -52,7 +56,7 @@ public class VDisk
      */
     public void create(VType src, VDirectory dest)
     {
-        util.write(src.create());
+        vUtil.write(src.create());
         throw new NotImplementedException();
     }
 
@@ -81,12 +85,10 @@ public class VDisk
     public void copy(VType src, VDirectory dest)
     {
         CopyVisitor cv = new CopyVisitor();
-
-        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), util);
-
+        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), vUtil);
         DirectoryBlock dir = (DirectoryBlock) dest.getInode();
-        //dir.add(i);
-        util.write(dir);
+        dir.add(i);
+        vUtil.write(dir);
     }
 
     public void store(VType src, VType dest)

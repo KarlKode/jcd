@@ -1,4 +1,4 @@
-package ch.ethz.jcd.main;
+package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
@@ -27,16 +27,15 @@ public class VUtil
         init();
     }
 
-    public VUtil(String vDiskFile, long size, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
+    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
-        // Check size and blockSize for validity
-        if (size <= 0 || size % blockSize != 0)
+        // Check diskSize and blockSize for validity
+        if (diskSize <= 0 || diskSize % blockSize != 0)
         {
             throw new InvalidSize();
         }
-        // TODO: check for minimum block size (to fit at least the superblock)
-        if (blockSize <= 0)
+        if (blockSize < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
             throw new InvalidBlockSize();
         }
@@ -57,10 +56,17 @@ public class VUtil
 
         raf = new RandomAccessFile(this.vDiskFile, "rwd");
 
+        init(diskSize, blockSize);
+
+        //throw new NotImplementedException();
+    }
+
+    private void init(long diskSize, int blockSize)
+    {
         // Create the superblock of the VDisk
         SuperBlock newSuperBlock = new SuperBlock(new byte[blockSize]);
         newSuperBlock.setBlockSize(blockSize);
-        newSuperBlock.setBlockCount((int) (size / blockSize));
+        newSuperBlock.setBlockCount((int) (diskSize / blockSize));
         superBlock = newSuperBlock;
         write(newSuperBlock);
 
@@ -68,16 +74,13 @@ public class VUtil
         BitMapBlock newBitMapBlock = new BitMapBlock(newSuperBlock.getFirstBitMapBlock(), new byte[superBlock.getBlockSize()]);
 
         // Set the superblock and the bitmap block as used
-        newBitMapBlock.setUsed(0);
-        newBitMapBlock.setUsed(1);
+        newBitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
+        newBitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
         write(newBitMapBlock);
 
-        // Create the root directory block
-        // TODO
+        // TODO Create the root directory block
 
-        init();
-
-        //throw new NotImplementedException();
+        init( );
     }
 
     private void init()
@@ -115,30 +118,8 @@ public class VUtil
         return new BitMapBlock(bitMapBlockAddress, read(bitMapBlockAddress).getBytes());
     }
 
-    private Block allocateBlock()
-    {
-        // Get the next free block and set it to used
-        int freeBlockAddress = bitMapBlock.getNextFreeBlockAddress();
-        // Sync
-        write(bitMapBlock);
-        return new Block(freeBlockAddress);
-    }
-
-    private void freeBlock(Block block)
-    {
-        bitMapBlock.setFree(block.getAddress());
-        // Sync
-        write(bitMapBlock);
-    }
-
-    private long getBlockOffset(int blockAddress)
-    {
-        return ((long) blockAddress) * ((long) superBlock.getBlockSize());
-    }
-
     /**
-     * This method writes a given Block in the VFS and returns the address
-     * of the allocated Block
+     * This method writes a given Block in the VFS
      *
      * @param block Block to store in the VFS
      */
@@ -156,6 +137,12 @@ public class VUtil
         }
     }
 
+    /**
+     * This method reads the Block to a given block address
+     *
+     * @param blockAddress
+     * @return read Block
+     */
     public Block read(int blockAddress)
     {
         byte[] blockBytes = new byte[superBlock.getBlockSize()];
@@ -173,8 +160,28 @@ public class VUtil
         return new Block(blockAddress, blockBytes);
     }
 
+    /**
+     *
+     * @return SuperBlock of loaded VDisk
+     */
     public SuperBlock getSuperBlock()
     {
         return superBlock;
+    }
+
+    /**
+     *
+     * @return BitMapBlock of loaded VDisk
+     */
+    public BitMapBlock getBitMapBlock( ) { return bitMapBlock; }
+
+    /**
+     *
+     * @param blockAddress
+     * @return offset to the given blockAddress in bytes
+     */
+    private long getBlockOffset(int blockAddress)
+    {
+        return ((long) blockAddress) * ((long) superBlock.getBlockSize());
     }
 }

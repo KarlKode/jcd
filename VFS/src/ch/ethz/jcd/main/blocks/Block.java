@@ -2,7 +2,9 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.visitor.BlockVisitor;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class Block
 {
@@ -30,7 +32,11 @@ public class Block
     {
         address = blockAddress;
 
-        setBytes(bytes);
+        this.bytes = bytes;
+
+        //TODO bytes == null
+
+        block = ByteBuffer.wrap(bytes);
     }
 
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
@@ -53,12 +59,9 @@ public class Block
         return bytes;
     }
 
-    public void setBytes(byte[] bytes)
+    @Override
+    public boolean equals( Object o )
     {
-        this.bytes = bytes;
-        if (bytes != null)
-        {
-            block = ByteBuffer.wrap(bytes);
-        }
+        return (o instanceof Block) ? Arrays.equals(bytes, ((Block) o).bytes) && address == ((Block) o).address : false;
     }
 }

@@ -1,8 +1,10 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.DiskFullException;
+import ch.ethz.jcd.main.exceptions.ToDoException;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BlockTest
 {
@@ -48,34 +50,73 @@ public class BlockTest
     }
 
     @Test
-    public void testGetBytes0() throws Exception
+    public void testGetBytes() throws Exception
     {
-        Block block = new Block();
-        assertEquals(null, block.getBytes());
+        throw new ToDoException( );
+    }
+
+    /**
+     * Tests to BitMapBlock.java
+     *
+     */
+
+    @Test
+    public void testNextFreeBlockAddress() throws Exception
+    {
+        BitMapBlock block = new BitMapBlock(1, new byte[16]);
+        block.setUsed(0);
+        block.setUsed(3);
+        block.setUsed(4);
+        block.setUsed(5);
+        block.setUsed(7);
+        assertEquals(2, block.getNextFreeBlockAddress());
+        assertEquals(6, block.getNextFreeBlockAddress());
+        assertEquals(8, block.getNextFreeBlockAddress());
+        block.setFree(5);
+        assertEquals(5, block.getNextFreeBlockAddress());
+        assertEquals(9, block.getNextFreeBlockAddress());
+        block.setUsed(11);
+        block.setFree(9);
+        assertEquals(9, block.getNextFreeBlockAddress());
     }
 
     @Test
-    public void testGetBytes1() throws Exception
+    public void testSetUsed() throws Exception
     {
-        byte[] bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        Block block = new Block(0, bytes);
-        assertEquals(bytes, block.getBytes());
+        BitMapBlock block = new BitMapBlock(1, new byte[16]);
+        block.setUsed(0);
+        block.setUsed(2);
+        assertTrue(block.isFree(4));
+        assertTrue(block.isFree(15));
+        assertFalse(block.isFree(0));
+        assertFalse(block.isFree(1));
+        assertFalse(block.isFree(2));
     }
 
     @Test
-    public void testSetBytes0() throws Exception
+    public void testSetFree() throws Exception
     {
-        Block block = new Block();
-        block.setBytes(null);
-        assertEquals(null, block.getBytes());
+        BitMapBlock block = new BitMapBlock(1, new byte[16]);
+        block.setUsed(0);
+        block.setUsed(2);
+        assertFalse(block.isFree(0));
+        assertFalse(block.isFree(1));
+        assertFalse(block.isFree(2));
+        block.setFree(0);
+        block.setFree(1);
+        block.setFree(2);
+        assertTrue(block.isFree(0));
+        assertTrue(block.isFree(1));
+        assertTrue(block.isFree(2));
     }
 
     @Test
-    public void testSetBytes1() throws Exception
+    public void testMoreAddressesThenBlockSizeNeeded()
     {
-        byte[] bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        Block block = new Block();
-        block.setBytes(bytes);
-        assertEquals(bytes, block.getBytes());
+        BitMapBlock block = new BitMapBlock(1, new byte[4]);
+        block.setUsed(0);
+        block.setUsed(2);
+        block.setUsed(3);
+        assertEquals(4, block.getNextFreeBlockAddress());
     }
 }

@@ -32,6 +32,12 @@ public class BitMapBlock extends Block
         bytes = bitMap.toByteArray();
     }
 
+    public void clear( )
+    {
+        bitMap.clear();
+        bytes = bitMap.toByteArray();
+    }
+
     public boolean isFree(int blockAddress)
     {
         return !bitMap.get(blockAddress);

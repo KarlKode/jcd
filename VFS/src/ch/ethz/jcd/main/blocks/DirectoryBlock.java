@@ -23,6 +23,11 @@ public class DirectoryBlock extends InodeBlock
         super(blockAddress, bytes);
     }
 
+    public void add(InodeBlock inode)
+    {
+        content.add(inode);
+    }
+
     public BlockList<InodeBlock> getContent()
     {
         return content;

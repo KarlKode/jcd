@@ -1,15 +1,16 @@
-package ch.ethz.jcd.main;
+package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.exceptions.InvalidBlockSize;
 import ch.ethz.jcd.main.exceptions.InvalidSize;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.utils.VDisk;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class VDiskCreate
+public class VDiskTest
 {
     private String vDiskFile = "/tmp/test.vdisk";
 

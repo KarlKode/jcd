@@ -1,4 +1,6 @@
-package ch.ethz.jcd.main;
+package ch.ethz.jcd.main.utils;
+
+import ch.ethz.jcd.main.Config;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
