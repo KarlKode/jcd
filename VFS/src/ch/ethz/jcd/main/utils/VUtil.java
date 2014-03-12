@@ -71,11 +71,12 @@ public class VUtil
         write(newSuperBlock);
 
         // Create the bit map of the VDisk
-        BitMapBlock newBitMapBlock = new BitMapBlock(newSuperBlock.getFirstBitMapBlock(), new byte[superBlock.getBlockSize()]);
+        int bitMapBlockAddress = newSuperBlock.getFirstBitMapBlock();
+        BitMapBlock newBitMapBlock = new BitMapBlock(bitMapBlockAddress, new byte[superBlock.getBlockSize()]);
 
         // Set the superblock and the bitmap block as used
         newBitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
-        newBitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
+        newBitMapBlock.setUsed(bitMapBlockAddress);
         write(newBitMapBlock);
 
         // TODO Create the root directory block
