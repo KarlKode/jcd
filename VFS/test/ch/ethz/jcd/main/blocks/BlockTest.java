@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.ToDoException;
 import org.junit.Test;
 
@@ -110,8 +111,12 @@ public class BlockTest
     }
 
     @Test
-    public void testMoreAddressesThenBlockSizeNeeded() throws Exception
+    public void testMoreAddressesThenBlockSizeNeeded()
     {
-        throw new ToDoException( );
+        BitMapBlock block = new BitMapBlock(1, new byte[4]);
+        block.setUsed(0);
+        block.setUsed(2);
+        block.setUsed(3);
+        assertEquals(4, block.getNextFreeBlockAddress());
     }
 }

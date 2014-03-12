@@ -4,6 +4,7 @@ public class SuperBlock extends DirectoryBlock
 {
     public static final int MIN_SUPER_BLOCK_SIZE = 16;
     public static int SUPER_BLOCK_ADDRESS = 0;
+    public static int BIT_MAP_BLOCK_ADDRESS = 1;
 
     private int blockSize;
     private int blockCount;

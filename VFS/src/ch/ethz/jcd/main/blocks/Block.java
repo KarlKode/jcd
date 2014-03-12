@@ -2,7 +2,9 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.visitor.BlockVisitor;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class Block
 {
@@ -55,5 +57,11 @@ public class Block
     public byte[] getBytes()
     {
         return bytes;
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        return (o instanceof Block) ? Arrays.equals(bytes, ((Block) o).bytes) && address == ((Block) o).address : false;
     }
 }
