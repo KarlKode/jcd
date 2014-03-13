@@ -1,5 +1,7 @@
 package ch.ethz.jcd.main.visitor;
 
+import ch.ethz.jcd.main.exceptions.BlockFullException;
+import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
@@ -26,20 +28,21 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     }
 
     @Override
-    public Block block(Block block, Void arg)
+    public Block block(Block block, Void arg) throws DiskFullException
     {
-        vUtil.write(block);
-        return new Block(block.getAddress());
+        Block b = new Block(allocator.allocate());
+        vUtil.write(b);
+        return b;
     }
 
     @Override
-    public Block directory(DirectoryBlock block, Void arg)
+    public Block directory(DirectoryBlock block, Void arg) throws DiskFullException, BlockFullException
     {
         DirectoryBlock dir = new DirectoryBlock(allocator.allocate());
 
-        for (Block b : block.getBlocks())
+        for (Integer blockAddress : block.getBlockAddressList())
         {
-            dir.add((InodeBlock) visit(b, arg));
+            dir.add(visit(vUtil.read(blockAddress), arg));
         }
 
         vUtil.write(dir);
@@ -48,13 +51,13 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     }
 
     @Override
-    public Block file(FileBlock block, Void arg)
+    public Block file(FileBlock block, Void arg) throws DiskFullException, BlockFullException
     {
-        FileBlock file = new FileBlock();
+        FileBlock file = new FileBlock(allocator.allocate());
 
-        for (Block b : block.getBlocks())
+        for (Integer blockAddress : block.getBlockAddressList())
         {
-            file.add(visit(b, arg));
+            file.add(visit(vUtil.read(blockAddress), arg));
         }
 
         vUtil.write(file);
@@ -65,7 +68,13 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     @Override
     public Block superBlock(SuperBlock block, Void arg)
     {
-        return directory(block, arg);
+        return null;
+    }
+
+    @Override
+    public Block bitMapBlock(BitMapBlock block, Void arg)
+    {
+        return null;
     }
 }
 

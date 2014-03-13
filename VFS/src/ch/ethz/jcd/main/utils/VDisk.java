@@ -18,8 +18,9 @@ import java.io.FileNotFoundException;
 public class VDisk
 {
     private VUtil vUtil;
-
     private Allocator allocator;
+
+    private DirectoryBlock root;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -29,9 +30,7 @@ public class VDisk
     public VDisk(String vDiskFile) throws FileNotFoundException
     {
         vUtil = new VUtil(vDiskFile);
-        allocator = new Allocator(vUtil);
-        // TODO
-        throw new NotImplementedException();
+        init( );
     }
 
     /**
@@ -43,7 +42,13 @@ public class VDisk
     public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException, InvalidBlockCountException
     {
         vUtil = new VUtil(vDiskFile, size, blockSize);
+        init( );
+    }
+
+    private void init( )
+    {
         allocator = new Allocator(vUtil);
+        root = new DirectoryBlock(vUtil.getSuperBlock().getRootDirectoryBlock());
         // TODO
         throw new NotImplementedException();
     }
@@ -55,17 +60,16 @@ public class VDisk
      * @param dest - destination
      * @return - create InodeBlock in the VFS
      */
-    public void create(VType src, VDirectory dest) throws DiskFullException, NoSuchFileOrDirectoryException
+    public void create(VType src, VDirectory dest) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException
     {
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<DirectoryBlock>(dest);
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(dest, vUtil);
 
         InodeBlock block = src.toBlock(allocator.allocate());
-        DirectoryBlock root = new DirectoryBlock(vUtil.getSuperBlock().getRootDirectoryBlock());
-        DirectoryBlock dir = sv.visit(root, vUtil);
-        dir.add(block);
+        DirectoryBlock destDir = sv.visit(root, null);
+        destDir.add(block);
 
         vUtil.write(block);
-        vUtil.write(dir);
+        vUtil.write(destDir);
     }
 
     public void delete(VType file)
@@ -90,13 +94,16 @@ public class VDisk
      * @param src  - source, either a VDirectory or a VFile
      * @param dest - destination
      */
-    public void copy(VType src, VDirectory dest)
+    public void copy(VType src, VDirectory dest) throws BlockFullException
     {
-        CopyVisitor cv = new CopyVisitor();
-        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), vUtil);
-        DirectoryBlock dir = (DirectoryBlock) dest.getInode();
-        dir.add(i);
-        vUtil.write(dir);
+        CopyVisitor cv = new CopyVisitor(vUtil, allocator);
+        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
+
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(dest, vUtil);
+        DirectoryBlock destDir = sv.visit(root, null);
+        destDir.add(i);
+
+        vUtil.write(destDir);
     }
 
     public void store(VType src, VType dest)

@@ -29,19 +29,4 @@ public class DirectoryBlock extends InodeBlock
     {
         super(blockAddress, bytes);
     }
-
-    public void add(InodeBlock inode)
-    {
-        blocks.add(inode);
-    }
-
-    public int size()
-    {
-        return blocks.size();
-    }
-
-    public LinkedList<InodeBlock> getBlocks()
-    {
-        return blocks;
-    }
 }

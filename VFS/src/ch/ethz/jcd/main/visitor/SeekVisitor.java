@@ -14,26 +14,29 @@ import java.util.Iterator;
  *
  * @param <T> either a DirectoryBlock or a FileBlock
  */
-public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
+public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
 {
     private String dest;
+    private VUtil vUtil;
 
     /**
      *
      * @param dest Destination to seek for
      */
-    public SeekVisitor(String dest)
+    public SeekVisitor(String dest, VUtil vUtil)
     {
         this.dest = dest;
+        this.vUtil = vUtil;
     }
 
     /**
      *
      * @param dest Destination to seek for
      */
-    public SeekVisitor(VType dest)
+    public SeekVisitor(VType dest, VUtil vUtil)
     {
         this.dest = dest.getName();
+        this.vUtil = vUtil;
     }
 
     /**
@@ -44,7 +47,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T visit(Block block, VUtil arg)
+    public T visit(Block block, Void arg)
     {
         return block.accept(this, arg);
     }
@@ -56,7 +59,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T block(Block block, VUtil arg)
+    public T block(Block block, Void arg)
     {
         return null;
     }
@@ -68,16 +71,20 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T blockList(BlockList block, VUtil arg)
+    public T directory(DirectoryBlock block, Void arg)
     {
+        if (dest.equals(block.getName()))
+        {
+            return (T) block;
+        }
+
         InodeBlock inode = null;
 
-        Iterator<Block> i = block.list().iterator();
+        Iterator<Integer> i = block.getBlockAddressList().iterator();
 
         while(i.hasNext() && inode == null)
         {
-            //TODO entweder Block oder Inode, ... mömmer wohrschindli im block ine ablege
-            Block b = arg.read(i.next().getAddress());
+            Block b = vUtil.read(i.next());
 
             inode = visit(b, arg);
         }
@@ -92,34 +99,12 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T directory(DirectoryBlock block, VUtil arg)
+    public T file(FileBlock block, Void arg)
     {
         if (dest.equals(block.getName()))
         {
             return (T) block;
         }
-
-        BlockList<InodeBlock> list = new BlockList<InodeBlock>(arg.read(block.getContent().getAddress()));
-
-        return (T) visit(list, arg);
-    }
-
-    /**
-     *
-     * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
-     * @return the loaded Block if the given destination is found, null otherwise
-     */
-    @Override
-    public T file(FileBlock block, VUtil arg)
-    {
-        if (dest.equals(block.getName()))
-        {
-            return (T) block;
-        }
-
-        // BlockList<Block> list = new BlockList<Block>(arg.read(block.getBlocks().getAddress()));
-        // return (T) visit(list, arg);
         return null;
     }
 
@@ -131,7 +116,20 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T superBlock(SuperBlock block, VUtil arg)
+    public T superBlock(SuperBlock block, Void arg)
+    {
+        return null;
+    }
+
+    /**
+     * This method return null in every case because the BitMapBlock should never been reached.
+     *
+     * @param block current Block in search progress
+     * @param arg VUtil used to load Blocks form disk
+     * @return the loaded Block if the given destination is found, null otherwise
+     */
+    @Override
+    public T bitMapBlock(BitMapBlock block, Void arg)
     {
         return null;
     }
