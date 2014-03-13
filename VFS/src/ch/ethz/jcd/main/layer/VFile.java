@@ -1,5 +1,7 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.Block;
+import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
@@ -15,9 +17,9 @@ public class VFile extends VType
         return visitor.file(this, arg);
     }
 
-    public InodeBlock create()
+    public InodeBlock toBlock(Block block)
     {
-        return null;
+        return new FileBlock(block);
     }
 
     public int getSize()

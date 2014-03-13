@@ -39,6 +39,11 @@ public class Block
         block = ByteBuffer.wrap(bytes);
     }
 
+    public Block(Block block)
+    {
+        this.address = block.address;
+    }
+
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
     {
         return visitor.visit(this, arg);

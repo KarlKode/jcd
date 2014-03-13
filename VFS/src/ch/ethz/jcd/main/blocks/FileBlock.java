@@ -8,7 +8,7 @@ public class FileBlock extends InodeBlock
 
     public FileBlock(Block b)
     {
-        this.address = b.address;
+        super(b);
     }
 
     public FileBlock(int blockAddress)

@@ -1,42 +1,55 @@
 package ch.ethz.jcd.main.visitor;
 
+import ch.ethz.jcd.main.layer.VType;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
 
-public class SeekVisitor implements BlockVisitor<Block, VUtil>
+public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, VUtil>
 {
+    private String dest;
+
+    public SeekVisitor(String dest)
+    {
+        this.dest = dest;
+    }
+
+    public SeekVisitor(VType dest)
+    {
+        this.dest = dest.getName();
+    }
+
     @Override
-    public Block visit(Block block, VUtil arg)
+    public T visit(Block block, VUtil arg)
     {
         return block.accept(this, arg);
     }
 
     @Override
-    public Block block(Block block, VUtil arg)
+    public T block(Block block, VUtil arg)
     {
         return null;
     }
 
     @Override
-    public Block blockList(BlockList block, VUtil arg)
+    public T blockList(BlockList block, VUtil arg)
     {
         return null;
     }
 
     @Override
-    public Block directory(DirectoryBlock block, VUtil arg)
+    public T directory(DirectoryBlock block, VUtil arg)
     {
         return null;
     }
 
     @Override
-    public Block file(FileBlock block, VUtil arg)
+    public T file(FileBlock block, VUtil arg)
     {
         return null;
     }
 
     @Override
-    public Block superBlock(SuperBlock block, VUtil arg)
+    public T superBlock(SuperBlock block, VUtil arg)
     {
         return null;
     }

@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
@@ -11,7 +12,7 @@ public abstract class VType
 
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
-    public abstract InodeBlock create();
+    public abstract InodeBlock toBlock(Block block);
 
     public String getName()
     {
