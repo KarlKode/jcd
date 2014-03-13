@@ -8,6 +8,11 @@ public class DirectoryBlock extends InodeBlock
     {
     }
 
+    public DirectoryBlock(Block block)
+    {
+        super(block);
+    }
+
     public DirectoryBlock(int blockAddress)
     {
         super(blockAddress);

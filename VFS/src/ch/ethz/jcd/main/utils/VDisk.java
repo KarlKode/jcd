@@ -6,9 +6,11 @@ import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VType;
 import ch.ethz.jcd.main.visitor.CopyVisitor;
+import ch.ethz.jcd.main.visitor.SeekVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
@@ -48,17 +50,22 @@ public class VDisk
 
     /**
      * This method creates either an EMPTY directory or an Empty file.
-     * <p/>
-     * TODO mönd de no d inode blöck no irgend wie flage das me erkennt obs es directory isch oder es file
      *
      * @param src  - either a VDirectory or a VFile
      * @param dest - destination
      * @return - create InodeBlock in the VFS
      */
-    public void create(VType src, VDirectory dest)
+    public void create(VType src, VDirectory dest) throws DiskFullException, NoSuchFileOrDirectoryException
     {
-        vUtil.write(src.create());
-        throw new NotImplementedException();
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<DirectoryBlock>(dest);
+
+        InodeBlock block = src.toBlock(allocator.allocate());
+        DirectoryBlock root = new DirectoryBlock(vUtil.getSuperBlock().getRootDirectoryBlock());
+        DirectoryBlock dir = sv.visit(root, vUtil);
+        dir.add(block);
+
+        vUtil.write(block);
+        vUtil.write(dir);
     }
 
     public void delete(VType file)

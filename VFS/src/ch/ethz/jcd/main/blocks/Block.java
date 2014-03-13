@@ -51,6 +51,12 @@ public class Block
         setBytes(bytes);
     }
 
+    public Block(Block block)
+    {
+        this.address = block.address;
+        this.bytes = block.bytes;
+    }
+
     /**
      * TODO: Detailed description
      *
