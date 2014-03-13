@@ -8,8 +8,6 @@ public interface BlockVisitor<R, A>
 
     public R block(Block block, A arg);
 
-    public R blockList(BlockList<Block> block, A arg);
-
     public R directory(DirectoryBlock block, A arg);
 
     public R file(FileBlock block, A arg);

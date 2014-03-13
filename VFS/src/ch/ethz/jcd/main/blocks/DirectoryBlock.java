@@ -1,8 +1,10 @@
 package ch.ethz.jcd.main.blocks;
 
+import java.util.LinkedList;
+
 public class DirectoryBlock extends InodeBlock
 {
-    protected BlockList<InodeBlock> content = new BlockList<InodeBlock>();
+    private LinkedList<InodeBlock> blocks = new LinkedList<InodeBlock>();
 
     public DirectoryBlock()
     {
@@ -30,16 +32,16 @@ public class DirectoryBlock extends InodeBlock
 
     public void add(InodeBlock inode)
     {
-        content.add(inode);
+        blocks.add(inode);
     }
 
-    public BlockList<InodeBlock> getContent()
+    public int size()
     {
-        return content;
+        return blocks.size();
     }
 
-    public void setContent(BlockList<InodeBlock> content)
+    public LinkedList<InodeBlock> getBlocks()
     {
-        this.content = content;
+        return blocks;
     }
 }

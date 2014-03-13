@@ -1,10 +1,10 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.Config;
+import java.util.LinkedList;
 
 public class FileBlock extends InodeBlock
 {
-    protected BlockList<Block> blocks = new BlockList<Block>();
+    private LinkedList<Block> blocks = new LinkedList<Block>();
 
     public FileBlock(Block b)
     {
@@ -26,19 +26,19 @@ public class FileBlock extends InodeBlock
         super(blockAddress, bytes);
     }
 
+    public void add(Block block)
+    {
+        blocks.add(block);
+    }
+
     public int size()
     {
-        // TODO: store the block size in the VDisk superblock
-        return blocks.size() * Config.VFS_BLOCK_SIZE;
+        //TODO richtig berechne
+        return blocks.size();
     }
 
-    public BlockList<Block> getBlocks()
+    public LinkedList<Block> getBlocks()
     {
         return blocks;
-    }
-
-    public void setBlocks(BlockList<Block> blocks)
-    {
-        this.blocks = blocks;
     }
 }

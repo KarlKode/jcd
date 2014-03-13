@@ -1,73 +1,69 @@
 package ch.ethz.jcd.main.visitor;
 
+import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
 
 /**
- * <p/>
  * This visitor copies each block which could be reached from the given VFile / VDirectory.
  * InodeBlock as return type is used to create the Block tree according to its given VType tree.
  */
-public class CopyVisitor implements BlockVisitor<Block, VUtil>
+public class CopyVisitor implements BlockVisitor<Block, Void>
 {
+    private VUtil vUtil;
+    private Allocator allocator;
+
+    public CopyVisitor(VUtil vUtil, Allocator allocator)
+    {
+        this.vUtil = vUtil;
+        this.allocator = allocator;
+    }
+
     @Override
-    public Block visit(Block block, VUtil arg)
+    public Block visit(Block block, Void arg)
     {
         return block.accept(this, arg);
     }
 
     @Override
-    public Block block(Block block, VUtil arg)
+    public Block block(Block block, Void arg)
     {
-        arg.write(block);
+        vUtil.write(block);
         return new Block(block.getAddress());
     }
 
     @Override
-    public Block blockList(BlockList<Block> block, VUtil arg)
+    public Block directory(DirectoryBlock block, Void arg)
     {
-        BlockList<Block> bl = new BlockList<Block>();
+        DirectoryBlock dir = new DirectoryBlock(allocator.allocate());
 
-        for (Block b : block.list())
+        for (Block b : block.getBlocks())
         {
-            bl.add(visit(b, arg));
+            dir.add((InodeBlock) visit(b, arg));
         }
 
-        arg.write(bl);
-
-        return bl;
-    }
-
-    @Override
-    public Block directory(DirectoryBlock block, VUtil arg)
-    {
-        DirectoryBlock dir = new DirectoryBlock();
-
-        BlockList<InodeBlock> bl = (BlockList<InodeBlock>) visit(block.getContent(), arg);
-
-        dir.setContent(bl);
-
-        arg.write(dir);
+        vUtil.write(dir);
 
         return dir;
     }
 
     @Override
-    public Block file(FileBlock block, VUtil arg)
+    public Block file(FileBlock block, Void arg)
     {
-        FileBlock fileBlock = new FileBlock(0);
+        FileBlock file = new FileBlock();
 
-        BlockList<Block> bl = (BlockList<Block>) visit(block.getBlocks(), arg);
+        for (Block b : block.getBlocks())
+        {
+            file.add(visit(b, arg));
+        }
 
-        fileBlock.setBlocks(bl);
+        vUtil.write(file);
 
-        arg.write(fileBlock);
-
-        return fileBlock;
+        return file;
     }
 
     @Override
-    public Block superBlock(SuperBlock block, VUtil arg)
+    public Block superBlock(SuperBlock block, Void arg)
     {
         return directory(block, arg);
     }
