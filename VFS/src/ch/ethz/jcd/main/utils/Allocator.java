@@ -72,6 +72,22 @@ public class Allocator
     }
 
     /**
+     * Check if a Block is unused
+     */
+    public boolean isFree(Block block)
+    {
+        try
+        {
+            return vUtil.getBitMapBlock().isUnused(block.getAddress());
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Completely clear a VDisk and initialize it as empty
      */
     public void format()
@@ -90,5 +106,15 @@ public class Allocator
         //TODO Root Directory Block Address
         vUtil.write(vUtil.getSuperBlock());
         vUtil.write(vUtil.getBitMapBlock());
+    }
+
+    /**
+     * Get the number of used Block in this BitMapBlock
+     *
+     * @return the number of used Blocks
+     */
+    public int getUsedBlocks()
+    {
+        return vUtil.getBitMapBlock().getUsedBlocks();
     }
 }

@@ -2,14 +2,10 @@ package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import static org.junit.Assert.*;
 
@@ -26,57 +22,29 @@ public class AllocatorTest
     private VUtil vUtil;
 
     @Before
-    public void removeOldVDisk()
+    public void setUp() throws Exception
     {
+        // Remove old disk if it exists
         File f = new File(VDISK_FILE);
         if (f.exists())
         {
             f.delete();
         }
-    }
 
-    @Before
-    public void setUp()
-    {
-        try
-        {
-            vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
-
-        }
-        catch (InvalidSizeException invalidSize)
-        {
-            invalidSize.printStackTrace();
-        }
-        catch (InvalidBlockSizeException invalidBlockSize)
-        {
-            invalidBlockSize.printStackTrace();
-        }
-        catch (VDiskCreationException e)
-        {
-            e.printStackTrace();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
     }
 
     @Test
-    public void testEmptyDisk( )
+    public void testConstructor( ) throws Exception
     {
         Allocator a = new Allocator(vUtil);
-
-        for(int i = vUtil.getSuperBlock().getFirstDataBlock(); i < VDISK_BLOCK_COUNT; i++)
-        {
-            assertTrue(a.isFree(new Block(i)));
-        }
+        assertEquals(2, a.getUsedBlocks());
     }
 
     @Test
     public void testAllocateBlock( ) throws DiskFullException
     {
         Allocator a = new Allocator(vUtil);
-        a.format();
         Block b = a.allocate();
         assertFalse(a.isFree(b));
     }
