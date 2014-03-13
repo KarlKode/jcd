@@ -3,10 +3,10 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.SuperBlock;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSize;
-import ch.ethz.jcd.main.exceptions.InvalidSize;
+import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,17 +27,17 @@ public class VUtil
         init();
     }
 
-    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
+    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
     {
         this.vDiskFile = vDiskFile;
         // Check diskSize and blockSize for validity
         if (diskSize <= 0 || diskSize % blockSize != 0)
         {
-            throw new InvalidSize();
+            throw new InvalidSizeException();
         }
         if (blockSize < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
-            throw new InvalidBlockSize();
+            throw new InvalidBlockSizeException();
         }
 
         // Create the VDisk file
@@ -71,11 +71,19 @@ public class VUtil
         write(newSuperBlock);
 
         // Create the bit map of the VDisk
-        BitMapBlock newBitMapBlock = new BitMapBlock(newSuperBlock.getFirstBitMapBlock(), new byte[superBlock.getBlockSize()]);
+        int bitMapBlockAddress = newSuperBlock.getFirstBitMapBlock();
+        BitMapBlock newBitMapBlock = new BitMapBlock(bitMapBlockAddress, new byte[superBlock.getBlockSize()]);
 
         // Set the superblock and the bitmap block as used
-        newBitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
-        newBitMapBlock.setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
+        try
+        {
+            newBitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
+            newBitMapBlock.setUsed(bitMapBlockAddress);
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
         write(newBitMapBlock);
 
         // TODO Create the root directory block
@@ -125,6 +133,8 @@ public class VUtil
      */
     public void write(Block block)
     {
+        block.commit();
+
         try
         {
             raf.seek(getBlockOffset(block.getAddress()));

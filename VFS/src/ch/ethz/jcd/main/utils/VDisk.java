@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.*;
@@ -37,7 +36,7 @@ public class VDisk
      * @param vDiskFile path to the VDisk file
      * @param size      total size of the VDisk
      */
-    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSize, InvalidSize, FileNotFoundException
+    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException
     {
         vUtil = new VUtil(vDiskFile, size, blockSize);
         allocator = new Allocator(vUtil);
@@ -47,8 +46,6 @@ public class VDisk
 
     /**
      * This method creates either an EMPTY directory or an Empty file.
-     * <p/>
-     * TODO mönd de no d inode blöck no irgend wie flage das me erkennt obs es directory isch oder es file
      *
      * @param src  - either a VDirectory or a VFile
      * @param dest - destination

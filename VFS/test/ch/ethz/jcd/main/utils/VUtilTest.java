@@ -3,8 +3,8 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.SuperBlock;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSize;
-import ch.ethz.jcd.main.exceptions.InvalidSize;
+import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,11 +65,11 @@ public class VUtilTest
         {
             vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
         }
-        catch (InvalidSize invalidSize)
+        catch (InvalidSizeException invalidSize)
         {
             invalidSize.printStackTrace();
         }
-        catch (InvalidBlockSize invalidBlockSize)
+        catch (InvalidBlockSizeException invalidBlockSize)
         {
             invalidBlockSize.printStackTrace();
         }
@@ -104,20 +104,20 @@ public class VUtilTest
         assertTrue(Arrays.equals(vUtil.getSuperBlock().getBytes(), vUtil1.getSuperBlock().getBytes()));
     }
 
-    @Test(expected = InvalidSize.class)
-    public void testVUtilTwoArgsInvalidSize( ) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
+    @Test(expected = InvalidSizeException.class)
+    public void testVUtilTwoArgsInvalidSize( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
     {
         VUtil vUtil1 = new VUtil("/tmp/vutilTwo.vdisk", 0, 1024);
     }
 
-    @Test(expected = InvalidBlockSize.class)
-    public void testVUtilTwoArgsInvalidBlockSize( ) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
+    @Test(expected = InvalidBlockSizeException.class)
+    public void testVUtilTwoArgsInvalidBlockSize( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
     {
         VUtil vUtil1 = new VUtil("/tmp/vutilTwo.vdisk", 1024, 8);
     }
 
     @Test
-    public void testVUtilTwoArgs( ) throws InvalidSize, InvalidBlockSize, VDiskCreationException, FileNotFoundException
+    public void testVUtilTwoArgs( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
     {
         VUtil vUtil1 = new VUtil(CREATE_TEST_VDISK_FILE, 4096, 64);
         SuperBlock superBlock = vUtil1.getSuperBlock();

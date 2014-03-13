@@ -1,7 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockSize;
-import ch.ethz.jcd.main.exceptions.InvalidSize;
+import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +31,11 @@ public class VDiskCopyTest
         {
             vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
         }
-        catch (InvalidSize invalidSize)
+        catch (InvalidSizeException invalidSize)
         {
             invalidSize.printStackTrace();
         }
-        catch (InvalidBlockSize invalidBlockSize)
+        catch (InvalidBlockSizeException invalidBlockSize)
         {
             invalidBlockSize.printStackTrace();
         }
