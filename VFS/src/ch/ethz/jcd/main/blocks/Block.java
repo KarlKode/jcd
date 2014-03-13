@@ -120,4 +120,11 @@ public class Block
     {
         return (other instanceof Block) && Arrays.equals(bytes, ((Block) other).bytes) && address == ((Block) other).address;
     }
+
+    /**
+     * Commit all operations that have been made on the Block and prepare it to be written to disk
+     */
+    public void commit()
+    {
+    }
 }

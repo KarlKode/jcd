@@ -96,6 +96,12 @@ public class BitMapBlock extends Block
         return bytes.length * 8;
     }
 
+    @Override
+    public void commit()
+    {
+        bytes = bitMap.toByteArray();
+    }
+
     private boolean isValidBlockAddress(int blockAddress)
     {
         return blockAddress < capacity();
