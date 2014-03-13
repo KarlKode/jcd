@@ -85,6 +85,7 @@ public class SuperBlock extends DirectoryBlock
 
     /**
      * Get the block address of the DirectoryBlock of the root directory
+     *
      * @return block address of the DirectoryBlock of the root directory
      */
     public int getRootDirectoryBlock()
@@ -94,6 +95,7 @@ public class SuperBlock extends DirectoryBlock
 
     /**
      * Get the block address of the first BitMapBlock of the FS the SuperBlock belongs to
+     *
      * @return block address of the first BitMapBlock of the FS the SuperBlock belongs to
      */
     public int getFirstBitMapBlock()
@@ -103,6 +105,7 @@ public class SuperBlock extends DirectoryBlock
 
     /**
      * Get the block address of the last BitMapBlock of the FS the SuperBlock belongs to
+     *
      * @return block address of the last BitMapBlock of the FS the SuperBlock belongs to
      */
     public int getLastBitMapBlock()
@@ -113,6 +116,7 @@ public class SuperBlock extends DirectoryBlock
 
     /**
      * Get the block address of the first Block with real data of the FS the SuperBlock belongs to
+     *
      * @return block address of the first Block with real data of the FS the SuperBlock belongs to
      */
     public int getFirstDataBlock()
