@@ -75,7 +75,6 @@ public class BitMapBlockTest
     {
         BitMapBlock block = new BitMapBlock(0, new byte[1]);
         block.setUsed(8);
-        System.out.println(block.isUnused(8));
     }
 
     @Test(expected = BlockAddressOutOfBoundException.class)
