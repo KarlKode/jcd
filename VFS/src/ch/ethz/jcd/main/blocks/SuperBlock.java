@@ -3,7 +3,7 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 
-public class SuperBlock extends DirectoryBlock
+public class SuperBlock extends Block
 {
     public static final int MIN_SUPER_BLOCK_SIZE = 16;
     public static final int OFFSET_BLOCK_SIZE = 0;
@@ -24,7 +24,7 @@ public class SuperBlock extends DirectoryBlock
      */
     public SuperBlock(byte[] bytes) throws InvalidBlockSizeException
     {
-        super(bytes);
+        super(SUPER_BLOCK_ADDRESS, bytes);
 
         if (bytes == null || bytes.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {

@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.visitor;
 
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.layer.VType;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
@@ -71,7 +72,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T directory(DirectoryBlock block, Void arg)
+    public T directory(DirectoryBlock block, Void arg) throws InvalidNameException
     {
         if (dest.equals(block.getName()))
         {
@@ -86,7 +87,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
         {
             Block b = vUtil.read(i.next());
 
-            inode = visit(b, arg);
+            inode = visit(new InodeBlock(b), arg);
         }
 
         return (T) inode;
@@ -106,6 +107,25 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
             return (T) block;
         }
         return null;
+    }
+
+    /**
+     *
+     * @param block current Block in search progress
+     * @param arg VUtil used to load Blocks form disk
+     * @return the loaded Block if the given destination is found, null otherwise
+     */
+    @Override
+    public T inode(InodeBlock block, Void arg) throws InvalidNameException
+    {
+        if(block.isDirectory())
+        {
+            return visit(new DirectoryBlock(block, block.getName()), arg);
+        }
+        else
+        {
+            return visit(new FileBlock(block, block.getName()), arg);
+        }
     }
 
     /**

@@ -11,14 +11,6 @@ public class Block
     protected ByteBuffer block;
     protected int address;
 
-
-    /**
-     * Instantiate a new Block
-     */
-    public Block()
-    {
-    }
-
     /**
      * Instantiate a new Block with the given block address
      *
@@ -54,7 +46,7 @@ public class Block
     public Block(Block block)
     {
         this.address = block.address;
-        this.bytes = block.bytes;
+        setBytes(block.bytes);
     }
 
     /**

@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.layer;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
 import java.util.LinkedList;
@@ -28,8 +29,8 @@ public class VDirectory extends VType
     }
 
     @Override
-    public InodeBlock toBlock(Block block)
+    public InodeBlock toBlock(Block block) throws InvalidNameException
     {
-        return new DirectoryBlock(block);
+        return new DirectoryBlock(block, this.name);
     }
 }

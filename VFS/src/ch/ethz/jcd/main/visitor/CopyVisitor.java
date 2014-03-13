@@ -2,6 +2,7 @@ package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
@@ -36,9 +37,9 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     }
 
     @Override
-    public Block directory(DirectoryBlock block, Void arg) throws DiskFullException, BlockFullException
+    public Block directory(DirectoryBlock block, Void arg) throws DiskFullException, BlockFullException, InvalidNameException
     {
-        DirectoryBlock dir = new DirectoryBlock(allocator.allocate());
+        DirectoryBlock dir = new DirectoryBlock(allocator.allocate(), block.getName());
 
         for (Integer blockAddress : block.getBlockAddressList())
         {
@@ -51,9 +52,9 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     }
 
     @Override
-    public Block file(FileBlock block, Void arg) throws DiskFullException, BlockFullException
+    public Block file(FileBlock block, Void arg) throws DiskFullException, BlockFullException, InvalidNameException
     {
-        FileBlock file = new FileBlock(allocator.allocate());
+        FileBlock file = new FileBlock(allocator.allocate(), block.getName());
 
         for (Integer blockAddress : block.getBlockAddressList())
         {
@@ -63,6 +64,12 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
         vUtil.write(file);
 
         return file;
+    }
+
+    @Override
+    public Block inode(InodeBlock block, Void arg) throws InvalidNameException
+    {
+        return null;
     }
 
     @Override

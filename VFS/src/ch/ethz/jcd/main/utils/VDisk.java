@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
+import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
@@ -48,7 +49,15 @@ public class VDisk
     private void init( )
     {
         allocator = new Allocator(vUtil);
-        root = new DirectoryBlock(vUtil.getSuperBlock().getRootDirectoryBlock());
+        Block b = vUtil.read(vUtil.getSuperBlock().getRootDirectoryBlock());
+        try
+        {
+            root = new DirectoryBlock(b, "");
+        }
+        catch (InvalidNameException e)
+        {
+            e.printStackTrace();
+        }
         // TODO
         throw new NotImplementedException();
     }
@@ -60,7 +69,7 @@ public class VDisk
      * @param dest - destination
      * @return - create InodeBlock in the VFS
      */
-    public void create(VType src, VDirectory dest) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException
+    public void create(VType src, VDirectory dest) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(dest, vUtil);
 

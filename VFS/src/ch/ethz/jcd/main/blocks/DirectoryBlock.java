@@ -1,32 +1,18 @@
 package ch.ethz.jcd.main.blocks;
 
-import java.util.LinkedList;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import ch.ethz.jcd.main.exceptions.ToDoException;
 
 public class DirectoryBlock extends InodeBlock
 {
-    private LinkedList<InodeBlock> blocks = new LinkedList<InodeBlock>();
-
-    public DirectoryBlock()
+    public DirectoryBlock(Block block, String name) throws InvalidNameException
     {
+        super(block, name);
     }
 
-    public DirectoryBlock(Block block)
+    @Override
+    public int size()
     {
-        super(block);
-    }
-
-    public DirectoryBlock(int blockAddress)
-    {
-        super(blockAddress);
-    }
-
-    public DirectoryBlock(byte[] bytes)
-    {
-        super(bytes);
-    }
-
-    public DirectoryBlock(int blockAddress, byte[] bytes)
-    {
-        super(blockAddress, bytes);
+        throw new ToDoException( );
     }
 }

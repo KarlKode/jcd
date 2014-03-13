@@ -135,8 +135,6 @@ public class VUtil
      */
     public void write(Block block)
     {
-        block.commit();
-
         try
         {
             raf.seek(getBlockOffset(block.getAddress()));

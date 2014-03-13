@@ -1,7 +1,5 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.DiskFullException;
-import ch.ethz.jcd.main.exceptions.ToDoException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,7 +11,8 @@ public class BlockTest
     {
         // Default value for integer
         int blockAddress = 0;
-        Block block = new Block();
+        byte[] bytes = null;
+        Block block = new Block(bytes);
         assertEquals(blockAddress, block.getAddress());
     }
 
@@ -37,7 +36,8 @@ public class BlockTest
     public void testSetAddress() throws Exception
     {
         int blockAddress = 1024;
-        Block block = new Block();
+        byte[] bytes = null;
+        Block block = new Block(bytes);
         blockAddress = 0;
         block.setAddress(blockAddress);
         assertEquals(blockAddress, block.getAddress());
@@ -52,7 +52,8 @@ public class BlockTest
     @Test
     public void testGetBytes0() throws Exception
     {
-        Block block = new Block();
+        byte[] bytes = null;
+        Block block = new Block(bytes);
         assertEquals(null, block.getBytes());
     }
 
@@ -67,17 +68,18 @@ public class BlockTest
     @Test
     public void testSetBytes0() throws Exception
     {
-        Block block = new Block();
-        block.setBytes(null);
-        assertEquals(null, block.getBytes());
+        byte[] bytes = null;
+        Block block = new Block(bytes);
+        bytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        block.setBytes(bytes);
+        assertEquals(bytes, block.getBytes());
     }
 
     @Test
     public void testSetBytes1() throws Exception
     {
         byte[] bytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        Block block = new Block();
-        block.setBytes(bytes);
+        Block block = new Block(bytes);
         assertEquals(bytes, block.getBytes());
     }
 }

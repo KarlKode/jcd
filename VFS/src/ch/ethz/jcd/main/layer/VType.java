@@ -2,6 +2,7 @@ package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.InodeBlock;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
 public abstract class VType
@@ -12,7 +13,7 @@ public abstract class VType
 
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
-    public abstract InodeBlock toBlock(Block block);
+    public abstract InodeBlock toBlock(Block block) throws InvalidNameException;
 
     public String getName()
     {

@@ -1,24 +1,19 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import ch.ethz.jcd.main.exceptions.ToDoException;
+
 public class FileBlock extends InodeBlock
 {
-    public FileBlock(Block b)
+    public FileBlock(Block b, String name) throws InvalidNameException
     {
-        super(b);
+        super(b, name);
     }
 
-    public FileBlock(int blockAddress)
+    @Override
+    public int size()
     {
-        super(blockAddress);
-    }
-
-    public FileBlock(byte[] bytes)
-    {
-        super(bytes);
-    }
-
-    public FileBlock(byte[] bytes, int blockAddress)
-    {
-        super(blockAddress, bytes);
+        throw new ToDoException( );
     }
 }
+

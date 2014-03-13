@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.layer;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
 public class VFile extends VType
@@ -17,9 +18,9 @@ public class VFile extends VType
         return visitor.file(this, arg);
     }
 
-    public InodeBlock toBlock(Block block)
+    public InodeBlock toBlock(Block block) throws InvalidNameException
     {
-        return new FileBlock(block);
+        return new FileBlock(block, this.name);
     }
 
     public int getSize()
