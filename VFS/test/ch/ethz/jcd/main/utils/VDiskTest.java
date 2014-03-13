@@ -14,7 +14,7 @@ public class VDiskTest
     private String vDiskFile = "/tmp/test.vdisk";
 
     @Before
-    public void removeOldVDisk()
+    public void removeOldVDisk() throws Exception
     {
         File f = new File(vDiskFile);
         if (f.exists())
@@ -24,7 +24,7 @@ public class VDiskTest
     }
 
     @Test
-    public void testValidCreation0() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testValidCreation0() throws Exception
     {
         long size = 1024L;
         int blockSize = 1024; // 1 kB
@@ -33,7 +33,7 @@ public class VDiskTest
 
     // Size is checked before block size -> throws InvalidSizeException
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidBlockSize0() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testInvalidBlockSize0() throws Exception
     {
         long size = 1024L;
         int blockSize = 0;
@@ -41,7 +41,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidBlockSizeException.class)
-    public void testInvalidBlockSize1() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testInvalidBlockSize1() throws Exception
     {
         long size = -1L; // -1 to make size % blockSize == 0
         int blockSize = -1;
@@ -49,7 +49,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize0() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testInvalidSize0() throws Exception
     {
         long size = 0L;
         int blockSize = 1024;
@@ -57,7 +57,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize1() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testInvalidSize1() throws Exception
     {
         long size = -1L;
         int blockSize = 1024;
@@ -65,7 +65,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize2() throws VDiskCreationException, InvalidSizeException, InvalidBlockSizeException, FileNotFoundException
+    public void testInvalidSize2() throws Exception
     {
         long size = 1L;
         int blockSize = 1024;

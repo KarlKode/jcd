@@ -3,10 +3,7 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.SuperBlock;
-import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,17 +24,13 @@ public class VUtil
         init();
     }
 
-    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
+    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException, InvalidBlockCountException
     {
         this.vDiskFile = vDiskFile;
         // Check diskSize and blockSize for validity
         if (diskSize <= 0 || diskSize % blockSize != 0)
         {
             throw new InvalidSizeException();
-        }
-        if (blockSize < SuperBlock.MIN_SUPER_BLOCK_SIZE)
-        {
-            throw new InvalidBlockSizeException();
         }
 
         // Create the VDisk file
@@ -61,7 +54,7 @@ public class VUtil
         //throw new NotImplementedException();
     }
 
-    private void init(long diskSize, int blockSize)
+    private void init(long diskSize, int blockSize) throws InvalidBlockSizeException, InvalidBlockCountException
     {
         // Create the superblock of the VDisk
         SuperBlock newSuperBlock = new SuperBlock(new byte[blockSize]);
@@ -107,7 +100,16 @@ public class VUtil
         {
             e.printStackTrace();
         }
-        SuperBlock block = new SuperBlock(bytes);
+        SuperBlock block = null;
+        try
+        {
+            block = new SuperBlock(bytes);
+        } catch (InvalidBlockSizeException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
+
         // Read the whole super block
         bytes = new byte[block.getBlockSize()];
         try

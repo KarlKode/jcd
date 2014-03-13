@@ -2,6 +2,10 @@ package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
+import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.InvalidSizeException;
+import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VType;
@@ -36,7 +40,7 @@ public class VDisk
      * @param vDiskFile path to the VDisk file
      * @param size      total size of the VDisk
      */
-    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException
+    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException, InvalidBlockCountException
     {
         vUtil = new VUtil(vDiskFile, size, blockSize);
         allocator = new Allocator(vUtil);

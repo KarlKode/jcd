@@ -7,6 +7,7 @@ import java.util.BitSet;
 public class BitMapBlock extends Block
 {
     private BitSet bitMap;
+    private int usedBlocks;
 
     /**
      * Instantiate a new BitMapBlock
@@ -18,6 +19,12 @@ public class BitMapBlock extends Block
     {
         super(blockAddress, bytes);
         bitMap = BitSet.valueOf(block);
+
+        usedBlocks = 0;
+        for (int i = bitMap.nextSetBit(0); i >= 0; i = bitMap.nextSetBit(i + 1))
+        {
+            usedBlocks++;
+        }
     }
 
     /**
@@ -43,8 +50,13 @@ public class BitMapBlock extends Block
         {
             throw new BlockAddressOutOfBoundException();
         }
-        bitMap.set(blockAddress);
-        bytes = bitMap.toByteArray();
+
+        if (isUnused(blockAddress))
+        {
+            bitMap.set(blockAddress);
+            bytes = bitMap.toByteArray();
+            usedBlocks++;
+        }
     }
 
     /**
@@ -58,8 +70,13 @@ public class BitMapBlock extends Block
         {
             throw new BlockAddressOutOfBoundException();
         }
-        bitMap.clear(blockAddress);
-        bytes = bitMap.toByteArray();
+
+        if (!isUnused(blockAddress))
+        {
+            bitMap.clear(blockAddress);
+            bytes = bitMap.toByteArray();
+            usedBlocks--;
+        }
     }
 
     /**
@@ -69,6 +86,7 @@ public class BitMapBlock extends Block
     {
         bitMap.clear();
         bytes = bitMap.toByteArray();
+        usedBlocks = 0;
     }
 
     /**
@@ -96,10 +114,14 @@ public class BitMapBlock extends Block
         return bytes.length * 8;
     }
 
-    @Override
-    public void commit()
+    /**
+     * Get the number of used Block in this BitMapBlock
+     *
+     * @return the number of used Blocks
+     */
+    public int getUsedBlocks()
     {
-        bytes = bitMap.toByteArray();
+        return usedBlocks;
     }
 
     private boolean isValidBlockAddress(int blockAddress)

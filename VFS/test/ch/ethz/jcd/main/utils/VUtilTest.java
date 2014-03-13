@@ -59,28 +59,9 @@ public class VUtilTest
     }
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
-        try
-        {
-            vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
-        }
-        catch (InvalidSizeException invalidSize)
-        {
-            invalidSize.printStackTrace();
-        }
-        catch (InvalidBlockSizeException invalidBlockSize)
-        {
-            invalidBlockSize.printStackTrace();
-        }
-        catch (VDiskCreationException e)
-        {
-            e.printStackTrace();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
     }
 
     @Test(expected = FileNotFoundException.class)
@@ -90,7 +71,7 @@ public class VUtilTest
     }
 
     @Test
-    public void testVUtilOneArgument( ) throws FileNotFoundException
+    public void testVUtilOneArgument( ) throws Exception
     {
         VUtil vUtil1 = new VUtil("/tmp/vutilOne.vdisk");
 
@@ -105,19 +86,19 @@ public class VUtilTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testVUtilTwoArgsInvalidSize( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
+    public void testVUtilTwoArgsInvalidSize( ) throws Exception
     {
         VUtil vUtil1 = new VUtil("/tmp/vutilTwo.vdisk", 0, 1024);
     }
 
     @Test(expected = InvalidBlockSizeException.class)
-    public void testVUtilTwoArgsInvalidBlockSize( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
+    public void testVUtilTwoArgsInvalidBlockSize( ) throws Exception
     {
         VUtil vUtil1 = new VUtil("/tmp/vutilTwo.vdisk", 1024, 8);
     }
 
     @Test
-    public void testVUtilTwoArgs( ) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException
+    public void testVUtilTwoArgs( ) throws Exception
     {
         VUtil vUtil1 = new VUtil(CREATE_TEST_VDISK_FILE, 4096, 64);
         SuperBlock superBlock = vUtil1.getSuperBlock();
@@ -128,7 +109,7 @@ public class VUtilTest
 
 
     @Test
-    public void testVFSinitialization() throws FileNotFoundException
+    public void testVFSinitialization() throws Exception
     {
         SuperBlock superBlock = vUtil.getSuperBlock();
         assertTrue(superBlock.equals(vUtil.read(0)));
@@ -137,7 +118,7 @@ public class VUtilTest
     }
 
     @Test
-    public void readEmptyBlockTest()
+    public void readEmptyBlockTest() throws Exception
     {
         Block expected = new Block(READ_EMPTY_TEST_BLOCK_ADDRESS, new byte[VDISK_BLOCK_SIZE]);
         Block actual = vUtil.read(READ_EMPTY_TEST_BLOCK_ADDRESS);
@@ -145,7 +126,7 @@ public class VUtilTest
     }
 
     @Test
-    public void readBlockTest()
+    public void readBlockTest() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate(VDISK_BLOCK_SIZE);
         buf.putInt(1);
@@ -160,7 +141,7 @@ public class VUtilTest
 
 
     @Test
-    public void writeTest()
+    public void writeTest() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate(VDISK_BLOCK_SIZE);
         buf.putChar('a');
