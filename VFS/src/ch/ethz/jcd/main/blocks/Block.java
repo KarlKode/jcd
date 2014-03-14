@@ -1,5 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.ToDoException;
+import ch.ethz.jcd.main.utils.ByteArray;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
 
 import java.nio.ByteBuffer;
@@ -7,8 +9,7 @@ import java.util.Arrays;
 
 public class Block
 {
-    protected byte[] bytes;
-    protected ByteBuffer block;
+    protected ByteArray bytes;
     protected int address;
 
     /**
@@ -28,7 +29,7 @@ public class Block
      */
     public Block(byte[] bytes)
     {
-        setBytes(bytes);
+        this.setBytes(bytes);
     }
 
     /**
@@ -40,13 +41,13 @@ public class Block
     public Block(int blockAddress, byte[] bytes)
     {
         address = blockAddress;
-        setBytes(bytes);
+        this.setBytes(bytes);
     }
 
     public Block(Block block)
     {
         this.address = block.address;
-        setBytes(block.bytes);
+        this.setByteArray(block.bytes);
     }
 
     /**
@@ -90,6 +91,16 @@ public class Block
      */
     public byte[] getBytes()
     {
+        return bytes.getBytes();
+    }
+
+    /**
+     * Get the content of the Block
+     *
+     * @return content of the Block
+     */
+    public ByteArray getByteArray()
+    {
         return bytes;
     }
 
@@ -100,11 +111,17 @@ public class Block
      */
     public void setBytes(byte[] bytes)
     {
+        this.bytes.setBytes(bytes);
+    }
+
+    /**
+     * Set the content of the Block
+     *
+     * @param bytes new content of the Block
+     */
+    public void setByteArray(ByteArray bytes)
+    {
         this.bytes = bytes;
-        if (bytes != null)
-        {
-            block = ByteBuffer.wrap(bytes);
-        }
     }
 
     /**
@@ -116,6 +133,7 @@ public class Block
     @Override
     public boolean equals(Object other)
     {
-        return (other instanceof Block) && Arrays.equals(bytes, ((Block) other).bytes) && address == ((Block) other).address;
+        throw new ToDoException();
+        //return (other instanceof Block) && Arrays.equals(bytes, ((Block) other).bytes) && address == ((Block) other).address;
     }
 }

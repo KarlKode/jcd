@@ -19,22 +19,22 @@ public class SuperBlock extends Block
     /**
      * Instantiate a new SuperBlock with the given content
      *
-     * @param bytes the content of the new SuperBlock. Must not be null and bytes.length must be >= MIN_SUPER_BLOCK_SIZE
-     * @throws InvalidBlockSizeException if bytes == null or bytes.length < MIN_SUPER_BLOCK_SIZE
+     * @param b the content of the new SuperBlock. Must not be null and bytes.size must be >= MIN_SUPER_BLOCK_SIZE
+     * @throws InvalidBlockSizeException if bytes == null or bytes.size < MIN_SUPER_BLOCK_SIZE
      */
-    public SuperBlock(byte[] bytes) throws InvalidBlockSizeException
+    public SuperBlock(byte[] b) throws InvalidBlockSizeException
     {
-        super(SUPER_BLOCK_ADDRESS, bytes);
+        super(SUPER_BLOCK_ADDRESS, b);
 
-        if (bytes == null || bytes.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
+        if (b == null || b.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
             throw new InvalidBlockSizeException();
         }
 
         address = SUPER_BLOCK_ADDRESS;
-        blockSize = block.getInt(OFFSET_BLOCK_SIZE);
-        blockCount = block.getInt(OFFSET_BLOCK_COUNT);
-        rootDirectoryBlock = block.getInt(OFFSET_ROOT_DIRECTORY_BLOCK);
+        blockSize = bytes.getInt(OFFSET_BLOCK_SIZE);
+        blockCount = bytes.getInt(OFFSET_BLOCK_COUNT);
+        rootDirectoryBlock = bytes.getInt(OFFSET_ROOT_DIRECTORY_BLOCK);
     }
 
     /**
@@ -50,7 +50,7 @@ public class SuperBlock extends Block
             throw new InvalidBlockSizeException();
         }
         this.blockSize = blockSize;
-        block.putInt(OFFSET_BLOCK_SIZE, this.blockSize);
+        bytes.putInt(OFFSET_BLOCK_SIZE, this.blockSize);
     }
 
     /**
@@ -70,7 +70,7 @@ public class SuperBlock extends Block
             throw new InvalidBlockCountException();
         }
         this.blockCount = blockCount;
-        block.putInt(OFFSET_BLOCK_COUNT, this.blockCount);
+        bytes.putInt(OFFSET_BLOCK_COUNT, this.blockCount);
     }
 
     /**
@@ -124,11 +124,21 @@ public class SuperBlock extends Block
         return 2;
     }
 
+    /**
+     *
+     * @param blockSize
+     * @return whether the given blockSize is valid or not
+     */
     private boolean isValidBlockSize(int blockSize)
     {
         return blockSize >= SuperBlock.MIN_SUPER_BLOCK_SIZE;
     }
 
+    /**
+     *
+     * @param blockCount
+     * @return whether the given blockSize is valid or not
+     */
     private boolean isValidBlockCount(int blockCount)
     {
         return blockCount > 0;

@@ -54,16 +54,16 @@ public class InodeBlock extends Block
     /**
      * This method expands the file by adding a given Block
      *
-     * @param block to add
+     * @param b to add
      * @throws BlockFullException thrown if the maximum file size is reached
      */
-    public void add(Block block) throws BlockFullException
+    public void add(Block b) throws BlockFullException
     {
         if(isBlockFull())
         {
             throw new BlockFullException();
         }
-        blockAddressList.add(block.getAddress());
+        blockAddressList.add(b.getAddress());
         this.storeLinkedBlocks( );
     }
 
@@ -86,11 +86,11 @@ public class InodeBlock extends Block
     /**
      * This method removes a given Block from the file
      *
-     * @param block to remove
+     * @param b to remove
      */
-    public void remove(Block block)
+    public void remove(Block b)
     {
-        blockAddressList.remove(block.getAddress());
+        blockAddressList.removeFirstOccurrence(b.getAddress());
         this.storeLinkedBlocks( );
     }
 
@@ -101,7 +101,7 @@ public class InodeBlock extends Block
      */
     public void remove(int blockAddress)
     {
-        blockAddressList.remove(blockAddress);
+        blockAddressList.removeFirstOccurrence(blockAddress);
         this.storeLinkedBlocks( );
     }
 
@@ -120,10 +120,8 @@ public class InodeBlock extends Block
      */
     public void init( )
     {
-        type = block.get(OFFSET_TYPE);
-        byte[] buf = new byte[MAX_NAME_SIZE];
-        block.get(buf, OFFSET_NAME, MAX_NAME_SIZE);
-        name = buf.toString();
+        type = bytes.get(OFFSET_TYPE);
+        name = bytes.getString(OFFSET_NAME,MAX_NAME_SIZE).trim();
         this.loadLinkedBlocks();
     }
 
@@ -134,9 +132,17 @@ public class InodeBlock extends Block
     {
         blockAddressList.clear();
 
-        for(int i = OFFSET_BLOCKS; i < bytes.length; i++)
+        for(int i = OFFSET_BLOCKS; i < bytes.size(); i = i + 4)
         {
-            blockAddressList.add(block.getInt(i));
+            int address = bytes.getInt(i);
+            if(address > 0)
+            {
+                blockAddressList.add(address);
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
@@ -147,9 +153,9 @@ public class InodeBlock extends Block
     {
         int i = OFFSET_BLOCKS;
         Iterator<Integer> it = blockAddressList.iterator();
-        while(i < bytes.length && it.hasNext())
+        while(i < bytes.size() && it.hasNext())
         {
-            block.putInt(i, blockAddressList.get(it.next()));
+            bytes.putInt(i, blockAddressList.get(it.next()));
             i++;
         }
     }
@@ -166,8 +172,9 @@ public class InodeBlock extends Block
             throw new InvalidNameException();
         }
         this.name = name;
-        byte[] bytes = name.getBytes();
-        block.put(bytes, OFFSET_NAME, bytes.length);
+        
+        //byte[] bytes = name.getBytes();
+        //block.put(bytes, OFFSET_NAME, bytes.size);
     }
 
     /**
@@ -176,7 +183,7 @@ public class InodeBlock extends Block
      */
     public boolean isBlockFull( )
     {
-        return (blockAddressList.size()) >= (bytes.length - OFFSET_BLOCKS) / 4;
+        return (blockAddressList.size()) >= (bytes.size() - OFFSET_BLOCKS) / 4;
     }
 
     /**
@@ -221,6 +228,6 @@ public class InodeBlock extends Block
      */
     public String getName( )
     {
-        return name;
+        return name.trim();
     }
 }
