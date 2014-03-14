@@ -3,9 +3,11 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.exceptions.ToDoException;
+import ch.ethz.jcd.main.utils.ByteArray;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -21,31 +23,37 @@ public class InodeBlockTest
 
     private InodeBlock init(byte[] head)
     {
-        ByteBuffer buf = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
-        buf.put(head);
-        return new InodeBlock(new Block(buf.array()));
+        ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
+        buf.put(0, head);
+        return new InodeBlock(new Block(buf.getBytes()));
     }
+
+    private InodeBlock initName(byte[] head, String name) throws InvalidNameException
+    {
+        ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
+        buf.put(0, head);
+        return new InodeBlock(new Block(buf.getBytes()), name);
+    }
+
 
     private InodeBlock initAddressList(byte[] head, byte[] list)
     {
-        ByteBuffer buf = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
-        buf.put(head);
-        byte[] filler = new byte[InodeBlock.OFFSET_BLOCKS - head.length];
-        buf.put(filler);
-        buf.put(list);
-        return new InodeBlock(new Block(buf.array()));
+        ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
+        buf.put(0, head);
+        buf.put(InodeBlock.OFFSET_BLOCKS, list);
+        return new InodeBlock(new Block(buf.getBytes()));
     }
 
 
     private InodeBlock initFull(byte[] head)
     {
-        ByteBuffer buf = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
-        buf.put(head);
+        ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
+        buf.put(0, head);
         for(int i = InodeBlock.OFFSET_BLOCKS; i < BLOCK_SIZE; i++)
         {
             buf.put(i, Byte.MAX_VALUE);
         }
-        return new InodeBlock(new Block(buf.array()));
+        return new InodeBlock(new Block(buf.getBytes()));
     }
 
 
@@ -61,11 +69,7 @@ public class InodeBlockTest
     public void testInodeBlockTwoArgs() throws InvalidNameException
     {
         String filename = "inode.txt";
-        ByteBuffer buf = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
-        buf.put(FILE_HEAD);
-
-        InodeBlock inode = new InodeBlock(new Block(buf.array()), filename);
-
+        InodeBlock inode = initName(FILE_HEAD, filename);
         assertEquals(filename, inode.getName());
         assertEquals(InodeBlock.TYPE_FILE, inode.getType());
     }
@@ -74,10 +78,7 @@ public class InodeBlockTest
     public void testInodeBlockTwoArgsInvalidName() throws InvalidNameException
     {
         String filename = null;
-        ByteBuffer buf = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
-        buf.put(FILE_HEAD);
-
-        InodeBlock inode = new InodeBlock(new Block(buf.array()), filename);
+        InodeBlock inode = initName(FILE_HEAD, filename);
     }
 
     @Test
@@ -90,7 +91,7 @@ public class InodeBlockTest
         assertEquals(1, inode.getBlockAddressList().size());
         assertEquals(blockAddress, inode.getBlockAddressList().get(0));
         InodeBlock expected = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
-        assertEquals(expected.getBytes(), inode.getBytes());
+        assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
     }
 
     @Test(expected = BlockFullException.class)
@@ -111,7 +112,7 @@ public class InodeBlockTest
         assertEquals(1, inode.getBlockAddressList().size());
         assertEquals(blockAddress, inode.getBlockAddressList().get(0));
         InodeBlock expected = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
-        assertEquals(expected.getBytes(), inode.getBytes());
+        assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
     }
 
     @Test (expected = BlockFullException.class)
@@ -132,7 +133,7 @@ public class InodeBlockTest
         inode.remove(new Block(blockAddress));
         assertEquals(0, inode.getBlockAddressList().size());
         InodeBlock expected = init(FILE_HEAD);
-        assertEquals(expected.getBytes(), inode.getBytes());
+        assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
     }
 
     @Test
@@ -141,11 +142,11 @@ public class InodeBlockTest
         Integer blockAddress = 1234;
         InodeBlock inode = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
         assertEquals(1, inode.getBlockAddressList().size());
+        assertEquals(blockAddress, inode.getBlockAddressList().get(0));
         inode.remove(blockAddress);
         assertEquals(0, inode.getBlockAddressList().size());
-        assertEquals(blockAddress, inode.getBlockAddressList().get(0));
         InodeBlock expected = init(FILE_HEAD);
-        assertEquals(expected.getBytes(), inode.getBytes());
+        assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
     }
 
     @Test
@@ -175,12 +176,14 @@ public class InodeBlockTest
         String name = "inode.txt";
         InodeBlock inode = init(FILE_HEAD);
         InodeBlock expected = init(FILE_HEAD);
-        ByteBuffer buf = ByteBuffer.wrap(expected.bytes.getBytes());
-        buf.put(InodeBlock.TYPE_FILE);
-        buf.put(name.getBytes(), 0, name.getBytes().length);
+
+        ByteArray buf = new ByteArray(expected.bytes.getBytes());
+        buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
+        buf.put(InodeBlock.OFFSET_NAME, name.getBytes());
         inode.setName(name);
+
         assertTrue(name.equals(inode.getName()));
-        assertEquals(buf.array(), inode.getBytes());
+        assertTrue(Arrays.equals(buf.getBytes(), inode.getBytes()));
     }
 
     @Test(expected = InvalidNameException.class)

@@ -25,11 +25,11 @@ public class Block
     /**
      * Instantiate a new Block with the given content
      *
-     * @param bytes the content of the new Block
+     * @param b  the content of the new Block
      */
-    public Block(byte[] bytes)
+    public Block(byte[] b)
     {
-        this.setBytes(bytes);
+        this.setBytes(b);
     }
 
     /**
@@ -107,21 +107,21 @@ public class Block
     /**
      * Set the content of the Block
      *
-     * @param bytes new content of the Block
+     * @param b new content of the Block
      */
-    public void setBytes(byte[] bytes)
+    public void setBytes(byte[] b)
     {
-        this.bytes.setBytes(bytes);
+        this.bytes = new ByteArray(b);
     }
 
     /**
      * Set the content of the Block
      *
-     * @param bytes new content of the Block
+     * @param array new content of the Block
      */
-    public void setByteArray(ByteArray bytes)
+    public void setByteArray(ByteArray array)
     {
-        this.bytes = bytes;
+        this.bytes = array;
     }
 
     /**

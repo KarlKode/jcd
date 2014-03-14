@@ -155,26 +155,25 @@ public class InodeBlock extends Block
         Iterator<Integer> it = blockAddressList.iterator();
         while(i < bytes.size() && it.hasNext())
         {
-            bytes.putInt(i, blockAddressList.get(it.next()));
-            i++;
+            bytes.putInt(i, it.next());
+            i = i + 4;
         }
+        bytes.clear(i);
     }
 
     /**
-     * This method sets the name of the Block
+     * This method sets the name of the Blockit
      *
      * @param name name to set
      */
     public void setName( String name ) throws InvalidNameException
     {
-        if(name.length() > MAX_NAME_SIZE)
+        if(name == null || name.length() > MAX_NAME_SIZE)
         {
             throw new InvalidNameException();
         }
         this.name = name;
-        
-        //byte[] bytes = name.getBytes();
-        //block.put(bytes, OFFSET_NAME, bytes.size);
+        bytes.put(OFFSET_NAME, name.getBytes( ));
     }
 
     /**

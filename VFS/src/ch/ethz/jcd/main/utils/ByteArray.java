@@ -19,12 +19,35 @@ public class ByteArray
         return bytes.length;
     }
 
-    public void put(byte b, int index)
+    public void clearAll( )
+    {
+        bytes = new byte[bytes.length];
+    }
+
+    public void clearAt(int index)
+    {
+        bytes[index] = 0;
+    }
+
+    public void clear(int index)
+    {
+        this.clear(index, bytes.length - index);
+    }
+
+    public void clear(int index, int len)
+    {
+        for(int i = index; i < index + len; i++)
+        {
+            bytes[i] = 0;
+        }
+    }
+
+    public void put(int index, byte b)
     {
         bytes[index] = b;
     }
 
-    public void put(byte[] b, int index)
+    public void put(int index, byte[] b)
     {
         for(int i = 0; i < b.length; i++)
         {
@@ -32,15 +55,15 @@ public class ByteArray
         }
     }
 
-    public void putInt(int i, int index)
+    public void putInt(int index, int i)
     {
         byte[] buf = ByteBuffer.allocate(4).putInt(i).array();
-        this.put(buf, index);
+        this.put(index, buf);
     }
 
     public void putString(String s, int index) throws IndexOutOfBoundsException
     {
-        this.put(s.getBytes(), index);
+        this.put(index, s.getBytes());
     }
 
     public byte get(int index)
