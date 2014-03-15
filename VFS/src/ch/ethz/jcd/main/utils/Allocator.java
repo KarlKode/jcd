@@ -15,13 +15,38 @@ public class Allocator
     private VUtil vUtil;
 
     /**
-     * Instantiate a new Allocator
+     * Instantiate a new Allocator. The SuperBlock stored in the VUtil contains
+     * knows about the first block that could be allocated. The ones before are
+     * reserved.
      *
      * @param vUtil - VUtil of the VDisk the Allocator belongs to
      */
     public Allocator(VUtil vUtil)
     {
         this.vUtil = vUtil;
+        this.reserve();
+    }
+
+    /**
+     * This method reserves the first n Blocks according to the SuperBlock
+     */
+    private void reserve()
+    {
+        int len = vUtil.getSuperBlock().getFirstDataBlock();
+        for(int i = 0; i < len; i++)
+        {
+            try
+            {
+                vUtil.getBitMapBlock().setUsed(i);
+            }
+            catch (BlockAddressOutOfBoundException e)
+            {
+                //TODO should never happen since the Disk is at least of the header size
+                e.printStackTrace();
+            }
+        }
+        // Sync
+        vUtil.write(vUtil.getBitMapBlock());
     }
 
     /**
@@ -37,18 +62,16 @@ public class Allocator
         try
         {
             freeBlockAddress = vUtil.getBitMapBlock().allocateBlock();
-        } catch (BlockAddressOutOfBoundException e)
+        }
+        catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
 
-        Block newBlock = new Block(freeBlockAddress, new byte[vUtil.getSuperBlock().getBlockSize()]);
-
         // Sync
         vUtil.write(vUtil.getBitMapBlock());
-        vUtil.write(newBlock);
 
-        return newBlock;
+        return new Block(freeBlockAddress, new byte[vUtil.getSuperBlock().getBlockSize()]);
     }
 
     /**
@@ -63,7 +86,7 @@ public class Allocator
             vUtil.getBitMapBlock().setUnused(block.getAddress());
         } catch (BlockAddressOutOfBoundException e)
         {
-            // TODO This should never happen!
+            // This should never happen
             e.printStackTrace();
         }
 
@@ -73,13 +96,16 @@ public class Allocator
 
     /**
      * Check if a Block is unused
+     *
+     * @return true if block is free, false otherwise
      */
     public boolean isFree(Block block)
     {
         try
         {
             return vUtil.getBitMapBlock().isUnused(block.getAddress());
-        } catch (BlockAddressOutOfBoundException e)
+        }
+        catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
             e.printStackTrace();
@@ -93,18 +119,8 @@ public class Allocator
     public void format()
     {
         vUtil.getBitMapBlock().clear();
-        try
-        {
-            vUtil.getBitMapBlock().setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
-            vUtil.getBitMapBlock().setUsed(SuperBlock.BIT_MAP_BLOCK_ADDRESS);
-        } catch (BlockAddressOutOfBoundException e)
-        {
-            // This should never happen
-            e.printStackTrace();
-        }
-
-        //TODO Root Directory Block Address
-        vUtil.write(vUtil.getSuperBlock());
+        this.reserve();
+        // Sync
         vUtil.write(vUtil.getBitMapBlock());
     }
 

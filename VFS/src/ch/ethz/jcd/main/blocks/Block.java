@@ -1,12 +1,14 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.ToDoException;
 import ch.ethz.jcd.main.utils.ByteArray;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+/**
+ * This class represents the general Block. It also holds the byte
+ * structure that it could be easily written to or read from disk.
+ */
 public class Block
 {
     protected ByteArray bytes;
@@ -133,7 +135,6 @@ public class Block
     @Override
     public boolean equals(Object other)
     {
-        throw new ToDoException();
-        //return (other instanceof Block) && Arrays.equals(bytes, ((Block) other).bytes) && address == ((Block) other).address;
+        return (other instanceof Block) && Arrays.equals(bytes.getBytes(), ((Block) other).bytes.getBytes()) && address == ((Block) other).address;
     }
 }

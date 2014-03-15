@@ -3,6 +3,11 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 
+/**
+ * This class represents the SuperBlock. The SuperBlock contains all
+ * information about block size, block count, root directory block,
+ * BitMapBlocks, etc.
+ */
 public class SuperBlock extends Block
 {
     public static final int MIN_SUPER_BLOCK_SIZE = 16;
@@ -63,6 +68,12 @@ public class SuperBlock extends Block
         return blockSize;
     }
 
+    /**
+     * This method sets the number of Blocks the Disk contains
+     *
+     * @param blockCount to set
+     * @throws InvalidBlockCountException if blockCount is invalid
+     */
     public void setBlockCount(int blockCount) throws InvalidBlockCountException
     {
         if (!isValidBlockCount(blockCount))

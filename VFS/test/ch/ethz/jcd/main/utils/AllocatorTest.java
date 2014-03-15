@@ -1,11 +1,12 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.Block;
-import ch.ethz.jcd.main.exceptions.DiskFullException;
+import ch.ethz.jcd.main.exceptions.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.Assert.*;
 
@@ -21,8 +22,7 @@ public class AllocatorTest
 
     private VUtil vUtil;
 
-    @Before
-    public void setUp() throws Exception
+    private void setUp() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         // Remove old disk if it exists
         File f = new File(VDISK_FILE);
@@ -35,23 +35,26 @@ public class AllocatorTest
     }
 
     @Test
-    public void testConstructor( ) throws Exception
+    public void testConstructor( ) throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
+        this.setUp();
         Allocator a = new Allocator(vUtil);
         assertEquals(2, a.getUsedBlocks());
     }
 
     @Test
-    public void testAllocateBlock( ) throws DiskFullException
+    public void testAllocateBlock( ) throws DiskFullException, FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
+        this.setUp();
         Allocator a = new Allocator(vUtil);
         Block b = a.allocate();
         assertFalse(a.isFree(b));
     }
 
     @Test(expected = DiskFullException.class)
-    public void testAllocateOnFullDisk( ) throws DiskFullException
+    public void testAllocateOnFullDisk( ) throws DiskFullException, FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
+        this.setUp();
         Allocator a = new Allocator(vUtil);
         for(int i = 0; i < VDISK_BLOCK_COUNT; i++)
         {
@@ -60,13 +63,29 @@ public class AllocatorTest
     }
 
     @Test
-    public void testFreeBlock( ) throws DiskFullException
+    public void testFreeBlock( ) throws DiskFullException, FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
+        this.setUp();
         Allocator a = new Allocator(vUtil);
-        a.format();
         Block b = a.allocate();
         assertFalse(a.isFree(b));
         a.free(b);
-        assertFalse(a.isFree(b));
+        assertTrue(a.isFree(b));
+    }
+
+    @Test
+    public void testFormat( ) throws DiskFullException, FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
+    {
+        this.setUp();
+        Allocator a = new Allocator(vUtil);
+        for(int i = 0; i < 5; i++)
+        {
+            a.allocate();
+        }
+        assertFalse(a.isFree(new Block(5)));
+        a.format();
+        assertFalse(a.isFree(new Block(0)));
+        assertFalse(a.isFree(new Block(1)));
+        assertTrue(a.isFree(new Block(2)));
     }
 }

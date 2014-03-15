@@ -173,7 +173,7 @@ public class InodeBlock extends Block
             throw new InvalidNameException();
         }
         this.name = name;
-        bytes.put(OFFSET_NAME, name.getBytes( ));
+        bytes.putString(OFFSET_NAME, name);
     }
 
     /**

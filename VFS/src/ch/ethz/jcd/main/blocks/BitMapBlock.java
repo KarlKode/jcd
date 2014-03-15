@@ -85,7 +85,7 @@ public class BitMapBlock extends Block
     public void clear()
     {
         bitMap.clear();
-        bytes.setBytes(bitMap.toByteArray());
+        bytes.setBytes(new byte[bitMap.size()]);
         usedBlocks = 0;
     }
 
