@@ -6,25 +6,22 @@ import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
 
 import java.util.Iterator;
+import java.util.Queue;
 
 /**
  * This visitor is used to determine whether a file exists or not.
  * Returns the loaded Block if the file exists, null otherwise.
  *
+ * TODO update javadoc
+ *
  * @param <T> either a DirectoryBlock or a FileBlock
  */
-public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
+public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<String>>
 {
-    private VType dest;
     private VUtil vUtil;
 
-    /**
-     *
-     * @param dest Destination to seek for
-     */
-    public SeekVisitor(VType dest, VUtil vUtil)
+    public SeekVisitor(VUtil vUtil)
     {
-        this.dest = dest;
         this.vUtil = vUtil;
     }
 
@@ -36,7 +33,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T visit(Block block, Void arg)
+    public T visit(Block block, Queue<String> arg)
     {
         return block.accept(this, arg);
     }
@@ -50,7 +47,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T block(Block block, Void arg)
+    public T block(Block block, Queue<String> arg)
     {
         return null;
     }
@@ -64,24 +61,30 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T directory(DirectoryBlock block, Void arg)
+    public T directory(DirectoryBlock block, Queue<String> arg)
     {
-        if (dest.getName().equals(block.getName()))
+        if (block.getName().equals(arg.peek()))
         {
-            return (T) block;
+            arg.remove();
+
+            if(arg.isEmpty())
+            {
+                return (T) block;
+            }
+
+            InodeBlock inode = null;
+
+            Iterator<Integer> i = block.getBlockAddressList().iterator();
+
+            while (i.hasNext() && inode == null)
+            {
+                Block b = vUtil.read(i.next());
+                inode = visit(new InodeBlock(b), arg);
+            }
+
+            return (T) inode;
         }
-
-        InodeBlock inode = null;
-
-        Iterator<Integer> i = block.getBlockAddressList().iterator();
-
-        while(i.hasNext() && inode == null)
-        {
-            Block b = vUtil.read(i.next());
-            inode = visit(new InodeBlock(b), arg);
-        }
-
-        return (T) inode;
+        return null;
     }
 
     /**
@@ -94,11 +97,16 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T file(FileBlock block, Void arg)
+    public T file(FileBlock block, Queue<String> arg)
     {
-        if (dest.getName().equals(block.getName()))
+        if (block.getName().equals(arg.peek()))
         {
-            return (T) block;
+            arg.remove();
+
+            if(arg.isEmpty())
+            {
+                return (T) block;
+            }
         }
         return null;
     }
@@ -112,7 +120,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T inode(InodeBlock block, Void arg)
+    public T inode(InodeBlock block, Queue<String> arg)
     {
         try
         {
@@ -140,7 +148,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T superBlock(SuperBlock block, Void arg)
+    public T superBlock(SuperBlock block, Queue<String> arg)
     {
         return null;
     }
@@ -153,7 +161,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T bitMapBlock(BitMapBlock block, Void arg)
+    public T bitMapBlock(BitMapBlock block, Queue<String> arg)
     {
         return null;
     }

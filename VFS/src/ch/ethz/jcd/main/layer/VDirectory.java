@@ -12,6 +12,11 @@ public class VDirectory extends VType
 {
     protected LinkedList<VType> content = new LinkedList<VType>();
 
+    public VDirectory(String path)
+    {
+        super(path);
+    }
+
     public void add(VType type)
     {
         content.add(type);

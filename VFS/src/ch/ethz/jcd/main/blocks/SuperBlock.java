@@ -2,6 +2,7 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.visitor.BlockVisitor;
 
 /**
  * This class represents the SuperBlock. The SuperBlock contains all
@@ -38,6 +39,19 @@ public class SuperBlock extends Block
         }
 
         this.setBytes(b);
+    }
+
+    /**
+     * TODO describe
+     * @param visitor
+     * @param arg
+     * @param <R>
+     * @param <A>
+     * @return
+     */
+    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
+    {
+        return visitor.superBlock(this, arg);
     }
 
     /**

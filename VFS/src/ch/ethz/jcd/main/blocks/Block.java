@@ -63,7 +63,7 @@ public class Block
      */
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
     {
-        return visitor.visit(this, arg);
+        return visitor.block(this, arg);
     }
 
     /**

@@ -1,6 +1,8 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VFile;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,20 +11,36 @@ import java.io.FileNotFoundException;
 
 public class VDiskTest
 {
+    private static final String VDISK_FILE= "test/vutilOne.vdisk";
+    private static final int VDISK_BLOCK_SIZE = 1024;
+    private static final int VDISK_BLOCK_COUNT = 256;
+
+
     private static final String vDiskFile = "/tmp/test.vdisk";
 
-    @Before
-    public void removeOldVDisk() throws Exception
+    private void deleteFile(String filename)
     {
-        File f = new File(vDiskFile);
+        File f = new File(filename);
         if (f.exists())
         {
             f.delete();
         }
     }
 
+    private void setUp( )
+    {
+        this.deleteFile(VDISK_FILE);
+        FDisk.fdisk(VDISK_FILE, VDISK_BLOCK_SIZE, VDISK_BLOCK_COUNT);
+    }
+
+    @Before
+    public void removeOldVDisk()
+    {
+        deleteFile(vDiskFile);
+    }
+
     @Test
-    public void testValidCreation0() throws Exception
+    public void testValidCreation0() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = 1024L;
         int blockSize = 1024; // 1 kB
@@ -31,7 +49,7 @@ public class VDiskTest
 
     // Size is checked before block size -> throws InvalidSizeException
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidBlockSize0() throws Exception
+    public void testInvalidBlockSize0() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = 1024L;
         int blockSize = 0;
@@ -39,7 +57,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidBlockSizeException.class)
-    public void testInvalidBlockSize1() throws Exception
+    public void testInvalidBlockSize1() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = -1L; // -1 to make size % blockSize == 0
         int blockSize = -1;
@@ -47,7 +65,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize0() throws Exception
+    public void testInvalidSize0() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = 0L;
         int blockSize = 1024;
@@ -55,7 +73,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize1() throws Exception
+    public void testInvalidSize1() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = -1L;
         int blockSize = 1024;
@@ -63,7 +81,7 @@ public class VDiskTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testInvalidSize2() throws Exception
+    public void testInvalidSize2() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         long size = 1L;
         int blockSize = 1024;
@@ -71,27 +89,40 @@ public class VDiskTest
     }
 
     @Test
-    public void testCreate( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    public void testCreate( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
-
+        this.setUp();
+        VDisk vDisk = new VDisk(VDISK_FILE);
+        vDisk.create(new VFile("new.txt"), new VDirectory("/"));
+        //TODO
     }
 
     @Test(expected = DiskFullException.class)
-    public void testCreateDiskFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    public void testCreateDiskFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
-
+        this.setUp();
+        VDisk vDisk = new VDisk(VDISK_FILE);
+        vDisk.create(new VFile("new.txt"), new VDirectory("/"));
+        //TODO
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testCreateNoSuchFileOrDirectory( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    public void testCreateNoSuchFileOrDirectory( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
-
+        this.setUp();
+        VDisk vDisk = new VDisk(VDISK_FILE);
+        vDisk.create(new VFile("new.txt"), new VDirectory("/home"));
     }
 
     @Test(expected = BlockFullException.class)
-    public void testCreateBlockFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    public void testCreateBlockFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
-
+        this.setUp();
+        VDisk vDisk = new VDisk(VDISK_FILE);
+        for(int i = 0; i < VDISK_BLOCK_COUNT; i++)
+        {
+            vDisk.create(new VFile(i+".txt"), new VDirectory("/"));
+        }
     }
 
     @Test(expected = InvalidNameException.class)

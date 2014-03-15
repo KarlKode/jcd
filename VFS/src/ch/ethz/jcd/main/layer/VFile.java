@@ -12,6 +12,11 @@ public class VFile extends VType
 
     protected Byte content;
 
+    public VFile(String path)
+    {
+        super(path);
+    }
+
     @Override
     public <R, A> R accept(VTypeVisitor<R, A> visitor, A arg)
     {

@@ -80,9 +80,9 @@ public class VDisk
      */
     public void create(VType src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(dest, vUtil);
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
         InodeBlock block = src.toBlock(allocator.allocate());
-        DirectoryBlock destDir = sv.visit(root, null);
+        DirectoryBlock destDir = sv.visit(root, dest.getPath());
 
         if(destDir == null)
         {
@@ -139,8 +139,8 @@ public class VDisk
         CopyVisitor cv = new CopyVisitor(vUtil, allocator);
         InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
 
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(dest, vUtil);
-        DirectoryBlock destDir = sv.visit(root, null);
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
+        DirectoryBlock destDir = sv.visit(root, dest.getPath());
 
         if(destDir == null)
         {

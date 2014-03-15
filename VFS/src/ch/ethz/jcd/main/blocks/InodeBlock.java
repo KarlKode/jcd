@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.exceptions.ToDoException;
+import ch.ethz.jcd.main.visitor.BlockVisitor;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -49,6 +50,30 @@ public class InodeBlock extends Block
     {
         super(b);
         this.init();
+    }
+
+    /**
+     * This method initializes the FileBlock. This includes detecting the
+     * inode type, reading the name, loading the linked blocks
+     */
+    public void init( )
+    {
+        type = bytes.get(OFFSET_TYPE);
+        name = bytes.getString(OFFSET_NAME,MAX_NAME_SIZE).trim();
+        this.loadLinkedBlocks();
+    }
+
+    /**
+     * TODO describe
+     * @param visitor
+     * @param arg
+     * @param <R>
+     * @param <A>
+     * @return
+     */
+    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
+    {
+        return visitor.inode(this, arg);
     }
 
     /**
@@ -112,17 +137,6 @@ public class InodeBlock extends Block
     public int size()
     {
         throw new ToDoException();
-    }
-
-    /**
-     * This method initializes the FileBlock. This includes detecting the
-     * inode type, reading the name, loading the linked blocks
-     */
-    public void init( )
-    {
-        type = bytes.get(OFFSET_TYPE);
-        name = bytes.getString(OFFSET_NAME,MAX_NAME_SIZE).trim();
-        this.loadLinkedBlocks();
     }
 
     /**

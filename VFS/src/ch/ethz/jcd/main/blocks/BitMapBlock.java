@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
+import ch.ethz.jcd.main.visitor.BlockVisitor;
 
 import java.util.BitSet;
 
@@ -13,7 +14,7 @@ public class BitMapBlock extends Block
      * Instantiate a new BitMapBlock
      *
      * @param blockAddress block address of the new BitMapBlock
-     * @param bytes        content of the new BitMapBlock
+     * @param b        content of the new BitMapBlock
      */
     public BitMapBlock(int blockAddress, byte[] b)
     {
@@ -44,6 +45,19 @@ public class BitMapBlock extends Block
             usedBlocks++;
         }
         bytes.put(0, bitMap.toByteArray());
+    }
+
+    /**
+     * TODO describe
+     * @param visitor
+     * @param arg
+     * @param <R>
+     * @param <A>
+     * @return
+     */
+    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
+    {
+        return visitor.bitMapBlock(this, arg);
     }
 
     /**
