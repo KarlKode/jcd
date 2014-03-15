@@ -11,6 +11,7 @@ import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 public class SuperBlock extends Block
 {
     public static final int MIN_SUPER_BLOCK_SIZE = 16;
+    public static final int MIN_BLOCK_SIZE = InodeBlock.OFFSET_NAME + InodeBlock.MAX_NAME_SIZE;
     public static final int OFFSET_BLOCK_SIZE = 0;
     public static final int OFFSET_BLOCK_COUNT = 4;
     public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 8;
@@ -29,14 +30,26 @@ public class SuperBlock extends Block
      */
     public SuperBlock(byte[] b) throws InvalidBlockSizeException
     {
-        super(SUPER_BLOCK_ADDRESS, b);
+        super(SUPER_BLOCK_ADDRESS);
 
         if (b == null || b.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
             throw new InvalidBlockSizeException();
         }
 
-        address = SUPER_BLOCK_ADDRESS;
+        this.setBytes(b);
+    }
+
+    /**
+     * This method sets the ByteArray of the SuperBlock and then resets blockSize, blockCount
+     * and rootDirectoryBlock
+     *
+     * @param b new content of the Block
+     */
+    @Override
+    public void setBytes(byte[] b)
+    {
+        super.setBytes(b);
         blockSize = bytes.getInt(OFFSET_BLOCK_SIZE);
         blockCount = bytes.getInt(OFFSET_BLOCK_COUNT);
         rootDirectoryBlock = bytes.getInt(OFFSET_ROOT_DIRECTORY_BLOCK);
@@ -95,6 +108,17 @@ public class SuperBlock extends Block
     }
 
     /**
+     * This method sets the root directory's blockAddress
+     *
+     * @param blockAddress to set
+     */
+    public void setRootDirectoryBlock(int blockAddress)
+    {
+        this.rootDirectoryBlock = blockAddress;
+        bytes.putInt(OFFSET_ROOT_DIRECTORY_BLOCK, this.rootDirectoryBlock);
+    }
+
+    /**
      * Get the block address of the DirectoryBlock of the root directory
      *
      * @return block address of the DirectoryBlock of the root directory
@@ -142,7 +166,7 @@ public class SuperBlock extends Block
      */
     private boolean isValidBlockSize(int blockSize)
     {
-        return blockSize >= SuperBlock.MIN_SUPER_BLOCK_SIZE;
+        return blockSize >= MIN_BLOCK_SIZE;
     }
 
     /**

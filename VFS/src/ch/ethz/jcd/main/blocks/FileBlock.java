@@ -10,6 +10,11 @@ public class FileBlock extends InodeBlock
         super(b, name);
     }
 
+    public FileBlock(Block b)
+    {
+        super(b);
+    }
+
     @Override
     public int size()
     {

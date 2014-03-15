@@ -15,16 +15,35 @@ public class BitMapBlock extends Block
      * @param blockAddress block address of the new BitMapBlock
      * @param bytes        content of the new BitMapBlock
      */
-    public BitMapBlock(int blockAddress, byte[] bytes)
+    public BitMapBlock(int blockAddress, byte[] b)
     {
-        super(blockAddress, bytes);
-        bitMap = BitSet.valueOf(bytes);
+        super(blockAddress, b);
+        bitMap = BitSet.valueOf(b);
 
         usedBlocks = 0;
         for (int i = bitMap.nextSetBit(0); i >= 0; i = bitMap.nextSetBit(i + 1))
         {
             usedBlocks++;
         }
+        bytes.put(0, bitMap.toByteArray());
+    }
+
+    /**
+     * Instantiate a new BitMapBlock
+     *
+     * @param block BitMapBlock read as Block
+     */
+    public BitMapBlock(Block block)
+    {
+        super(block.getAddress(), block.getBytes());
+        bitMap = BitSet.valueOf(block.getBytes());
+
+        usedBlocks = 0;
+        for (int i = bitMap.nextSetBit(0); i >= 0; i = bitMap.nextSetBit(i + 1))
+        {
+            usedBlocks++;
+        }
+        bytes.put(0, bitMap.toByteArray());
     }
 
     /**
@@ -54,7 +73,7 @@ public class BitMapBlock extends Block
         if (isUnused(blockAddress))
         {
             bitMap.set(blockAddress);
-            bytes.setBytes(bitMap.toByteArray());
+            bytes.put(0, bitMap.toByteArray());
             usedBlocks++;
         }
     }
@@ -74,7 +93,7 @@ public class BitMapBlock extends Block
         if (!isUnused(blockAddress))
         {
             bitMap.clear(blockAddress);
-            bytes.setBytes(bitMap.toByteArray());
+            bytes.put(0, bitMap.toByteArray());
             usedBlocks--;
         }
     }

@@ -205,6 +205,15 @@ public class InodeBlock extends Block
 
     /**
      *
+     * @return whether the InodeBlock is empty or not
+     */
+    public boolean isEmpty( )
+    {
+        return blockAddressList.size()  == 0;
+    }
+
+    /**
+     *
      * @return the blockAddressList
      */
     public LinkedList<Integer> getBlockAddressList()

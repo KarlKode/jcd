@@ -16,8 +16,8 @@ public class AllocatorTest
      * General constants
      */
     private static final String VDISK_FILE = "/tmp/allocatorTest.vdisk";
-    private static final int VDISK_SIZE = 1024;
-    private static final int VDISK_BLOCK_SIZE = 16;
+    private static final int VDISK_SIZE = 1024000;
+    private static final int VDISK_BLOCK_SIZE = 256;
     private static final int VDISK_BLOCK_COUNT = VDISK_SIZE / VDISK_BLOCK_SIZE;
 
     private VUtil vUtil;
@@ -39,7 +39,7 @@ public class AllocatorTest
     {
         this.setUp();
         Allocator a = new Allocator(vUtil);
-        assertEquals(2, a.getUsedBlocks());
+        assertEquals(3, a.getUsedBlocks());
     }
 
     @Test

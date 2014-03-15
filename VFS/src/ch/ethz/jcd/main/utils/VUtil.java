@@ -2,6 +2,7 @@ package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.Block;
+import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.SuperBlock;
 import ch.ethz.jcd.main.exceptions.*;
 
@@ -20,6 +21,7 @@ public class VUtil
     private RandomAccessFile raf;
     private SuperBlock superBlock;
     private BitMapBlock bitMapBlock;
+    private DirectoryBlock rootBlock;
 
     /**
      * This constructor builds a new VUtil. Use it if you want to mount an
@@ -34,6 +36,7 @@ public class VUtil
         raf = new RandomAccessFile(this.vDiskFile, "rwd");
         superBlock = loadSuperBlock();
         bitMapBlock = loadBitMapBlock();
+        rootBlock = loadRootDirectoryBlock();
     }
 
     /**
@@ -49,7 +52,7 @@ public class VUtil
      * @throws FileNotFoundException if RandomAccessFile could not find the disk file
      * @throws InvalidBlockCountException if the blockSize does not fit into the diskSize
      */
-    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, FileNotFoundException, InvalidBlockCountException
+    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, InvalidBlockCountException
     {
         this.vDiskFile = vDiskFile;
         // Check diskSize and blockSize for validity
@@ -58,25 +61,27 @@ public class VUtil
             throw new InvalidSizeException();
         }
 
-        // Create the VDisk file
-        File fp = new File(this.vDiskFile);
+        if (blockSize < SuperBlock.MIN_SUPER_BLOCK_SIZE)
+        {
+            throw new InvalidBlockSizeException();
+        }
+
         try
         {
+            // Create the VDisk file
+            File fp = new File(this.vDiskFile);
             if (!fp.createNewFile())
             {
                 throw new VDiskCreationException();
             }
+            raf = new RandomAccessFile(this.vDiskFile, "rw");
         }
         catch (IOException e)
         {
             throw new VDiskCreationException();
         }
 
-        raf = new RandomAccessFile(this.vDiskFile, "rw");
-
         init(diskSize, blockSize);
-
-        //throw new NotImplementedException();
     }
 
     /**
@@ -91,29 +96,31 @@ public class VUtil
     private void init(long diskSize, int blockSize) throws InvalidBlockSizeException, InvalidBlockCountException
     {
         // Create the superblock of the VDisk
-        superBlock = new SuperBlock(new byte[blockSize]);
-        superBlock.setBlockSize(blockSize);
-        superBlock.setBlockCount((int) (diskSize / blockSize));
+        ByteArray bytes = new ByteArray(new byte[blockSize]);
+        bytes.putInt(SuperBlock.OFFSET_BLOCK_SIZE, blockSize);
+        bytes.putInt(SuperBlock.OFFSET_BLOCK_COUNT, (int) (diskSize / blockSize));
+        bytes.putInt(SuperBlock.OFFSET_ROOT_DIRECTORY_BLOCK, 2);
+        superBlock = new SuperBlock(bytes.getBytes());
 
-        // Create the bit map of the VDisk
+        // Create the bit map and the root directory of the VDisk
         try
         {
-            bitMapBlock = new BitMapBlock(superBlock.getFirstBitMapBlock(), new byte[superBlock.getBlockSize()]);
-            // Set the SuperBlock and the BitMapBlock as used
-            bitMapBlock.setUsed(SuperBlock.SUPER_BLOCK_ADDRESS);
-            bitMapBlock.setUsed(superBlock.getFirstBitMapBlock());
+            bitMapBlock = new BitMapBlock(superBlock.getFirstBitMapBlock(), new byte[blockSize]);
+            rootBlock = new DirectoryBlock(new Block(superBlock.getRootDirectoryBlock(), new byte[blockSize]));
+            // Set the SuperBlock, the BitMapBlock and the rootBlock as used
+            bitMapBlock.setUsed(superBlock.getAddress());
+            bitMapBlock.setUsed(bitMapBlock.getAddress());
+            bitMapBlock.setUsed(rootBlock.getAddress());
         }
         catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
             e.printStackTrace();
         }
-
         //Sync
         write(superBlock);
         write(bitMapBlock);
-
-        // TODO Create the root directory block
+        write(rootBlock);
     }
 
     /**
@@ -123,32 +130,21 @@ public class VUtil
      */
     private SuperBlock loadSuperBlock()
     {
+        SuperBlock block = null;
         byte[] bytes = new byte[SuperBlock.MIN_SUPER_BLOCK_SIZE];
+
         try
         {
             raf.read(bytes);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        SuperBlock block = null;
-        try
-        {
+            // Read the whole super block
+            bytes = new byte[new SuperBlock(bytes).getBlockSize()];
+            raf.seek(SuperBlock.SUPER_BLOCK_ADDRESS);
+            raf.read(bytes);
             block = new SuperBlock(bytes);
         }
-        catch (InvalidBlockSizeException e)
+        catch (InvalidBlockSizeException | IOException e)
         {
             // This should never happen
-            e.printStackTrace();
-        }
-
-        // Read the whole super block
-        bytes = new byte[block.getBlockSize()];
-        try
-        {
-            raf.read(bytes);
-        } catch (IOException e)
-        {
             e.printStackTrace();
         }
         return block;
@@ -161,8 +157,17 @@ public class VUtil
      */
     private BitMapBlock loadBitMapBlock()
     {
-        int bitMapBlockAddress = superBlock.getFirstBitMapBlock();
-        return new BitMapBlock(bitMapBlockAddress, read(bitMapBlockAddress).getBytes());
+        return new BitMapBlock(read(superBlock.getFirstBitMapBlock()));
+    }
+
+    /**
+     * This method tries to load the BitMapBlock(s) stored after the SuperBlock.
+     *
+     * @return loaded BitMapBlock(s)
+     */
+    private DirectoryBlock loadRootDirectoryBlock()
+    {
+        return new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
     }
 
     /**
@@ -187,7 +192,7 @@ public class VUtil
     /**
      * This method reads the Block to a given block address
      *
-     * @param blockAddress
+     * @param blockAddress  to read at
      * @return read Block
      */
     public Block read(int blockAddress)
@@ -208,6 +213,7 @@ public class VUtil
     }
 
     /**
+     * This method returns the super block of the loaded disks
      *
      * @return SuperBlock of loaded VDisk
      */
@@ -217,14 +223,22 @@ public class VUtil
     }
 
     /**
+     * This method returns the bit map block of the loaded disk
      *
      * @return BitMapBlock of loaded VDisk
      */
     public BitMapBlock getBitMapBlock( ) { return bitMapBlock; }
 
     /**
+     * This method returns the root directory block of the loaded disk
      *
-     * @param blockAddress
+     * @return DirectoryBlock
+     */
+    public DirectoryBlock getRootDirectoryBlock( ) { return rootBlock; }
+
+    /**
+     *
+     * @param blockAddress  to compute the offset
      * @return offset to the given blockAddress in bytes
      */
     private long getBlockOffset(int blockAddress)

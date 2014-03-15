@@ -22,6 +22,15 @@ public class SuperBlockTest
     private ByteBuffer buffer;
     private SuperBlock block;
 
+    /**
+     * constants to test whether the constructor sets blockSize, blockCount,
+     * rootDirectoryBlock correctly
+     */
+    private static final byte[] TEST_CONSTRUCTOR = new byte[] {0, 0, 0, 64, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0};
+    private static final int TEST_CONSTRUCTOR_BLOCK_SIZE = 64;
+    private static final int TEST_CONSTRUCTOR_BLOCK_COUNT = 256;
+    private static final int TEST_CONSTRUCTOR_ROOT_DIRECTORY_BLOCK_ADDRESS = 2;
+
 
     @Before
     public void setUp() throws Exception
@@ -44,6 +53,15 @@ public class SuperBlockTest
     public void testConstructorInvalid1() throws Exception
     {
         block = new SuperBlock(null);
+    }
+
+    @Test
+    public void testConstructor( ) throws InvalidBlockSizeException
+    {
+        SuperBlock superBlock = new SuperBlock(TEST_CONSTRUCTOR);
+        assertEquals(TEST_CONSTRUCTOR_BLOCK_SIZE, superBlock.getBlockSize());
+        assertEquals(TEST_CONSTRUCTOR_BLOCK_COUNT, superBlock.getBlockCount());
+        assertEquals(TEST_CONSTRUCTOR_ROOT_DIRECTORY_BLOCK_ADDRESS, superBlock.getRootDirectoryBlock());
     }
 
     @Test(expected = InvalidBlockSizeException.class)

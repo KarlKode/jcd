@@ -11,24 +11,12 @@ import java.util.Iterator;
  * This visitor is used to determine whether a file exists or not.
  * Returns the loaded Block if the file exists, null otherwise.
  *
- * TODO de block muess au no glese werde
- *
  * @param <T> either a DirectoryBlock or a FileBlock
  */
 public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
 {
-    private String dest;
+    private VType dest;
     private VUtil vUtil;
-
-    /**
-     *
-     * @param dest Destination to seek for
-     */
-    public SeekVisitor(String dest, VUtil vUtil)
-    {
-        this.dest = dest;
-        this.vUtil = vUtil;
-    }
 
     /**
      *
@@ -36,7 +24,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
      */
     public SeekVisitor(VType dest, VUtil vUtil)
     {
-        this.dest = dest.getName();
+        this.dest = dest;
         this.vUtil = vUtil;
     }
 
@@ -54,6 +42,8 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
     }
 
     /**
+     * This method returns null because a Block represents a leaf in the file
+     * system tree.
      *
      * @param block current Block in search progress
      * @param arg VUtil used to load Blocks form disk
@@ -66,15 +56,17 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
     }
 
     /**
+     * This method checks if the given DirectoryBlock is the searched one, if not
+     * it reads the block and visits all linked InodeBlocks
      *
      * @param block current Block in search progress
      * @param arg VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T directory(DirectoryBlock block, Void arg) throws InvalidNameException
+    public T directory(DirectoryBlock block, Void arg)
     {
-        if (dest.equals(block.getName()))
+        if (dest.getName().equals(block.getName()))
         {
             return (T) block;
         }
@@ -86,7 +78,6 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
         while(i.hasNext() && inode == null)
         {
             Block b = vUtil.read(i.next());
-
             inode = visit(new InodeBlock(b), arg);
         }
 
@@ -94,6 +85,9 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
     }
 
     /**
+     * This method checks if the given FileBlock match to the searched destination,
+     * if it not returns null because a FileBlock represents a leaf in the inode
+     * tree structure.
      *
      * @param block current Block in search progress
      * @param arg VUtil used to load Blocks form disk
@@ -102,7 +96,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
     @Override
     public T file(FileBlock block, Void arg)
     {
-        if (dest.equals(block.getName()))
+        if (dest.getName().equals(block.getName()))
         {
             return (T) block;
         }
@@ -110,21 +104,31 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Void>
     }
 
     /**
+     * This method evaluates whether the visited InodBlock is DirectoryBlock or a
+     * FileBlock and visits them
      *
      * @param block current Block in search progress
      * @param arg VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
-    public T inode(InodeBlock block, Void arg) throws InvalidNameException
+    public T inode(InodeBlock block, Void arg)
     {
-        if(block.isDirectory())
+        try
         {
-            return visit(new DirectoryBlock(block, block.getName()), arg);
+            if(block.isDirectory())
+            {
+                return visit(new DirectoryBlock(block, block.getName()), arg);
+            }
+            else if(block.isFile())
+            {
+                return visit(new FileBlock(block, block.getName()), arg);
+            }
+            return null;
         }
-        else
+        catch (InvalidNameException e)
         {
-            return visit(new FileBlock(block, block.getName()), arg);
+            return null;
         }
     }
 

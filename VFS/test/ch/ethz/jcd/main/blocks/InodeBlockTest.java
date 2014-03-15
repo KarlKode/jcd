@@ -204,6 +204,15 @@ public class InodeBlockTest
     }
 
     @Test
+    public void testIsEmpty( )
+    {
+        InodeBlock inode = init(FILE_HEAD);
+        assertTrue(inode.isEmpty());
+        inode = initFull(FILE_HEAD);
+        assertFalse(inode.isEmpty());
+    }
+
+    @Test
     public void testIsFile( )
     {
         InodeBlock inode = init(DIRECTORY_HEAD);

@@ -6,8 +6,6 @@ import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
-
 public class VDiskCopyTest
 {
     /**
@@ -31,21 +29,9 @@ public class VDiskCopyTest
         {
             vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
         }
-        catch (InvalidSizeException invalidSize)
+        catch (InvalidSizeException | InvalidBlockSizeException | VDiskCreationException invalidSize)
         {
             invalidSize.printStackTrace();
-        }
-        catch (InvalidBlockSizeException invalidBlockSize)
-        {
-            invalidBlockSize.printStackTrace();
-        }
-        catch (VDiskCreationException e)
-        {
-            e.printStackTrace();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
         }
     }
 

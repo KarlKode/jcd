@@ -1,8 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,7 +9,7 @@ import java.io.FileNotFoundException;
 
 public class VDiskTest
 {
-    private String vDiskFile = "/tmp/test.vdisk";
+    private static final String vDiskFile = "/tmp/test.vdisk";
 
     @Before
     public void removeOldVDisk() throws Exception
@@ -71,4 +69,96 @@ public class VDiskTest
         int blockSize = 1024;
         VDisk vd = new VDisk(vDiskFile, size * blockSize, blockSize);
     }
+
+    @Test
+    public void testCreate( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = DiskFullException.class)
+    public void testCreateDiskFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = NoSuchFileOrDirectoryException.class)
+    public void testCreateNoSuchFileOrDirectory( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = BlockFullException.class)
+    public void testCreateBlockFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = InvalidNameException.class)
+    public void testCreateDiskFullInvalidName( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    {
+
+    }
+
+    @Test
+    public void testDelete( ) throws NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test(expected = NoSuchFileOrDirectoryException.class)
+    public void testDeleteNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test
+    public void testMove( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = NoSuchFileOrDirectoryException.class)
+    public void testMoveNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    {
+
+    }
+
+    @Test(expected = InvalidNameException.class)
+    public void testMoveInvalidName( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    {
+
+    }
+
+    @Test
+    public void testList( ) throws NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test(expected = NoSuchFileOrDirectoryException.class)
+    public void testListNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test
+    public void testCopy( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test(expected = NoSuchFileOrDirectoryException.class)
+    public void testCopyNoSuchFileOrDirectory( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    @Test(expected = BlockFullException.class)
+    public void testCopyBlockFull( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    {
+
+    }
+
+    //TODO import/export tests
 }
