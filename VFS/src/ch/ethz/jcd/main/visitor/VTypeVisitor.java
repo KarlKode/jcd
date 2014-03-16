@@ -2,11 +2,11 @@ package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VType;
+import ch.ethz.jcd.main.layer.VInode;
 
 /**
  * This interface is an implementation of the visitor pattern and provides the
- * necessary tools to visit the VType structure.*
+ * necessary tools to visit the VInode structure.*
  *
  * @param <R> generic return type
  * @param <A> generic argument type
@@ -14,13 +14,13 @@ import ch.ethz.jcd.main.layer.VType;
 public interface VTypeVisitor<R, A>
 {
     /**
-     * This mehtod visits the given VType
+     * This mehtod visits the given VInode
      *
      * @param type to visit
      * @param arg to pass
      * @return a generic return value
      */
-    public R visit(VType type, A arg);
+    public R visit(VInode type, A arg);
 
     /**
      * This method is called after accepting the VDirectory.

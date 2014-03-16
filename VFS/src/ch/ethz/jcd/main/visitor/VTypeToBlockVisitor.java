@@ -7,22 +7,22 @@ import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VType;
+import ch.ethz.jcd.main.layer.VInode;
 
 /**
- * This Visitor is used to convert a VType into a Block.
+ * This Visitor is used to convert a VInode into a Block.
  */
 public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
 {
     /**
-     * This method visits the given VType.
+     * This method visits the given VInode.
      *
      * @param type to visit
      * @param arg Block containing information to use
      * @return created Block
      */
     @Override
-    public InodeBlock visit(VType type, Block arg)
+    public InodeBlock visit(VInode type, Block arg)
     {
         return type.accept(this, arg);
     }

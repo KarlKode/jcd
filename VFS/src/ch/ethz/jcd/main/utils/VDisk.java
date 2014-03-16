@@ -9,7 +9,7 @@ import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
-import ch.ethz.jcd.main.layer.VType;
+import ch.ethz.jcd.main.layer.VInode;
 import ch.ethz.jcd.main.visitor.CopyVisitor;
 import ch.ethz.jcd.main.visitor.SeekVisitor;
 import ch.ethz.jcd.main.visitor.VTypeToBlockVisitor;
@@ -81,11 +81,11 @@ public class VDisk
      * @throws BlockFullException               if the destination directory is full
      * @throws NoSuchFileOrDirectoryException   if the destination is not found
      */
-    public void create(VType src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
+    public void create(VInode src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
         InodeBlock block = vtbv.visit(src, allocator.allocate());
-        DirectoryBlock destDir = sv.visit(root, dest.getPath());
+        DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
 
         if(destDir == null)
         {
@@ -102,7 +102,7 @@ public class VDisk
      *
      * @param inode to delete
      */
-    public void delete(VType inode) throws NoSuchFileOrDirectoryException
+    public void delete(VInode inode) throws NoSuchFileOrDirectoryException
     {
         throw new NotImplementedException();
     }
@@ -114,7 +114,7 @@ public class VDisk
      * @param src   file/directory to move
      * @param dest  where to move
      */
-    public void move(VType src, VType dest) throws NoSuchFileOrDirectoryException, InvalidNameException
+    public void move(VInode src, VInode dest) throws NoSuchFileOrDirectoryException, InvalidNameException
     {
         throw new NotImplementedException();
     }
@@ -137,13 +137,13 @@ public class VDisk
      * @param dest  destination
      * @throws BlockFullException               if the destination directory is full
      */
-    public void copy(VType src, VDirectory dest) throws BlockFullException, NoSuchFileOrDirectoryException
+    public void copy(VInode src, VDirectory dest) throws BlockFullException, NoSuchFileOrDirectoryException
     {
         CopyVisitor cv = new CopyVisitor(vUtil, allocator);
         InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
 
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        DirectoryBlock destDir = sv.visit(root, dest.getPath());
+        DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
 
         if(destDir == null)
         {
@@ -160,7 +160,7 @@ public class VDisk
      * @param src   source, either a VDirectory or a VFile
      * @param dest  destination
      */
-    public void store(VType src, VType dest)
+    public void store(VInode src, VInode dest)
     {
         throw new NotImplementedException();
     }
@@ -171,7 +171,7 @@ public class VDisk
      *
      * @param file
      */
-    public void load(VType file)
+    public void load(VInode file)
     {
         throw new NotImplementedException();
     }

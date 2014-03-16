@@ -12,6 +12,7 @@ import ch.ethz.jcd.main.visitor.BlockVisitor;
 public class DirectoryBlock extends InodeBlock
 {
     public static final String ROOT_DIRECTORY_BLOCK_NAME = "";
+    public static final String ROOT_DIRECTORY_BLOCK_PATH = "/";
 
     /**
      * Instantiate a new DirectoryBlock by cloning the given Block and adding the

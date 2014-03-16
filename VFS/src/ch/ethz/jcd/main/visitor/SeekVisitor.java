@@ -1,7 +1,6 @@
 package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
-import ch.ethz.jcd.main.layer.VType;
 import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
 

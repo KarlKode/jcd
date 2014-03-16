@@ -9,7 +9,7 @@ import ch.ethz.jcd.main.blocks.*;
 
 /**
  * This visitor copies each block which could be reached from the given VFile / VDirectory.
- * InodeBlock as return type is used to create the Block tree according to its given VType tree.
+ * InodeBlock as return type is used to create the Block tree according to its given VInode tree.
  */
 public class CopyVisitor implements BlockVisitor<Block, Void>
 {
