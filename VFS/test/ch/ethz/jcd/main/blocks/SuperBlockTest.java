@@ -18,7 +18,6 @@ public class SuperBlockTest
     public static final int VDISK_FIRST_BIT_MAP_BLOCK_ADDRESS = 1;
     public static final int VDISK_LAST_BIT_MAP_BLOCK_ADDRESS = 1;
     public static final int VDISK_FIRST_DATA_BLOCK_ADDRESS = 2;
-    private byte[] bytes;
     private ByteBuffer buffer;
     private SuperBlock block;
 

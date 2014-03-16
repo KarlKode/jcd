@@ -25,8 +25,6 @@ public abstract class VType
 
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
-    public abstract InodeBlock toBlock(Block block) throws InvalidNameException;
-
     public String getName()
     {
         return name;

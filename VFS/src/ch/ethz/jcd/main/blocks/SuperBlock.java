@@ -42,13 +42,16 @@ public class SuperBlock extends Block
     }
 
     /**
-     * TODO describe
-     * @param visitor
-     * @param arg
-     * @param <R>
-     * @param <A>
-     * @return
+     * This method is part of the visitor pattern and is called by the visitor.
+     * It tells to the visitor which sort of Block he called.
+     *
+     * @param visitor calling this method
+     * @param arg to pass
+     * @param <R> generic return type
+     * @param <A> generic argument type
+     * @return the visitors return value
      */
+    @Override
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
     {
         return visitor.superBlock(this, arg);

@@ -46,6 +46,12 @@ public class Block
         this.setBytes(bytes);
     }
 
+    /**
+     * Instantiate a new Block in such a way that the new one is equal to
+     * the passed one.
+     *
+     * @param block to clone
+     */
     public Block(Block block)
     {
         this.address = block.address;
@@ -53,13 +59,14 @@ public class Block
     }
 
     /**
-     * TODO: Detailed description
+     * This method is part of the visitor pattern and is called by the visitor.
+     * It tells to the visitor which sort of Block he called.
      *
-     * @param visitor
-     * @param arg
-     * @param <R>
-     * @param <A>
-     * @return
+     * @param visitor calling this method
+     * @param arg to pass
+     * @param <R> generic return type
+     * @param <A> generic argument type
+     * @return the visitors return value
      */
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
     {

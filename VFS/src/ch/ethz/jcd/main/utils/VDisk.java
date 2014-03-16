@@ -12,6 +12,7 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VType;
 import ch.ethz.jcd.main.visitor.CopyVisitor;
 import ch.ethz.jcd.main.visitor.SeekVisitor;
+import ch.ethz.jcd.main.visitor.VTypeToBlockVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
@@ -25,7 +26,9 @@ public class VDisk
 {
     private VUtil vUtil;
     private Allocator allocator;
+    private VTypeToBlockVisitor vtbv = new VTypeToBlockVisitor( );
     private DirectoryBlock root;
+
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -81,7 +84,7 @@ public class VDisk
     public void create(VType src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock block = src.toBlock(allocator.allocate());
+        InodeBlock block = vtbv.visit(src, allocator.allocate());
         DirectoryBlock destDir = sv.visit(root, dest.getPath());
 
         if(destDir == null)

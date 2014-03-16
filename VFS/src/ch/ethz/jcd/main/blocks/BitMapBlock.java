@@ -5,6 +5,12 @@ import ch.ethz.jcd.main.visitor.BlockVisitor;
 
 import java.util.BitSet;
 
+/**
+ * A BitMapBlock block is a kind of freelist. It behave in a relatively simple
+ * way. A single bit is used to differ whether a blockAddress is used or not.
+ * Each time a Block is allocated or freed, the bit is changed according to the
+ * performed action. Changes are written immediately to disk.
+ */
 public class BitMapBlock extends Block
 {
     private BitSet bitMap;
@@ -13,8 +19,8 @@ public class BitMapBlock extends Block
     /**
      * Instantiate a new BitMapBlock
      *
-     * @param blockAddress block address of the new BitMapBlock
-     * @param b        content of the new BitMapBlock
+     * @param blockAddress  block address of the new BitMapBlock
+     * @param b             content of the new BitMapBlock
      */
     public BitMapBlock(int blockAddress, byte[] b)
     {
@@ -48,13 +54,16 @@ public class BitMapBlock extends Block
     }
 
     /**
-     * TODO describe
-     * @param visitor
-     * @param arg
-     * @param <R>
-     * @param <A>
-     * @return
+     * This method is part of the visitor pattern and is called by the visitor.
+     * It tells to the visitor which sort of Block he called.
+     *
+     * @param visitor calling this method
+     * @param arg to pass
+     * @param <R> generic return type
+     * @param <A> generic argument type
+     * @return the visitors return value
      */
+    @Override
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
     {
         return visitor.bitMapBlock(this, arg);
@@ -157,6 +166,11 @@ public class BitMapBlock extends Block
         return usedBlocks;
     }
 
+    /**
+     *
+     * @param blockAddress to check
+     * @return whether the given blockAddress is valid or not
+     */
     private boolean isValidBlockAddress(int blockAddress)
     {
         return blockAddress < capacity();

@@ -23,11 +23,6 @@ public class VFile extends VType
         return visitor.file(this, arg);
     }
 
-    public InodeBlock toBlock(Block block) throws InvalidNameException
-    {
-        return new FileBlock(block, this.name);
-    }
-
     public int getSize()
     {
         return size;
