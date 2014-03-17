@@ -26,7 +26,15 @@ public class VInodeTest
         VInode vInode = new VFile(PATH);
         assertEquals(PATH_ARRAY.length, vInode.getPathQueue().size());
         assertTrue(FILE_NAME.equals(vInode.getName()));
-        assertTrue(Arrays.equals(PATH_ARRAY, vInode.getPathQueue().toArray()));
+
+        String[] path = new String[vInode.getPathQueue().size()];
+        vInode.getPathQueue().toArray(path);
+        assertEquals(PATH_ARRAY.length, path.length);
+
+        for(int i = 0; i < PATH_ARRAY.length; i++)
+        {
+            assertTrue(PATH_ARRAY[i].equals(path[i]));
+        }
 
         vInode = new VDirectory(DirectoryBlock.ROOT_DIRECTORY_BLOCK_PATH);
         assertEquals(DirectoryBlock.ROOT_DIRECTORY_BLOCK_PATH.length(), vInode.getPathQueue().size());

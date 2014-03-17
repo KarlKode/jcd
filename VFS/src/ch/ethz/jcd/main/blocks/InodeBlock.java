@@ -19,13 +19,15 @@ public class InodeBlock extends Block
 {
     public static final int MAX_NAME_SIZE = 63;
     public static final int OFFSET_TYPE = 0;
-    public static final int OFFSET_NAME = 1;
-    public static final int OFFSET_BLOCKS = OFFSET_NAME + MAX_NAME_SIZE;
+    public static final int OFFSET_NAME = OFFSET_TYPE + 1;
+    public static final int OFFSET_PARENT_BLOCK_ADDRESS = OFFSET_NAME + MAX_NAME_SIZE;
+    public static final int OFFSET_BLOCKS = OFFSET_PARENT_BLOCK_ADDRESS + 4;
     public static final byte TYPE_DIRECTORY = Byte.parseByte("00");
     public static final byte TYPE_FILE = Byte.parseByte("01");
 
     protected String name;
     protected byte type;
+    protected int parentBlockAddress;
     protected LinkedList<Integer> blockAddressList = new LinkedList<>();
 
     /**
@@ -60,6 +62,7 @@ public class InodeBlock extends Block
     {
         type = bytes.get(OFFSET_TYPE);
         name = bytes.getString(OFFSET_NAME,MAX_NAME_SIZE).trim();
+        parentBlockAddress = bytes.getInt(OFFSET_PARENT_BLOCK_ADDRESS);
         this.loadLinkedBlocks();
     }
 
@@ -254,5 +257,24 @@ public class InodeBlock extends Block
     public String getName( )
     {
         return name.trim();
+    }
+
+    /**
+     * This method sets the parent's block address
+     *
+     * @param blockAddress to set
+     */
+    public void setParentBlockAddress(int blockAddress)
+    {
+        this.parentBlockAddress = blockAddress;
+        bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, blockAddress);
+    }
+    /**
+     *
+     * @return the block address of the parent inode
+     */
+    public int getParentBlockAddress( )
+    {
+        return parentBlockAddress;
     }
 }

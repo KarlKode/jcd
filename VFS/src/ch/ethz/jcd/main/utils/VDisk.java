@@ -11,11 +11,13 @@ import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VInode;
 import ch.ethz.jcd.main.visitor.CopyVisitor;
+import ch.ethz.jcd.main.visitor.DeleteVisitor;
 import ch.ethz.jcd.main.visitor.SeekVisitor;
 import ch.ethz.jcd.main.visitor.VTypeToBlockVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
+import java.util.Queue;
 
 /**
  * This class provides an abstract interface to the user, for example a
@@ -74,17 +76,17 @@ public class VDisk
     /**
      * This method creates either an EMPTY directory or an Empty file.
      *
-     * @param src   either a VDirectory or a VFile
+     * @param inode   either a VDirectory or a VFile
      * @param dest  destination
      * @throws DiskFullException                if there is no space for disk creation left
      * @throws InvalidNameException             if filename of the source file is invalid
      * @throws BlockFullException               if the destination directory is full
      * @throws NoSuchFileOrDirectoryException   if the destination is not found
      */
-    public void create(VInode src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
+    public void create(VInode inode, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock block = vtbv.visit(src, allocator.allocate());
+        InodeBlock block = vtbv.visit(inode, allocator.allocate());
         DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
 
         if(destDir == null)
@@ -100,11 +102,15 @@ public class VDisk
     /**
      * This method deletes the given File/Directory from disk.
      *
-     * @param inode to delete
+     * @param dest to delete
      */
-    public void delete(VInode inode) throws NoSuchFileOrDirectoryException
+    public void delete(VInode dest) throws NoSuchFileOrDirectoryException
     {
-        throw new NotImplementedException();
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
+        InodeBlock inode = sv.visit(root, dest.getPathQueue());
+
+        DeleteVisitor dv = new DeleteVisitor(vUtil, allocator);
+        dv.visit(inode, null);
     }
 
     /**
@@ -116,7 +122,11 @@ public class VDisk
      */
     public void move(VInode src, VInode dest) throws NoSuchFileOrDirectoryException, InvalidNameException
     {
-        throw new NotImplementedException();
+        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
+        InodeBlock srcInode = sv.visit(root, src.getPathQueue());
+        InodeBlock destInode = sv.visit(root, dest.getPathQueue());
+
+
     }
 
     /**

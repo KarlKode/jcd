@@ -63,6 +63,13 @@ public class InodeBlockTest
         InodeBlock inode = init(FILE_HEAD);
         assertTrue(FILE_NAME.equals(inode.getName()));
         assertEquals(InodeBlock.TYPE_FILE, inode.getType());
+
+        ByteArray buf = new ByteArray(new byte[128]);
+        buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
+        buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
+        buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
+        inode = new InodeBlock(new Block(buf.getBytes()));
+        assertEquals(65, inode.getParentBlockAddress());
     }
 
     @Test
@@ -72,6 +79,13 @@ public class InodeBlockTest
         InodeBlock inode = initName(FILE_HEAD, filename);
         assertEquals(filename, inode.getName());
         assertEquals(InodeBlock.TYPE_FILE, inode.getType());
+
+        ByteArray buf = new ByteArray(new byte[128]);
+        buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
+        buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
+        buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
+        inode = new InodeBlock(new Block(buf.getBytes()));
+        assertEquals(65, inode.getParentBlockAddress());
     }
 
     @Test(expected = InvalidNameException.class)
@@ -228,5 +242,20 @@ public class InodeBlockTest
         assertFalse(inode.isDirectory());
         inode = initFull(DIRECTORY_HEAD);
         assertTrue(inode.isDirectory());
+    }
+
+    @Test
+    public void testSetParentBlockAddress( )
+    {
+        ByteArray buf = new ByteArray(new byte[128]);
+        buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
+        buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
+        buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
+        InodeBlock inode = new InodeBlock(new Block(buf.getBytes()));
+        assertEquals(65, inode.getParentBlockAddress());
+        inode.setParentBlockAddress(127);
+        buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 127);
+        assertEquals(127, inode.getParentBlockAddress());
+        assertTrue(Arrays.equals(buf.getBytes(), inode.getBytes()));
     }
 }

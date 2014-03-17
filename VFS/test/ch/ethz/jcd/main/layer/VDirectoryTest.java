@@ -60,8 +60,14 @@ public class VDirectoryTest
         vInode.add(dir);
         assertEquals(2, vInode.list().size());
 
-        LinkedList newPath = dir.getPath( );
+        LinkedList<String> newPath = dir.getPath( );
         newPath.removeLast();
-        assertTrue(Arrays.equals(newPath.toArray(), vInode.getPathQueue().toArray()));
+
+        assertEquals(DIR_PATH_ARRAY.length, newPath.size());
+
+        for(int i = 0; i < DIR_PATH_ARRAY.length; i++)
+        {
+            assertTrue(DIR_PATH_ARRAY[i].equals(newPath.get(i)));
+        }
     }
 }

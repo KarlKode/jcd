@@ -46,7 +46,9 @@ public class VDirectory extends VInode
      */
     public void add(VInode type)
     {
-        type.setPath(this.path);
+        LinkedList<String> newInodePath = new LinkedList<String>(this.path);
+        newInodePath.add(type.getName());
+        type.setPath(newInodePath);
         content.add(type);
     }
 
