@@ -46,9 +46,9 @@ public class SuperBlock extends Block
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -177,7 +177,6 @@ public class SuperBlock extends Block
     }
 
     /**
-     *
      * @param blockSize
      * @return whether the given blockSize is valid or not
      */
@@ -187,7 +186,6 @@ public class SuperBlock extends Block
     }
 
     /**
-     *
      * @param blockCount
      * @return whether the given blockSize is valid or not
      */

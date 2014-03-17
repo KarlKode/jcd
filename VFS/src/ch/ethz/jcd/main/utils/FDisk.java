@@ -11,7 +11,6 @@ import ch.ethz.jcd.main.exceptions.InvalidNameException;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
 
 public class FDisk
 {
@@ -44,8 +43,7 @@ public class FDisk
             raf.seek(getBlockOffset(rootBlock.getAddress(), blockSize));
             raf.write(rootBlock.getBytes());
             raf.close();
-        }
-        catch (BlockAddressOutOfBoundException | InvalidBlockSizeException | InvalidNameException | IOException e)
+        } catch (BlockAddressOutOfBoundException | InvalidBlockSizeException | InvalidNameException | IOException e)
         {
             e.printStackTrace();
         }

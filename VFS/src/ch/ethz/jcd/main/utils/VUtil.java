@@ -13,7 +13,6 @@ import java.io.RandomAccessFile;
 
 /**
  * This class provides an interface to read and write on a VDisk.
- *
  */
 public class VUtil
 {
@@ -44,12 +43,12 @@ public class VUtil
      * virtual disk.
      *
      * @param vDiskFile name of the disk to create
-     * @param diskSize of the disk to create
+     * @param diskSize  of the disk to create
      * @param blockSize of the disk to create
-     * @throws InvalidSizeException if the given diskSize is invalid
-     * @throws InvalidBlockSizeException if the blockSize is invalid
-     * @throws VDiskCreationException if the disk file not could be created
-     * @throws FileNotFoundException if RandomAccessFile could not find the disk file
+     * @throws InvalidSizeException       if the given diskSize is invalid
+     * @throws InvalidBlockSizeException  if the blockSize is invalid
+     * @throws VDiskCreationException     if the disk file not could be created
+     * @throws FileNotFoundException      if RandomAccessFile could not find the disk file
      * @throws InvalidBlockCountException if the blockSize does not fit into the diskSize
      */
     public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, InvalidBlockCountException
@@ -75,8 +74,7 @@ public class VUtil
                 throw new VDiskCreationException();
             }
             raf = new RandomAccessFile(this.vDiskFile, "rw");
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             throw new VDiskCreationException();
         }
@@ -88,9 +86,9 @@ public class VUtil
      * This method initializes the new created VDisk. A SuperBlock and a BitMapBlock
      * are created
      *
-     * @param diskSize of created VDisk
+     * @param diskSize  of created VDisk
      * @param blockSize of created VDisk
-     * @throws InvalidBlockSizeException if the blockSize is invalid
+     * @throws InvalidBlockSizeException  if the blockSize is invalid
      * @throws InvalidBlockCountException if the blockSize does not fit into the specified diskSize
      */
     private void init(long diskSize, int blockSize) throws InvalidBlockSizeException, InvalidBlockCountException
@@ -111,8 +109,7 @@ public class VUtil
             bitMapBlock.setUsed(superBlock.getAddress());
             bitMapBlock.setUsed(bitMapBlock.getAddress());
             bitMapBlock.setUsed(rootBlock.getAddress());
-        }
-        catch (BlockAddressOutOfBoundException e)
+        } catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
             e.printStackTrace();
@@ -141,8 +138,7 @@ public class VUtil
             raf.seek(SuperBlock.SUPER_BLOCK_ADDRESS);
             raf.read(bytes);
             block = new SuperBlock(bytes);
-        }
-        catch (InvalidBlockSizeException | IOException e)
+        } catch (InvalidBlockSizeException | IOException e)
         {
             // This should never happen
             e.printStackTrace();
@@ -181,8 +177,7 @@ public class VUtil
         {
             raf.seek(getBlockOffset(block.getAddress()));
             raf.write(block.getBytes());
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             // TODO exception handling
             e.printStackTrace();
@@ -192,7 +187,7 @@ public class VUtil
     /**
      * This method reads the Block to a given block address
      *
-     * @param blockAddress  to read at
+     * @param blockAddress to read at
      * @return read Block
      */
     public Block read(int blockAddress)
@@ -202,8 +197,7 @@ public class VUtil
         {
             raf.seek(getBlockOffset(blockAddress));
             raf.read(blockBytes);
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             // TODO exception handling
             e.printStackTrace();
@@ -227,18 +221,23 @@ public class VUtil
      *
      * @return BitMapBlock of loaded VDisk
      */
-    public BitMapBlock getBitMapBlock( ) { return bitMapBlock; }
+    public BitMapBlock getBitMapBlock()
+    {
+        return bitMapBlock;
+    }
 
     /**
      * This method returns the root directory block of the loaded disk
      *
      * @return DirectoryBlock
      */
-    public DirectoryBlock getRootDirectoryBlock( ) { return rootBlock; }
+    public DirectoryBlock getRootDirectoryBlock()
+    {
+        return rootBlock;
+    }
 
     /**
-     *
-     * @param blockAddress  to compute the offset
+     * @param blockAddress to compute the offset
      * @return offset to the given blockAddress in bytes
      */
     private long getBlockOffset(int blockAddress)

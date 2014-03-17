@@ -1,9 +1,5 @@
 package ch.ethz.jcd.main.layer;
 
-import ch.ethz.jcd.main.blocks.Block;
-import ch.ethz.jcd.main.blocks.FileBlock;
-import ch.ethz.jcd.main.blocks.InodeBlock;
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
 public class VFile extends VType

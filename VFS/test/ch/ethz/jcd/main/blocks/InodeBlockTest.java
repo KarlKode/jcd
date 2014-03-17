@@ -15,10 +15,10 @@ public class InodeBlockTest
 {
     private static final int BLOCK_SIZE = 1024;
 
-    private static final byte[] FILE_HEAD = new byte[] { InodeBlock.TYPE_FILE, 'f', 'i', 'l', 'e', '.', 't', 'x', 't' };
+    private static final byte[] FILE_HEAD = new byte[]{InodeBlock.TYPE_FILE, 'f', 'i', 'l', 'e', '.', 't', 'x', 't'};
     private static final String FILE_NAME = "file.txt";
 
-    private static final byte[] DIRECTORY_HEAD = new byte[] { InodeBlock.TYPE_DIRECTORY, 'h', 'o', 'm', 'e' };
+    private static final byte[] DIRECTORY_HEAD = new byte[]{InodeBlock.TYPE_DIRECTORY, 'h', 'o', 'm', 'e'};
     private static final String DIRECTORY_NAME = "home";
 
     private InodeBlock init(byte[] head)
@@ -49,7 +49,7 @@ public class InodeBlockTest
     {
         ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
         buf.put(0, head);
-        for(int i = InodeBlock.OFFSET_BLOCKS; i < BLOCK_SIZE; i++)
+        for (int i = InodeBlock.OFFSET_BLOCKS; i < BLOCK_SIZE; i++)
         {
             buf.put(i, Byte.MAX_VALUE);
         }
@@ -82,7 +82,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testAddBlock( ) throws BlockFullException
+    public void testAddBlock() throws BlockFullException
     {
         Integer blockAddress = 1234;
         InodeBlock inode = init(FILE_HEAD);
@@ -95,7 +95,7 @@ public class InodeBlockTest
     }
 
     @Test(expected = BlockFullException.class)
-    public void testAddBlockFull( ) throws BlockFullException
+    public void testAddBlockFull() throws BlockFullException
     {
         Integer blockAddress = 1234;
         InodeBlock inode = initFull(FILE_HEAD);
@@ -103,7 +103,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testAddAddress( ) throws BlockFullException
+    public void testAddAddress() throws BlockFullException
     {
         Integer blockAddress = 1234;
         InodeBlock inode = init(FILE_HEAD);
@@ -115,8 +115,8 @@ public class InodeBlockTest
         assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
     }
 
-    @Test (expected = BlockFullException.class)
-    public void testAddAddressFull( ) throws BlockFullException
+    @Test(expected = BlockFullException.class)
+    public void testAddAddressFull() throws BlockFullException
     {
         Integer blockAddress = 1234;
         InodeBlock inode = initFull(FILE_HEAD);
@@ -124,7 +124,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testRemoveBlock( )
+    public void testRemoveBlock()
     {
         Integer blockAddress = 1234;
         InodeBlock inode = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
@@ -137,7 +137,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testRemoveAddress( )
+    public void testRemoveAddress()
     {
         Integer blockAddress = 1234;
         InodeBlock inode = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
@@ -150,7 +150,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testSize( )
+    public void testSize()
     {
         InodeBlock block = init(FILE_HEAD);
         assertEquals(0, block.size());
@@ -159,19 +159,19 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testLoadLinkedBlocks( )
+    public void testLoadLinkedBlocks()
     {
         throw new ToDoException();
     }
 
     @Test
-    public void testStoreLinkedBlocks( )
+    public void testStoreLinkedBlocks()
     {
         throw new ToDoException();
     }
 
     @Test
-    public void testSetName( ) throws InvalidNameException
+    public void testSetName() throws InvalidNameException
     {
         String name = "inode.txt";
         InodeBlock inode = init(FILE_HEAD);
@@ -187,7 +187,7 @@ public class InodeBlockTest
     }
 
     @Test(expected = InvalidNameException.class)
-    public void testSetNameInvalidName( ) throws InvalidNameException
+    public void testSetNameInvalidName() throws InvalidNameException
     {
         String name = "realyextremlyinvalidlongunreadableandunusablefilenamewithmorethen64digits.txt";
         InodeBlock inode = init(FILE_HEAD);
@@ -195,7 +195,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testIsBlockFull( )
+    public void testIsBlockFull()
     {
         InodeBlock inode = init(FILE_HEAD);
         assertFalse(inode.isBlockFull());
@@ -204,7 +204,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testIsEmpty( )
+    public void testIsEmpty()
     {
         InodeBlock inode = init(FILE_HEAD);
         assertTrue(inode.isEmpty());
@@ -213,7 +213,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testIsFile( )
+    public void testIsFile()
     {
         InodeBlock inode = init(DIRECTORY_HEAD);
         assertFalse(inode.isFile());
@@ -222,7 +222,7 @@ public class InodeBlockTest
     }
 
     @Test
-    public void testIsDirectory( )
+    public void testIsDirectory()
     {
         InodeBlock inode = init(FILE_HEAD);
         assertFalse(inode.isDirectory());

@@ -2,7 +2,7 @@ package ch.ethz.jcd.main.blocks;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class BlockTest
 {
@@ -60,7 +60,7 @@ public class BlockTest
     @Test
     public void testGetBytes1() throws Exception
     {
-        byte[] bytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        byte[] bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         Block block = new Block(0, bytes);
         assertEquals(bytes, block.getBytes());
     }
@@ -70,7 +70,7 @@ public class BlockTest
     {
         byte[] bytes = null;
         Block block = new Block(bytes);
-        bytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         block.setBytes(bytes);
         assertEquals(bytes, block.getBytes());
     }
@@ -78,7 +78,7 @@ public class BlockTest
     @Test
     public void testSetBytes1() throws Exception
     {
-        byte[] bytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        byte[] bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         Block block = new Block(bytes);
         assertEquals(bytes, block.getBytes());
     }

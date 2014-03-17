@@ -28,8 +28,7 @@ public class VDiskCopyTest
         try
         {
             vUtil = new VUtil(VDISK_FILE, VDISK_SIZE, VDISK_BLOCK_SIZE);
-        }
-        catch (InvalidSizeException | InvalidBlockSizeException | VDiskCreationException invalidSize)
+        } catch (InvalidSizeException | InvalidBlockSizeException | VDiskCreationException invalidSize)
         {
             invalidSize.printStackTrace();
         }

@@ -1,9 +1,8 @@
 package ch.ethz.jcd.main.visitor;
 
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
-import ch.ethz.jcd.main.layer.VType;
-import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.blocks.*;
+import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import ch.ethz.jcd.main.utils.VUtil;
 
 import java.util.Iterator;
 import java.util.Queue;
@@ -11,7 +10,7 @@ import java.util.Queue;
 /**
  * This visitor is used to determine whether a file exists or not.
  * Returns the loaded Block if the file exists, null otherwise.
- *
+ * <p/>
  * TODO update javadoc
  *
  * @param <T> either a DirectoryBlock or a FileBlock
@@ -29,7 +28,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * This method visit the given Block
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -43,7 +42,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * system tree.
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -57,7 +56,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * it reads the block and visits all linked InodeBlocks
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -67,7 +66,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
         {
             arg.remove();
 
-            if(arg.isEmpty())
+            if (arg.isEmpty())
             {
                 return (T) block;
             }
@@ -93,7 +92,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * tree structure.
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -103,7 +102,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
         {
             arg.remove();
 
-            if(arg.isEmpty())
+            if (arg.isEmpty())
             {
                 return (T) block;
             }
@@ -116,7 +115,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * FileBlock and visits them
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -124,17 +123,15 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
     {
         try
         {
-            if(block.isDirectory())
+            if (block.isDirectory())
             {
                 return visit(new DirectoryBlock(block, block.getName()), arg);
-            }
-            else if(block.isFile())
+            } else if (block.isFile())
             {
                 return visit(new FileBlock(block, block.getName()), arg);
             }
             return null;
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             return null;
         }
@@ -144,7 +141,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * This method return null in every case because the SuperBlock should never been reached.
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override
@@ -157,7 +154,7 @@ public class SeekVisitor<T extends InodeBlock> implements BlockVisitor<T, Queue<
      * This method return null in every case because the BitMapBlock should never been reached.
      *
      * @param block current Block in search progress
-     * @param arg VUtil used to load Blocks form disk
+     * @param arg   VUtil used to load Blocks form disk
      * @return the loaded Block if the given destination is found, null otherwise
      */
     @Override

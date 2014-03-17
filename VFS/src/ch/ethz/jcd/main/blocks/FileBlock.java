@@ -15,7 +15,7 @@ public class FileBlock extends InodeBlock
      * Instantiate a new FileBlock by cloning the given Block and adding the
      * given name.
      *
-     * @param b to clone
+     * @param b    to clone
      * @param name to set
      * @throws InvalidNameException if the given name is invalid
      */
@@ -40,9 +40,9 @@ public class FileBlock extends InodeBlock
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -52,13 +52,12 @@ public class FileBlock extends InodeBlock
     }
 
     /**
-     *
      * @return size of the file
      */
     @Override
     public int size()
     {
-        throw new ToDoException( );
+        throw new ToDoException();
     }
 }
 

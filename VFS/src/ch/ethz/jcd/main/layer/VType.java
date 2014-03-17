@@ -1,9 +1,7 @@
 package ch.ethz.jcd.main.layer;
 
-import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.visitor.VTypeVisitor;
 
 import java.util.Arrays;
@@ -37,18 +35,17 @@ public abstract class VType
 
     public void setPath(String path)
     {
-        if(path.equals(DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME+"/"))
+        if (path.equals(DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME + "/"))
         {
             this.path.add(DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME);
-        }
-        else
+        } else
         {
             this.path.addAll(Arrays.asList(path.split("/")));
         }
         this.setName(this.path.getLast());
     }
 
-    public Queue<String> getPath( )
+    public Queue<String> getPath()
     {
         return path;
     }

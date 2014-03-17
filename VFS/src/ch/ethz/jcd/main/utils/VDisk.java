@@ -3,10 +3,6 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VType;
@@ -26,7 +22,7 @@ public class VDisk
 {
     private VUtil vUtil;
     private Allocator allocator;
-    private VTypeToBlockVisitor vtbv = new VTypeToBlockVisitor( );
+    private VTypeToBlockVisitor vtbv = new VTypeToBlockVisitor();
     private DirectoryBlock root;
 
 
@@ -38,7 +34,7 @@ public class VDisk
     public VDisk(String vDiskFile) throws FileNotFoundException
     {
         vUtil = new VUtil(vDiskFile);
-        init( );
+        init();
     }
 
     /**
@@ -50,21 +46,20 @@ public class VDisk
     public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException, InvalidBlockCountException
     {
         vUtil = new VUtil(vDiskFile, size, blockSize);
-        init( );
+        init();
     }
 
     /**
      * This method prepares the loaded disk for usage.
      */
-    private void init( )
+    private void init()
     {
         allocator = new Allocator(vUtil);
         Block b = vUtil.read(vUtil.getSuperBlock().getRootDirectoryBlock());
         try
         {
             root = new DirectoryBlock(b, "");
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             // TODO
             throw new NotImplementedException();
@@ -74,12 +69,12 @@ public class VDisk
     /**
      * This method creates either an EMPTY directory or an Empty file.
      *
-     * @param src   either a VDirectory or a VFile
-     * @param dest  destination
-     * @throws DiskFullException                if there is no space for disk creation left
-     * @throws InvalidNameException             if filename of the source file is invalid
-     * @throws BlockFullException               if the destination directory is full
-     * @throws NoSuchFileOrDirectoryException   if the destination is not found
+     * @param src  either a VDirectory or a VFile
+     * @param dest destination
+     * @throws DiskFullException              if there is no space for disk creation left
+     * @throws InvalidNameException           if filename of the source file is invalid
+     * @throws BlockFullException             if the destination directory is full
+     * @throws NoSuchFileOrDirectoryException if the destination is not found
      */
     public void create(VType src, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
@@ -87,7 +82,7 @@ public class VDisk
         InodeBlock block = vtbv.visit(src, allocator.allocate());
         DirectoryBlock destDir = sv.visit(root, dest.getPath());
 
-        if(destDir == null)
+        if (destDir == null)
         {
             throw new NoSuchFileOrDirectoryException();
         }
@@ -111,8 +106,8 @@ public class VDisk
      * This method moves a given file or directory and its structure to an other
      * location. Also use it to rename files or directories
      *
-     * @param src   file/directory to move
-     * @param dest  where to move
+     * @param src  file/directory to move
+     * @param dest where to move
      */
     public void move(VType src, VType dest) throws NoSuchFileOrDirectoryException, InvalidNameException
     {
@@ -122,7 +117,7 @@ public class VDisk
     /**
      * This method lists the content of the given directory.
      *
-     * @param dir   to list
+     * @param dir to list
      */
     public void list(VDirectory dir) throws NoSuchFileOrDirectoryException
     {
@@ -133,9 +128,9 @@ public class VDisk
      * This method copies either a directory or a file. Note that the whole
      * structure is copied. There are no optimization like "copy on write".
      *
-     * @param src   source, either a VDirectory or a VFile
-     * @param dest  destination
-     * @throws BlockFullException               if the destination directory is full
+     * @param src  source, either a VDirectory or a VFile
+     * @param dest destination
+     * @throws BlockFullException if the destination directory is full
      */
     public void copy(VType src, VDirectory dest) throws BlockFullException, NoSuchFileOrDirectoryException
     {
@@ -145,7 +140,7 @@ public class VDisk
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
         DirectoryBlock destDir = sv.visit(root, dest.getPath());
 
-        if(destDir == null)
+        if (destDir == null)
         {
             throw new NoSuchFileOrDirectoryException();
         }
@@ -157,8 +152,8 @@ public class VDisk
     /**
      * This method stores a file or a directory imported from the host file system
      *
-     * @param src   source, either a VDirectory or a VFile
-     * @param dest  destination
+     * @param src  source, either a VDirectory or a VFile
+     * @param dest destination
      */
     public void store(VType src, VType dest)
     {

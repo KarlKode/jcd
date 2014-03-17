@@ -27,7 +27,7 @@ public class Block
     /**
      * Instantiate a new Block with the given content
      *
-     * @param b  the content of the new Block
+     * @param b the content of the new Block
      */
     public Block(byte[] b)
     {
@@ -63,9 +63,9 @@ public class Block
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)

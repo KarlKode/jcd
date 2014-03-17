@@ -18,7 +18,7 @@ public class DirectoryBlock extends InodeBlock
      * given name.
      *
      * @param block to clone
-     * @param name to set
+     * @param name  to set
      * @throws InvalidNameException if the given name is invalid
      */
     public DirectoryBlock(Block block, String name) throws InvalidNameException
@@ -42,9 +42,9 @@ public class DirectoryBlock extends InodeBlock
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -54,12 +54,11 @@ public class DirectoryBlock extends InodeBlock
     }
 
     /**
-     *
      * @return size of the directory
      */
     @Override
     public int size()
     {
-        throw new ToDoException( );
+        throw new ToDoException();
     }
 }

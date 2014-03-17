@@ -17,7 +17,7 @@ public interface VTypeVisitor<R, A>
      * This mehtod visits the given VType
      *
      * @param type to visit
-     * @param arg to pass
+     * @param arg  to pass
      * @return a generic return value
      */
     public R visit(VType type, A arg);
@@ -26,7 +26,7 @@ public interface VTypeVisitor<R, A>
      * This method is called after accepting the VDirectory.
      *
      * @param vdir being accepted
-     * @param arg passed by the visitor
+     * @param arg  passed by the visitor
      * @return a generic return value
      */
     public R directory(VDirectory vdir, A arg);
@@ -35,7 +35,7 @@ public interface VTypeVisitor<R, A>
      * This method is called after accepting the VFile.
      *
      * @param vfile being accepted
-     * @param arg passed by the visitor
+     * @param arg   passed by the visitor
      * @return a generic return value
      */
     public R file(VFile vfile, A arg);
