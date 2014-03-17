@@ -104,16 +104,6 @@ public class Block
     }
 
     /**
-     * Get the content of the Block
-     *
-     * @return content of the Block
-     */
-    public ByteArray getByteArray()
-    {
-        return bytes;
-    }
-
-    /**
      * Set the content of the Block
      *
      * @param b new content of the Block
@@ -131,6 +121,16 @@ public class Block
     public void setByteArray(ByteArray array)
     {
         this.bytes = array;
+    }
+
+    /**
+     * Get the content of the Block
+     *
+     * @return content of the Block
+     */
+    public ByteArray getByteArray()
+    {
+        return bytes;
     }
 
     /**
