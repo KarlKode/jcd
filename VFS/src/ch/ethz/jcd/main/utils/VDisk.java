@@ -108,7 +108,9 @@ public class VDisk
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
         InodeBlock inode = sv.visit(root, dest.getPathQueue());
-
+        DirectoryBlock parent = new DirectoryBlock(vUtil.read(inode.getParentBlockAddress()));
+        parent.remove(inode);
+        vUtil.write(inode);
         DeleteVisitor dv = new DeleteVisitor(vUtil, allocator);
         dv.visit(inode, null);
     }
