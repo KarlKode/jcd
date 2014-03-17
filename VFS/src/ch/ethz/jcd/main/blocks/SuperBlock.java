@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
@@ -18,6 +19,7 @@ public class SuperBlock extends Block
     public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 8;
     public static final int SUPER_BLOCK_ADDRESS = 0;
     public static final int BIT_MAP_BLOCK_ADDRESS = 1;
+    public static final int DATA_BLOCK_BEGIN_ADDRESS = 2;
 
     private int blockSize;
     private int blockCount;
@@ -129,8 +131,12 @@ public class SuperBlock extends Block
      *
      * @param blockAddress to set
      */
-    public void setRootDirectoryBlock(int blockAddress)
+    public void setRootDirectoryBlock(int blockAddress) throws InvalidBlockAddressException
     {
+        if (!isValidRootDirectoryBlock(blockAddress))
+        {
+            throw new InvalidBlockAddressException();
+        }
         this.rootDirectoryBlock = blockAddress;
         bytes.putInt(OFFSET_ROOT_DIRECTORY_BLOCK, this.rootDirectoryBlock);
     }
@@ -152,7 +158,7 @@ public class SuperBlock extends Block
      */
     public int getFirstBitMapBlock()
     {
-        return 1;
+        return BIT_MAP_BLOCK_ADDRESS;
     }
 
     /**
@@ -163,7 +169,7 @@ public class SuperBlock extends Block
     public int getLastBitMapBlock()
     {
         // TODO: Calculate the real size of the bit map
-        return 1;
+        return BIT_MAP_BLOCK_ADDRESS;
     }
 
     /**
@@ -173,12 +179,12 @@ public class SuperBlock extends Block
      */
     public int getFirstDataBlock()
     {
-        return 2;
+        return DATA_BLOCK_BEGIN_ADDRESS;
     }
 
     /**
-     * @param blockSize
-     * @return whether the given blockSize is valid or not
+     * @param blockSize block size
+     * @return true if the given block size is valid
      */
     private boolean isValidBlockSize(int blockSize)
     {
@@ -186,11 +192,20 @@ public class SuperBlock extends Block
     }
 
     /**
-     * @param blockCount
-     * @return whether the given blockSize is valid or not
+     * @param blockCount block count
+     * @return true if the given block size is valid or not
      */
     private boolean isValidBlockCount(int blockCount)
     {
         return blockCount > 0;
+    }
+
+    /**
+     * @param blockAddress block address
+     * @return if the the given root directory block address is valid
+     */
+    private boolean isValidRootDirectoryBlock(int blockAddress)
+    {
+        return blockAddress >= getFirstDataBlock();
     }
 }

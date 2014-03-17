@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 import org.junit.Before;
@@ -15,9 +16,9 @@ public class SuperBlockTest
     private static final int VDISK_BLOCK_SIZE = SuperBlock.MIN_SUPER_BLOCK_SIZE;
     private static final int VDISK_BLOCK_COUNT = VDISK_SIZE / VDISK_BLOCK_SIZE;
     private static final int VDISK_ROOT_DIRECTORY_BLOCK = 2;
-    public static final int VDISK_FIRST_BIT_MAP_BLOCK_ADDRESS = 1;
-    public static final int VDISK_LAST_BIT_MAP_BLOCK_ADDRESS = 1;
-    public static final int VDISK_FIRST_DATA_BLOCK_ADDRESS = 2;
+    public static final int VDISK_FIRST_BIT_MAP_BLOCK_ADDRESS = SuperBlock.BIT_MAP_BLOCK_ADDRESS;
+    public static final int VDISK_LAST_BIT_MAP_BLOCK_ADDRESS = SuperBlock.BIT_MAP_BLOCK_ADDRESS;
+    public static final int VDISK_FIRST_DATA_BLOCK_ADDRESS = SuperBlock.DATA_BLOCK_BEGIN_ADDRESS;
     private ByteBuffer buffer;
     private SuperBlock block;
 
@@ -120,6 +121,20 @@ public class SuperBlockTest
         assertEquals(VDISK_BLOCK_COUNT, block.getBlockCount());
     }
 
+    @Test(expected = InvalidBlockAddressException.class)
+    public void testSetRootDirectoryBlock() throws Exception
+    {
+        int rootDirectoryBlockAddress;
+
+        rootDirectoryBlockAddress = VDISK_ROOT_DIRECTORY_BLOCK;
+        block.setRootDirectoryBlock(rootDirectoryBlockAddress);
+        assertEquals(rootDirectoryBlockAddress, block.getRootDirectoryBlock());
+        assertEquals(rootDirectoryBlockAddress, buffer.getInt(SuperBlock.OFFSET_ROOT_DIRECTORY_BLOCK));
+
+        rootDirectoryBlockAddress = -1;
+        block.setRootDirectoryBlock(rootDirectoryBlockAddress);
+    }
+
     @Test
     public void testGetRootDirectoryBlock() throws Exception
     {
@@ -135,7 +150,7 @@ public class SuperBlockTest
     @Test
     public void testGetLastBitMapBlock() throws Exception
     {
-        assertEquals(VDISK_LAST_BIT_MAP_BLOCK_ADDRESS, block.getFirstBitMapBlock());
+        assertEquals(VDISK_LAST_BIT_MAP_BLOCK_ADDRESS, block.getLastBitMapBlock());
     }
 
     @Test
