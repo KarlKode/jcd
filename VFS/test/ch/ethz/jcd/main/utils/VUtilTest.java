@@ -13,7 +13,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class VUtilTest
 {
@@ -33,9 +34,9 @@ public class VUtilTest
 
     private static final byte[] SAMPLE_BLOCK = new byte[]
             {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'n', 'm', 'o', 'p'
-             , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-             , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-             , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     /**
      * constants to test if a disk is created correctly
@@ -48,7 +49,7 @@ public class VUtilTest
     /**
      * constants to test if a existing disk is loaded correctly
      */
-    private static final String LOAD_TEST_VDISK_FILE= "test/vutilOne.vdisk";
+    private static final String LOAD_TEST_VDISK_FILE = "test/vutilOne.vdisk";
     private static final int LOAD_TEST_VDISK_BLOCK_SIZE = 1024;
     private static final int LOAD_TEST_VDISK_BLOCK_COUNT = 256;
 
@@ -70,14 +71,14 @@ public class VUtilTest
     }
 
     @Test(expected = FileNotFoundException.class)
-    public void testVUtilFileNotFound( ) throws FileNotFoundException
+    public void testVUtilFileNotFound() throws FileNotFoundException
     {
         this.deleteFile(NO_DISK_TEST_VDISK_FILE);
         new VUtil(NO_DISK_TEST_VDISK_FILE);
     }
 
     @Test
-    public void testVUtilOneArgument( ) throws FileNotFoundException
+    public void testVUtilOneArgument() throws FileNotFoundException
     {
         this.deleteFile(LOAD_TEST_VDISK_FILE);
         FDisk.fdisk(LOAD_TEST_VDISK_FILE, LOAD_TEST_VDISK_BLOCK_SIZE, LOAD_TEST_VDISK_BLOCK_COUNT);
@@ -96,21 +97,21 @@ public class VUtilTest
     }
 
     @Test(expected = InvalidSizeException.class)
-    public void testVUtilTwoArgsInvalidSize( ) throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
+    public void testVUtilTwoArgsInvalidSize() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         this.deleteFile(CREATE_TEST_VDISK_FILE);
         new VUtil(CREATE_TEST_VDISK_FILE, 0, 1024);
     }
 
     @Test(expected = InvalidBlockSizeException.class)
-    public void testVUtilTwoArgsInvalidBlockSize( ) throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
+    public void testVUtilTwoArgsInvalidBlockSize() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         this.deleteFile(CREATE_TEST_VDISK_FILE);
         new VUtil(CREATE_TEST_VDISK_FILE, 1024, 8);
     }
 
     @Test
-    public void testVUtilTwoArgs( ) throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
+    public void testVUtilTwoArgs() throws FileNotFoundException, InvalidBlockSizeException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         this.deleteFile(CREATE_TEST_VDISK_FILE);
         VUtil vUtil = new VUtil(CREATE_TEST_VDISK_FILE, CREATE_TEST_VDISK_SIZE, CREATE_TEST_VDISK_BLOCK_SIZE);

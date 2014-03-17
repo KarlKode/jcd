@@ -1,7 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.Block;
-import ch.ethz.jcd.main.blocks.SuperBlock;
 import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
 
@@ -33,13 +32,12 @@ public class Allocator
     private void reserve()
     {
         int len = vUtil.getSuperBlock().getFirstDataBlock();
-        for(int i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
             try
             {
                 vUtil.getBitMapBlock().setUsed(i);
-            }
-            catch (BlockAddressOutOfBoundException e)
+            } catch (BlockAddressOutOfBoundException e)
             {
                 //TODO should never happen since the Disk is at least of the header size
                 e.printStackTrace();
@@ -62,8 +60,7 @@ public class Allocator
         try
         {
             freeBlockAddress = vUtil.getBitMapBlock().allocateBlock();
-        }
-        catch (BlockAddressOutOfBoundException e)
+        } catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
@@ -104,8 +101,7 @@ public class Allocator
         try
         {
             return vUtil.getBitMapBlock().isUnused(block.getAddress());
-        }
-        catch (BlockAddressOutOfBoundException e)
+        } catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
             e.printStackTrace();

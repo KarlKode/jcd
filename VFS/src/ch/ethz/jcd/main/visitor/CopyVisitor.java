@@ -1,11 +1,11 @@
 package ch.ethz.jcd.main.visitor;
 
+import ch.ethz.jcd.main.blocks.*;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
-import ch.ethz.jcd.main.blocks.*;
 
 /**
  * This visitor copies each block which could be reached from the given VFile / VDirectory.
@@ -32,7 +32,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * This method accept the passed Block.
      *
      * @param block to visit next
-     * @param arg to pass
+     * @param arg   to pass
      * @return the copied Block
      */
     @Override
@@ -46,19 +46,18 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * No future visits needed
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied Block
      */
     @Override
     public Block block(Block block, Void arg)
     {
-        Block b ;
+        Block b;
         try
         {
             b = new Block(allocator.allocate());
             vUtil.write(b);
-        }
-        catch (DiskFullException e)
+        } catch (DiskFullException e)
         {
             b = null;
         }
@@ -70,7 +69,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * It also reads the given DirectoryBlock and visits all linked InodeBlocks
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied DirectoryBlock
      */
     @Override
@@ -86,16 +85,13 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
                 dir.add(visit(new InodeBlock(vUtil.read(blockAddress)), arg));
             }
             vUtil.write(dir);
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             dir = null;
-        }
-        catch (DiskFullException e)
+        } catch (DiskFullException e)
         {
             dir = null;
-        }
-        catch (BlockFullException e)
+        } catch (BlockFullException e)
         {
             dir = null;
         }
@@ -107,7 +103,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * It also reads FileBlock and visits all linked Blocks
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied FileBlock
      */
     @Override
@@ -123,16 +119,13 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
             }
 
             vUtil.write(file);
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             file = null;
-        }
-        catch (DiskFullException e)
+        } catch (DiskFullException e)
         {
             file = null;
-        }
-        catch (BlockFullException e)
+        } catch (BlockFullException e)
         {
             file = null;
         }
@@ -144,7 +137,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * FileBlock and visits them
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the corresponding return value of detected inode type
      */
     @Override
@@ -152,17 +145,15 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
     {
         try
         {
-            if(block.isDirectory())
+            if (block.isDirectory())
             {
                 return visit(new DirectoryBlock(block, block.getName()), arg);
-            }
-            else if(block.isFile())
+            } else if (block.isFile())
             {
                 return visit(new FileBlock(block, block.getName()), arg);
             }
             return null;
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             return null;
         }
@@ -172,7 +163,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * This method should never been reached
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return null since the SuperBlock should not be copied
      */
     @Override
@@ -185,9 +176,9 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
      * This method should never been reached
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return null since the SuperBlock should not be copied
-     * */
+     */
     @Override
     public Block bitMapBlock(BitMapBlock block, Void arg)
     {

@@ -18,7 +18,7 @@ public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
      * This method visits the given VInode.
      *
      * @param type to visit
-     * @param arg Block containing information to use
+     * @param arg  Block containing information to use
      * @return created Block
      */
     @Override
@@ -32,7 +32,7 @@ public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
      * given Block.
      *
      * @param vdir to convert
-     * @param arg block to use as reference
+     * @param arg  block to use as reference
      * @return the created DirectoryBlock
      */
     @Override
@@ -41,8 +41,7 @@ public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
         try
         {
             return new DirectoryBlock(arg, vdir.getName());
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             //should never happen
             return null;
@@ -53,7 +52,7 @@ public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
      * This method converts a VFile into a FileBlock according to a given Block
      *
      * @param vfile to convert
-     * @param arg block to use as reference
+     * @param arg   block to use as reference
      * @return the created FileBlock
      */
     @Override
@@ -62,8 +61,7 @@ public class VTypeToBlockVisitor implements VTypeVisitor<InodeBlock, Block>
         try
         {
             return new FileBlock(arg, vfile.getName());
-        }
-        catch (InvalidNameException e)
+        } catch (InvalidNameException e)
         {
             //should never happen
             return null;

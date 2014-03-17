@@ -19,8 +19,8 @@ public class BitMapBlock extends Block
     /**
      * Instantiate a new BitMapBlock
      *
-     * @param blockAddress  block address of the new BitMapBlock
-     * @param b             content of the new BitMapBlock
+     * @param blockAddress block address of the new BitMapBlock
+     * @param b            content of the new BitMapBlock
      */
     public BitMapBlock(int blockAddress, byte[] b)
     {
@@ -58,9 +58,9 @@ public class BitMapBlock extends Block
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -167,7 +167,6 @@ public class BitMapBlock extends Block
     }
 
     /**
-     *
      * @param blockAddress to check
      * @return whether the given blockAddress is valid or not
      */

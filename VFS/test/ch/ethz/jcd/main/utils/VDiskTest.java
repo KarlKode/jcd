@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 
 public class VDiskTest
 {
-    private static final String VDISK_FILE= "test/vutilOne.vdisk";
+    private static final String VDISK_FILE = "test/vutilOne.vdisk";
     private static final int VDISK_BLOCK_SIZE = 1024;
     private static final int VDISK_BLOCK_COUNT = 256;
 
@@ -27,7 +27,7 @@ public class VDiskTest
         }
     }
 
-    private void setUp( )
+    private void setUp()
     {
         this.deleteFile(VDISK_FILE);
         FDisk.fdisk(VDISK_FILE, VDISK_BLOCK_SIZE, VDISK_BLOCK_COUNT);
@@ -89,7 +89,7 @@ public class VDiskTest
     }
 
     @Test
-    public void testCreate( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
+    public void testCreate() throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
         this.setUp();
         VDisk vDisk = new VDisk(VDISK_FILE);
@@ -98,7 +98,7 @@ public class VDiskTest
     }
 
     @Test(expected = DiskFullException.class)
-    public void testCreateDiskFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
+    public void testCreateDiskFull() throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
         this.setUp();
         VDisk vDisk = new VDisk(VDISK_FILE);
@@ -107,7 +107,7 @@ public class VDiskTest
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testCreateNoSuchFileOrDirectory( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
+    public void testCreateNoSuchFileOrDirectory() throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
         this.setUp();
         VDisk vDisk = new VDisk(VDISK_FILE);
@@ -115,78 +115,78 @@ public class VDiskTest
     }
 
     @Test(expected = BlockFullException.class)
-    public void testCreateBlockFull( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
+    public void testCreateBlockFull() throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException, FileNotFoundException
     {
         this.setUp();
         VDisk vDisk = new VDisk(VDISK_FILE);
-        for(int i = 0; i < VDISK_BLOCK_COUNT; i++)
+        for (int i = 0; i < VDISK_BLOCK_COUNT; i++)
         {
-            vDisk.create(new VFile(i+".txt"), new VDirectory("/"));
+            vDisk.create(new VFile(i + ".txt"), new VDirectory("/"));
         }
     }
 
     @Test(expected = InvalidNameException.class)
-    public void testCreateDiskFullInvalidName( ) throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
+    public void testCreateDiskFullInvalidName() throws DiskFullException, NoSuchFileOrDirectoryException, BlockFullException, InvalidNameException
     {
 
     }
 
     @Test
-    public void testDelete( ) throws NoSuchFileOrDirectoryException
+    public void testDelete() throws NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testDeleteNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException
+    public void testDeleteNoSuchFileOrDirectory() throws NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test
-    public void testMove( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    public void testMove() throws NoSuchFileOrDirectoryException, InvalidNameException
     {
 
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testMoveNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    public void testMoveNoSuchFileOrDirectory() throws NoSuchFileOrDirectoryException, InvalidNameException
     {
 
     }
 
     @Test(expected = InvalidNameException.class)
-    public void testMoveInvalidName( ) throws NoSuchFileOrDirectoryException, InvalidNameException
+    public void testMoveInvalidName() throws NoSuchFileOrDirectoryException, InvalidNameException
     {
 
     }
 
     @Test
-    public void testList( ) throws NoSuchFileOrDirectoryException
+    public void testList() throws NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testListNoSuchFileOrDirectory( ) throws NoSuchFileOrDirectoryException
+    public void testListNoSuchFileOrDirectory() throws NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test
-    public void testCopy( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    public void testCopy() throws BlockFullException, NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test(expected = NoSuchFileOrDirectoryException.class)
-    public void testCopyNoSuchFileOrDirectory( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    public void testCopyNoSuchFileOrDirectory() throws BlockFullException, NoSuchFileOrDirectoryException
     {
 
     }
 
     @Test(expected = BlockFullException.class)
-    public void testCopyBlockFull( ) throws BlockFullException, NoSuchFileOrDirectoryException
+    public void testCopyBlockFull() throws BlockFullException, NoSuchFileOrDirectoryException
     {
 
     }

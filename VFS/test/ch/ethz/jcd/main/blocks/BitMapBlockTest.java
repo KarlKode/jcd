@@ -24,9 +24,10 @@ public class BitMapBlockTest
     @Test
     public void testAllocateBlock() throws Exception
     {
-        int[] usedBlocks = new int[] {0, 1, 3, 4};
+        int[] usedBlocks = new int[]{0, 1, 3, 4};
         BitSet bitSet = new BitSet();
-        for (int usedBlock : usedBlocks) {
+        for (int usedBlock : usedBlocks)
+        {
             bitSet.set(usedBlock);
         }
         BitMapBlock block = new BitMapBlock(0, bitSet.toByteArray());

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by phgamper on 3/14/14.
- *
+ * <p/>
  * This class provides an interface to operate on a byte array in a simple way.
  */
 public class ByteArray
@@ -35,7 +35,7 @@ public class ByteArray
     /**
      * This method initializes bytes
      */
-    public void clearAll( )
+    public void clearAll()
     {
         bytes = new byte[bytes.length];
     }
@@ -64,12 +64,12 @@ public class ByteArray
     /**
      * This method initializes a specified number of bytes from a given index.
      *
-     * @param index first byte to initialize
+     * @param index  first byte to initialize
      * @param number of bytes to initialize
      */
     public void clear(int index, int number)
     {
-        for(int i = index; i < index + number; i++)
+        for (int i = index; i < index + number; i++)
         {
             bytes[i] = 0;
         }
@@ -79,7 +79,7 @@ public class ByteArray
      * This method puts a byte at a given index.
      *
      * @param index where to put
-     * @param b byte to put
+     * @param b     byte to put
      */
     public void put(int index, byte b)
     {
@@ -90,13 +90,13 @@ public class ByteArray
      * This method puts a byte array starting at given index.
      *
      * @param index where to put
-     * @param b bytes to put
+     * @param b     bytes to put
      */
     public void put(int index, byte[] b)
     {
-        for(int i = 0; i < b.length; i++)
+        for (int i = 0; i < b.length; i++)
         {
-            bytes[i+index] = b[i];
+            bytes[i + index] = b[i];
         }
     }
 
@@ -104,7 +104,7 @@ public class ByteArray
      * This method puts an Integer starting at given index.
      *
      * @param index where to put
-     * @param i integer to put
+     * @param i     integer to put
      */
     public void putInt(int index, int i)
     {
@@ -116,7 +116,7 @@ public class ByteArray
      * This method puts a String starting at given index.
      *
      * @param index where to put
-     * @param s String to put
+     * @param s     String to put
      */
     public void putString(int index, String s)
     {
@@ -138,16 +138,16 @@ public class ByteArray
      * This method returns a byte array of length len starting at given index.
      *
      * @param index of first byte to return
-     * @param len number of bytes to return
+     * @param len   number of bytes to return
      * @return byte array of length len
      */
     public byte[] get(int index, int len)
     {
         byte[] buf = new byte[len];
 
-        for(int i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
-            buf[i] = bytes[i+index];
+            buf[i] = bytes[i + index];
         }
 
         return buf;
@@ -170,12 +170,12 @@ public class ByteArray
      * This method returns a String of length len starting at given index.
      *
      * @param index of where the String starts
-     * @param len of the String to return
+     * @param len   of the String to return
      * @return String at given index of length len
      */
     public String getString(int index, int len)
     {
-        return new String(get(index,len));
+        return new String(get(index, len));
     }
 
     /**
@@ -183,7 +183,7 @@ public class ByteArray
      *
      * @return the whole byte array
      */
-    public byte[] getBytes( )
+    public byte[] getBytes()
     {
         return bytes;
     }
