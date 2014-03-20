@@ -27,9 +27,9 @@ public class VDirectory extends VInode
      * It tells to the visitor which sort of VInode he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override

@@ -1,9 +1,6 @@
 package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.blocks.*;
-import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.DiskFullException;
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 
@@ -31,7 +28,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * This method accept the passed Block.
      *
      * @param block to visit next
-     * @param arg to pass
+     * @param arg   to pass
      * @return the copied Block
      */
     @Override
@@ -45,7 +42,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * No future visits needed
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied Block
      */
     @Override
@@ -60,7 +57,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * It also reads the given DirectoryBlock and visits all linked InodeBlocks
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied DirectoryBlock
      */
     @Override
@@ -81,7 +78,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * It also reads FileBlock and visits all linked Blocks
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the copied FileBlock
      */
     @Override
@@ -100,17 +97,16 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * FileBlock and visits them
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return the corresponding return value of detected inode type
      */
     @Override
     public Void inode(InodeBlock block, Void arg)
     {
-        if(block.isDirectory())
+        if (block.isDirectory())
         {
             return visit(new DirectoryBlock(block), arg);
-        }
-        else if(block.isFile())
+        } else if (block.isFile())
         {
             return visit(new FileBlock(block), arg);
         }
@@ -121,7 +117,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * This method should never been reached
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return null since the SuperBlock should not be copied
      */
     @Override
@@ -134,9 +130,9 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
      * This method should never been reached
      *
      * @param block being visited
-     * @param arg passed from last Block
+     * @param arg   passed from last Block
      * @return null since the SuperBlock should not be copied
-     * */
+     */
     @Override
     public Void bitMapBlock(BitMapBlock block, Void arg)
     {

@@ -33,16 +33,15 @@ public abstract class VInode
      * It tells to the visitor which sort of VInode he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     public abstract <R, A> R accept(VTypeVisitor<R, A> visitor, A arg);
 
     /**
-     *
-     *  @return the name of the inode
+     * @return the name of the inode
      */
     public String getName()
     {
@@ -72,32 +71,19 @@ public abstract class VInode
     public void setPath(String path)
     {
         this.path.clear();
-        if(path.equals(DirectoryBlock.ROOT_DIRECTORY_BLOCK_PATH))
+        if (path.equals(DirectoryBlock.ROOT_DIRECTORY_BLOCK_PATH))
         {
             this.path.add(DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME);
             this.name = DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME;
-        }
-        else
+        } else
         {
             this.path.addAll(Arrays.asList(path.split("/")));
-            if(this.path.getLast().equals(""))
+            if (this.path.getLast().equals(""))
             {
                 this.path.removeLast();
             }
             this.name = this.path.getLast();
         }
-    }
-
-    /**
-     * This method sets the path stored in a linke list
-     *
-     * @param path to set
-     */
-    public void setPath(LinkedList<String> path)
-    {
-        this.path.clear();
-        this.path.addAll(path);
-        this.name = this.path.getLast();
     }
 
     /**
@@ -118,6 +104,18 @@ public abstract class VInode
     public LinkedList<String> getPath()
     {
         return path;
+    }
+
+    /**
+     * This method sets the path stored in a linke list
+     *
+     * @param path to set
+     */
+    public void setPath(LinkedList<String> path)
+    {
+        this.path.clear();
+        this.path.addAll(path);
+        this.name = this.path.getLast();
     }
 
     /**

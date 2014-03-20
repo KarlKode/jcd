@@ -11,8 +11,8 @@ import java.util.LinkedList;
 /**
  * This class is an abstraction of FileBlock and DirectoryBlock called InodeBlock.
  * An InodeBlock has the following structure:
- *
- *      1 byte |    63 bytes    |   4 bytes         |   4 bytes
+ * <p/>
+ * 1 byte |    63 bytes    |   4 bytes         |   4 bytes
  * [    type   |    name        |   BlockAddress1   |   BlockAddress2   |   ... ]
  */
 public class InodeBlock extends Block
@@ -33,7 +33,7 @@ public class InodeBlock extends Block
     /**
      * This constructor is used to specialize a general Block
      *
-     * @param b general Block
+     * @param b    general Block
      * @param name of created InodeBlock
      */
     public InodeBlock(Block b, String name) throws InvalidNameException
@@ -58,10 +58,10 @@ public class InodeBlock extends Block
      * This method initializes the FileBlock. This includes detecting the
      * inode type, reading the name, loading the linked blocks
      */
-    public void init( )
+    public void init()
     {
         type = bytes.get(OFFSET_TYPE);
-        name = bytes.getString(OFFSET_NAME,MAX_NAME_SIZE).trim();
+        name = bytes.getString(OFFSET_NAME, MAX_NAME_SIZE).trim();
         parentBlockAddress = bytes.getInt(OFFSET_PARENT_BLOCK_ADDRESS);
         this.loadLinkedBlocks();
     }
@@ -71,9 +71,9 @@ public class InodeBlock extends Block
      * It tells to the visitor which sort of Block he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -90,12 +90,12 @@ public class InodeBlock extends Block
      */
     public void add(Block b) throws BlockFullException
     {
-        if(isBlockFull())
+        if (isBlockFull())
         {
             throw new BlockFullException();
         }
         blockAddressList.add(b.getAddress());
-        this.storeLinkedBlocks( );
+        this.storeLinkedBlocks();
     }
 
     /**
@@ -106,12 +106,12 @@ public class InodeBlock extends Block
      */
     public void add(int blockAddress) throws BlockFullException
     {
-        if(isBlockFull())
+        if (isBlockFull())
         {
             throw new BlockFullException();
         }
         blockAddressList.add(blockAddress);
-        this.storeLinkedBlocks( );
+        this.storeLinkedBlocks();
     }
 
     /**
@@ -122,7 +122,7 @@ public class InodeBlock extends Block
     public void remove(Block b)
     {
         blockAddressList.removeFirstOccurrence(b.getAddress());
-        this.storeLinkedBlocks( );
+        this.storeLinkedBlocks();
     }
 
     /**
@@ -133,11 +133,10 @@ public class InodeBlock extends Block
     public void remove(int blockAddress)
     {
         blockAddressList.removeFirstOccurrence(blockAddress);
-        this.storeLinkedBlocks( );
+        this.storeLinkedBlocks();
     }
 
     /**
-     *
      * @return size of the Inodes specialized type
      */
     public int size()
@@ -148,18 +147,17 @@ public class InodeBlock extends Block
     /**
      * This method loads the blockAddresses of all linked Blocks
      */
-    public void loadLinkedBlocks( )
+    public void loadLinkedBlocks()
     {
         blockAddressList.clear();
 
-        for(int i = OFFSET_BLOCKS; i < bytes.size(); i = i + 4)
+        for (int i = OFFSET_BLOCKS; i < bytes.size(); i = i + 4)
         {
             int address = bytes.getInt(i);
-            if(address > 0)
+            if (address > 0)
             {
                 blockAddressList.add(address);
-            }
-            else
+            } else
             {
                 break;
             }
@@ -169,11 +167,11 @@ public class InodeBlock extends Block
     /**
      * This method stors the blockAddressList
      */
-    public void storeLinkedBlocks( )
+    public void storeLinkedBlocks()
     {
         int i = OFFSET_BLOCKS;
         Iterator<Integer> it = blockAddressList.iterator();
-        while(i < bytes.size() && it.hasNext())
+        while (i < bytes.size() && it.hasNext())
         {
             bytes.putInt(i, it.next());
             i = i + 4;
@@ -182,58 +180,38 @@ public class InodeBlock extends Block
     }
 
     /**
-     * This method sets the name of the Blockit
-     *
-     * @param name name to set
-     */
-    public void setName( String name ) throws InvalidNameException
-    {
-        if(name == null || name.length() > MAX_NAME_SIZE)
-        {
-            throw new InvalidNameException();
-        }
-        this.name = name;
-        bytes.putString(OFFSET_NAME, name);
-    }
-
-    /**
-     *
      * @return whether the InodeBlock is full or not
      */
-    public boolean isBlockFull( )
+    public boolean isBlockFull()
     {
         return (blockAddressList.size()) >= (bytes.size() - OFFSET_BLOCKS) / 4;
     }
 
     /**
-     *
      * @return whether the InodeBlock is a File or not
      */
-    public boolean isFile( )
+    public boolean isFile()
     {
         return type == TYPE_FILE;
     }
 
     /**
-     *
      * @return whether the InodeBlock is a Directory or not
      */
-    public boolean isDirectory( )
+    public boolean isDirectory()
     {
         return type == TYPE_DIRECTORY;
     }
 
     /**
-     *
      * @return whether the InodeBlock is empty or not
      */
-    public boolean isEmpty( )
+    public boolean isEmpty()
     {
-        return blockAddressList.size()  == 0;
+        return blockAddressList.size() == 0;
     }
 
     /**
-     *
      * @return the blockAddressList
      */
     public LinkedList<Integer> getBlockAddressList()
@@ -242,21 +220,42 @@ public class InodeBlock extends Block
     }
 
     /**
-     *
      * @return the byte representation of the inode type
      */
-    public byte getType( )
+    public byte getType()
     {
         return type;
     }
 
     /**
-     *
      * @return the name of the InodeBlock
      */
-    public String getName( )
+    public String getName()
     {
         return name.trim();
+    }
+
+    /**
+     * This method sets the name of the Blockit
+     *
+     * @param name name to set
+     */
+    public void setName(String name) throws InvalidNameException
+    {
+        if (name == null || name.length() > MAX_NAME_SIZE)
+        {
+            throw new InvalidNameException();
+        }
+        this.name = name;
+        bytes.putString(OFFSET_NAME, name);
+    }
+
+    /**
+     * @return the block address of the parent inode
+     */
+    public int getParentBlockAddress()
+    {
+        return parentBlockAddress;
     }
 
     /**
@@ -268,13 +267,5 @@ public class InodeBlock extends Block
     {
         this.parentBlockAddress = blockAddress;
         bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, blockAddress);
-    }
-    /**
-     *
-     * @return the block address of the parent inode
-     */
-    public int getParentBlockAddress( )
-    {
-        return parentBlockAddress;
     }
 }

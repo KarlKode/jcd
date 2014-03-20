@@ -27,9 +27,9 @@ public class VFile extends VInode
      * It tells to the visitor which sort of VInode he called.
      *
      * @param visitor calling this method
-     * @param arg to pass
-     * @param <R> generic return type
-     * @param <A> generic argument type
+     * @param arg     to pass
+     * @param <R>     generic return type
+     * @param <A>     generic argument type
      * @return the visitors return value
      */
     @Override
@@ -49,19 +49,17 @@ public class VFile extends VInode
     }
 
     /**
-     *
      * @return the file's content
      */
-    public ByteArray getContent( )
+    public ByteArray getContent()
     {
         return content;
     }
 
     /**
-     *
      * @return the file's content as byte array
      */
-    public byte[] getBytes( )
+    public byte[] getBytes()
     {
         return content.getBytes();
     }

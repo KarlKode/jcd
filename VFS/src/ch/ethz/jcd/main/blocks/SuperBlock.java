@@ -75,6 +75,16 @@ public class SuperBlock extends Block
     }
 
     /**
+     * Get the block size of the SuperBlock
+     *
+     * @return block size of the SuperBlock in bytes
+     */
+    public int getBlockSize()
+    {
+        return blockSize;
+    }
+
+    /**
      * Set the block size of the SuperBlock
      *
      * @param blockSize the new block size in bytes
@@ -91,13 +101,13 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the block size of the SuperBlock
+     * Get the number of Blocks of the FS that the SuperBlock belongs to
      *
-     * @return block size of the SuperBlock in bytes
+     * @return total number of Blocks of the FS that the SuperBlock belongs to
      */
-    public int getBlockSize()
+    public int getBlockCount()
     {
-        return blockSize;
+        return blockCount;
     }
 
     /**
@@ -117,13 +127,13 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the number of Blocks of the FS that the SuperBlock belongs to
+     * Get the block address of the DirectoryBlock of the root directory
      *
-     * @return total number of Blocks of the FS that the SuperBlock belongs to
+     * @return block address of the DirectoryBlock of the root directory
      */
-    public int getBlockCount()
+    public int getRootDirectoryBlock()
     {
-        return blockCount;
+        return rootDirectoryBlock;
     }
 
     /**
@@ -139,16 +149,6 @@ public class SuperBlock extends Block
         }
         this.rootDirectoryBlock = blockAddress;
         bytes.putInt(OFFSET_ROOT_DIRECTORY_BLOCK, this.rootDirectoryBlock);
-    }
-
-    /**
-     * Get the block address of the DirectoryBlock of the root directory
-     *
-     * @return block address of the DirectoryBlock of the root directory
-     */
-    public int getRootDirectoryBlock()
-    {
-        return rootDirectoryBlock;
     }
 
     /**
