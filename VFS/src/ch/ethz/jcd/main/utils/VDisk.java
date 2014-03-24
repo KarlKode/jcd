@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.*;
@@ -20,8 +19,6 @@ import java.io.FileNotFoundException;
 public class VDisk
 {
     private VUtil vUtil;
-    private VTypeToBlockVisitor vtbv = new VTypeToBlockVisitor();
-    private DirectoryBlock root;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -31,16 +28,6 @@ public class VDisk
     public VDisk(String vDiskFile) throws FileNotFoundException
     {
         vUtil = new VUtil(vDiskFile);
-
-        Block b = vUtil.read(vUtil.getSuperBlock().getRootDirectoryBlock());
-        try
-        {
-            root = new DirectoryBlock(b, "");
-        } catch (InvalidNameException e)
-        {
-            // TODO
-            throw new NotImplementedException();
-        }
     }
 
     /**
@@ -51,7 +38,7 @@ public class VDisk
      *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
      * @param blockSize     block size of the new VFS
      */
-    public static VDisk create(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
+    public static VDisk format(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
     {
         VUtil.format(vDiskFileName, size, blockSize);
         return new VDisk(vDiskFileName);
@@ -69,9 +56,10 @@ public class VDisk
      */
     public void create(VInode inode, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
+        VTypeToBlockVisitor vTypeToBlockVisitor = new VTypeToBlockVisitor();
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock block = vtbv.visit(inode, vUtil.allocate());
-        DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
+        InodeBlock block = vTypeToBlockVisitor.visit(inode, vUtil.allocate());
+        DirectoryBlock destDir = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
 
         if (destDir == null)
         {
@@ -91,7 +79,7 @@ public class VDisk
     public void delete(VInode dest) throws NoSuchFileOrDirectoryException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock inode = sv.visit(root, dest.getPathQueue());
+        InodeBlock inode = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
         DirectoryBlock parent = new DirectoryBlock(vUtil.read(inode.getParentBlockAddress()));
         parent.remove(inode);
         vUtil.write(inode);
@@ -109,10 +97,10 @@ public class VDisk
     public void move(VInode src, VInode dest) throws NoSuchFileOrDirectoryException, InvalidNameException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock srcInode = sv.visit(root, src.getPathQueue());
-        InodeBlock destInode = sv.visit(root, dest.getPathQueue());
+        InodeBlock srcInode = sv.visit(vUtil.getRootDirectoryBlock(), src.getPathQueue());
+        InodeBlock destInode = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
 
-
+        throw new NotImplementedException();
     }
 
     /**
@@ -139,7 +127,7 @@ public class VDisk
         InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
 
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
+        DirectoryBlock destDir = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
 
         if (destDir == null)
         {
