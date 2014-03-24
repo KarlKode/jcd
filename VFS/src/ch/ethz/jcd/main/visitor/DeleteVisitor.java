@@ -1,7 +1,6 @@
 package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.blocks.*;
-import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 
 /**
@@ -10,18 +9,15 @@ import ch.ethz.jcd.main.utils.VUtil;
 public class DeleteVisitor implements BlockVisitor<Void, Void>
 {
     private VUtil vUtil;
-    private Allocator allocator;
 
     /**
      * Instantiate a new DeleteVisitor
      *
-     * @param vUtil     Interface to read/write on the disk
-     * @param allocator Util to allocate/free Blocks
+     * @param vUtil Interface to read/write on the disk
      */
-    public DeleteVisitor(VUtil vUtil, Allocator allocator)
+    public DeleteVisitor(VUtil vUtil)
     {
         this.vUtil = vUtil;
-        this.allocator = allocator;
     }
 
     /**
@@ -48,7 +44,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
     @Override
     public Void block(Block block, Void arg)
     {
-        allocator.free(block);
+        vUtil.free(block);
         return null;
     }
 
@@ -69,7 +65,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
         {
             visit(new InodeBlock(vUtil.read(blockAddress)), arg);
         }
-        allocator.free(block);
+        vUtil.free(block);
         return null;
     }
 
@@ -88,7 +84,7 @@ public class DeleteVisitor implements BlockVisitor<Void, Void>
         {
             visit(vUtil.read(blockAddress), arg);
         }
-        allocator.free(block);
+        vUtil.free(block);
         return null;
     }
 

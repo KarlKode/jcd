@@ -4,7 +4,6 @@ import ch.ethz.jcd.main.blocks.*;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
-import ch.ethz.jcd.main.utils.Allocator;
 import ch.ethz.jcd.main.utils.VUtil;
 
 /**
@@ -14,18 +13,15 @@ import ch.ethz.jcd.main.utils.VUtil;
 public class CopyVisitor implements BlockVisitor<Block, Void>
 {
     private VUtil vUtil;
-    private Allocator allocator;
 
     /**
      * This constructor builds a CopyVisitor.
      *
-     * @param vUtil     Interface to read/write on the disk
-     * @param allocator Util to allocate/free Blocks
+     * @param vUtil Interface to read/write on the disk
      */
-    public CopyVisitor(VUtil vUtil, Allocator allocator)
+    public CopyVisitor(VUtil vUtil)
     {
         this.vUtil = vUtil;
-        this.allocator = allocator;
     }
 
     /**
@@ -55,7 +51,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
         Block b;
         try
         {
-            b = new Block(allocator.allocate());
+            b = new Block(vUtil.allocate());
             vUtil.write(b);
         } catch (DiskFullException e)
         {
@@ -78,7 +74,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
         DirectoryBlock dir;
         try
         {
-            dir = new DirectoryBlock(allocator.allocate(), block.getName());
+            dir = new DirectoryBlock(vUtil.allocate(), block.getName());
 
             for (Integer blockAddress : block.getBlockAddressList())
             {
@@ -112,7 +108,7 @@ public class CopyVisitor implements BlockVisitor<Block, Void>
         FileBlock file;
         try
         {
-            file = new FileBlock(allocator.allocate(), block.getName());
+            file = new FileBlock(vUtil.allocate(), block.getName());
             for (Integer blockAddress : block.getBlockAddressList())
             {
                 file.add(visit(vUtil.read(blockAddress), arg));

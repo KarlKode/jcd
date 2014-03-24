@@ -15,17 +15,13 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.FileNotFoundException;
 
 /**
- * This class provides an abstract interface to the user, for example a
- * console application. The user don't have to know anything about how
- * the disk operation are implemented.
+ * Public high level interface that hides the implementation details of all operations on a virtual disk.
  */
 public class VDisk
 {
     private VUtil vUtil;
-    private Allocator allocator;
     private VTypeToBlockVisitor vtbv = new VTypeToBlockVisitor();
     private DirectoryBlock root;
-
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -35,27 +31,7 @@ public class VDisk
     public VDisk(String vDiskFile) throws FileNotFoundException
     {
         vUtil = new VUtil(vDiskFile);
-        init();
-    }
 
-    /**
-     * Create a new VDisk
-     *
-     * @param vDiskFile path to the VDisk file
-     * @param size      total size of the VDisk
-     */
-    public VDisk(String vDiskFile, long size, int blockSize) throws VDiskCreationException, InvalidBlockSizeException, InvalidSizeException, FileNotFoundException, InvalidBlockCountException
-    {
-        vUtil = new VUtil(vDiskFile, size, blockSize);
-        init();
-    }
-
-    /**
-     * This method prepares the loaded disk for usage.
-     */
-    private void init()
-    {
-        allocator = new Allocator(vUtil);
         Block b = vUtil.read(vUtil.getSuperBlock().getRootDirectoryBlock());
         try
         {
@@ -65,6 +41,20 @@ public class VDisk
             // TODO
             throw new NotImplementedException();
         }
+    }
+
+    /**
+     * Create a new VDisk file that contains an almost empty VFS
+     *
+     * @param vDiskFileName path to the VDisk file
+     * @param size          total size of the VDisk (in bytes).
+     *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
+     * @param blockSize     block size of the new VFS
+     */
+    public static VDisk create(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
+    {
+        VUtil.format(vDiskFileName, size, blockSize);
+        return new VDisk(vDiskFileName);
     }
 
     /**
@@ -80,7 +70,7 @@ public class VDisk
     public void create(VInode inode, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
     {
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock block = vtbv.visit(inode, allocator.allocate());
+        InodeBlock block = vtbv.visit(inode, vUtil.allocate());
         DirectoryBlock destDir = sv.visit(root, dest.getPathQueue());
 
         if (destDir == null)
@@ -105,7 +95,7 @@ public class VDisk
         DirectoryBlock parent = new DirectoryBlock(vUtil.read(inode.getParentBlockAddress()));
         parent.remove(inode);
         vUtil.write(inode);
-        DeleteVisitor dv = new DeleteVisitor(vUtil, allocator);
+        DeleteVisitor dv = new DeleteVisitor(vUtil);
         dv.visit(inode, null);
     }
 
@@ -145,7 +135,7 @@ public class VDisk
      */
     public void copy(VInode src, VDirectory dest) throws BlockFullException, NoSuchFileOrDirectoryException
     {
-        CopyVisitor cv = new CopyVisitor(vUtil, allocator);
+        CopyVisitor cv = new CopyVisitor(vUtil);
         InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
 
         SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);

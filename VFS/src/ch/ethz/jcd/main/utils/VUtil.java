@@ -16,95 +16,98 @@ import java.io.RandomAccessFile;
  */
 public class VUtil
 {
-    private final String vDiskFile;
     private RandomAccessFile raf;
     private SuperBlock superBlock;
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
 
     /**
-     * This constructor builds a new VUtil. Use it if you want to mount an
-     * existing virtual disk.
+     * Create a new VUtil instance for the VFS in the file at vDiskFileName
      *
-     * @param vDiskFile name of disk to mount
-     * @throws FileNotFoundException if RandomAccessFile could not find the disk file
+     * @param vDiskFileName name of the file that contains the VFS
+     * @throws FileNotFoundException the VFS file can not be found
      */
-    public VUtil(String vDiskFile) throws FileNotFoundException
+    public VUtil(String vDiskFileName) throws FileNotFoundException
     {
-        this.vDiskFile = vDiskFile;
-        raf = new RandomAccessFile(this.vDiskFile, "rwd");
-        superBlock = loadSuperBlock();
-        bitMapBlock = loadBitMapBlock();
-        rootBlock = loadRootDirectoryBlock();
+        raf = new RandomAccessFile(vDiskFileName, "rwd");
+
+        // Load super block
+        byte[] superBlockBytes = new byte[SuperBlock.MIN_SUPER_BLOCK_SIZE];
+        try
+        {
+            raf.read(superBlockBytes);
+            // Read the whole super block
+            superBlockBytes = new byte[new SuperBlock(superBlockBytes).getBlockSize()];
+            raf.seek(SuperBlock.SUPER_BLOCK_ADDRESS);
+            raf.read(superBlockBytes);
+            superBlock = new SuperBlock(superBlockBytes);
+        } catch (InvalidBlockSizeException | IOException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
+
+        // Load bitmap block
+        bitMapBlock = new BitMapBlock(read(superBlock.getFirstBitMapBlock()));
+        rootBlock = new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
     }
 
     /**
-     * This constructor builds a new VUtil. Use it if you want to create a new
-     * virtual disk.
+     * Format the file at vDiskFileName so that it contains a valid empty VFS with the given parameters
      *
-     * @param vDiskFile name of the disk to create
-     * @param diskSize  of the disk to create
-     * @param blockSize of the disk to create
-     * @throws InvalidSizeException       if the given diskSize is invalid
-     * @throws InvalidBlockSizeException  if the blockSize is invalid
-     * @throws VDiskCreationException     if the disk file not could be created
-     * @throws FileNotFoundException      if RandomAccessFile could not find the disk file
-     * @throws InvalidBlockCountException if the blockSize does not fit into the diskSize
+     * @param vDiskFileName the path of the file that should be formatted
+     * @param diskSize      total size of the VDisk (in bytes).
+     *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
+     * @param blockSize     block size of the new VFS
+     * @throws InvalidBlockSizeException Invalid block size
+     * @throws InvalidSizeException      Invalid disk size
+     * @throws VDiskCreationException    Internal error while creating the VFS file
      */
-    public VUtil(String vDiskFile, long diskSize, int blockSize) throws InvalidSizeException, InvalidBlockSizeException, VDiskCreationException, InvalidBlockCountException
+    public static void format(String vDiskFileName, long diskSize, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException
     {
-        this.vDiskFile = vDiskFile;
-        // Check diskSize and blockSize for validity
-        if (diskSize <= 0 || diskSize % blockSize != 0)
-        {
-            throw new InvalidSizeException();
-        }
-
+        // Check block size
         if (blockSize < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
             throw new InvalidBlockSizeException();
         }
 
+        // Check disk size
+        if (diskSize <= 0 || diskSize % blockSize != 0 || diskSize < 16 * blockSize)
+        {
+            throw new InvalidSizeException();
+        }
+
+        File file = new File(vDiskFileName);
+        if (file.exists())
+        {
+            file.delete();
+        }
         try
         {
-            // Create the VDisk file
-            File fp = new File(this.vDiskFile);
-            if (!fp.createNewFile())
+            if (!file.createNewFile())
             {
                 throw new VDiskCreationException();
             }
-            raf = new RandomAccessFile(this.vDiskFile, "rw");
         } catch (IOException e)
         {
             throw new VDiskCreationException();
         }
 
-        init(diskSize, blockSize);
-    }
-
-    /**
-     * This method initializes the new created VDisk. A SuperBlock and a BitMapBlock
-     * are created
-     *
-     * @param diskSize  of created VDisk
-     * @param blockSize of created VDisk
-     * @throws InvalidBlockSizeException  if the blockSize is invalid
-     * @throws InvalidBlockCountException if the blockSize does not fit into the specified diskSize
-     */
-    private void init(long diskSize, int blockSize) throws InvalidBlockSizeException, InvalidBlockCountException
-    {
         // Create the superblock of the VDisk
         ByteArray bytes = new ByteArray(new byte[blockSize]);
         bytes.putInt(SuperBlock.OFFSET_BLOCK_SIZE, blockSize);
         bytes.putInt(SuperBlock.OFFSET_BLOCK_COUNT, (int) (diskSize / blockSize));
         bytes.putInt(SuperBlock.OFFSET_ROOT_DIRECTORY_BLOCK, 2);
-        superBlock = new SuperBlock(bytes.getBytes());
+        SuperBlock superBlock = new SuperBlock(bytes.getBytes());
+        BitMapBlock bitMapBlock;
+        DirectoryBlock rootBlock;
 
         // Create the bit map and the root directory of the VDisk
         try
         {
             bitMapBlock = new BitMapBlock(superBlock.getFirstBitMapBlock(), new byte[blockSize]);
             rootBlock = new DirectoryBlock(new Block(superBlock.getRootDirectoryBlock(), new byte[blockSize]));
+
             // Set the SuperBlock, the BitMapBlock and the rootBlock as used
             bitMapBlock.setUsed(superBlock.getAddress());
             bitMapBlock.setUsed(bitMapBlock.getAddress());
@@ -112,76 +115,71 @@ public class VUtil
         } catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
-            e.printStackTrace();
+            throw new VDiskCreationException();
         }
-        //Sync
-        write(superBlock);
-        write(bitMapBlock);
-        write(rootBlock);
-    }
 
-    /**
-     * This method tries to load the SuperBlock stored on the first n bytes.
-     *
-     * @return loaded SuperBlock
-     */
-    private SuperBlock loadSuperBlock()
-    {
-        SuperBlock block = null;
-        byte[] bytes = new byte[SuperBlock.MIN_SUPER_BLOCK_SIZE];
-
+        // Write formatted disk
+        RandomAccessFile raf;
         try
         {
-            raf.read(bytes);
-            // Read the whole super block
-            bytes = new byte[new SuperBlock(bytes).getBlockSize()];
-            raf.seek(SuperBlock.SUPER_BLOCK_ADDRESS);
-            raf.read(bytes);
-            block = new SuperBlock(bytes);
-        } catch (InvalidBlockSizeException | IOException e)
+            raf = new RandomAccessFile(vDiskFileName, "rwd");
+        } catch (FileNotFoundException e)
         {
             // This should never happen
-            e.printStackTrace();
+            throw new VDiskCreationException();
         }
-        return block;
+
+        write(raf, superBlock, superBlock);
+        write(raf, superBlock, bitMapBlock);
+        write(raf, superBlock, rootBlock);
+
+        try
+        {
+            raf.close();
+        } catch (IOException e)
+        {
+            // This should never happen
+            throw new VDiskCreationException();
+        }
     }
 
     /**
-     * This method tries to load the BitMapBlock(s) stored after the SuperBlock.
+     * Write the Block to the VFS in file
      *
-     * @return loaded BitMapBlock(s)
+     * @param file  RandomAccessFile to access the VFS file
+     * @param block Block to write
      */
-    private BitMapBlock loadBitMapBlock()
-    {
-        return new BitMapBlock(read(superBlock.getFirstBitMapBlock()));
-    }
-
-    /**
-     * This method tries to load the BitMapBlock(s) stored after the SuperBlock.
-     *
-     * @return loaded BitMapBlock(s)
-     */
-    private DirectoryBlock loadRootDirectoryBlock()
-    {
-        return new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
-    }
-
-    /**
-     * This method writes a given Block in the VFS
-     *
-     * @param block Block to store in the VFS
-     */
-    public void write(Block block)
+    private static void write(RandomAccessFile file, SuperBlock superBlock, Block block)
     {
         try
         {
-            raf.seek(getBlockOffset(block.getAddress()));
-            raf.write(block.getBytes());
+            file.seek(getBlockOffset(superBlock.getBlockSize(), block.getAddress()));
+            file.write(block.getBytes());
         } catch (IOException e)
         {
             // TODO exception handling
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @param blockSize    block size of the VFS
+     * @param blockAddress to compute the offset
+     * @return offset to the given blockAddress in bytes
+     */
+    private static long getBlockOffset(long blockSize, int blockAddress)
+    {
+        return blockSize * ((long) blockAddress);
+    }
+
+    /**
+     * Write the Block to disk
+     *
+     * @param block Block to permanently write to disk
+     */
+    public void write(Block block)
+    {
+        write(raf, superBlock, block);
     }
 
     /**
@@ -242,6 +240,50 @@ public class VUtil
      */
     private long getBlockOffset(int blockAddress)
     {
-        return ((long) blockAddress) * ((long) superBlock.getBlockSize());
+        return getBlockOffset(superBlock.getBlockSize(), blockAddress);
+    }
+
+    /**
+     * Allocate a previously free block in the VFS
+     *
+     * @return Block instance that contains the data of the now used block
+     * @throws DiskFullException
+     */
+    public Block allocate() throws DiskFullException
+    {
+        // Get the next free block and set it to used
+        int freeBlockAddress;
+        try
+        {
+            freeBlockAddress = bitMapBlock.allocateBlock();
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            throw new DiskFullException();
+        }
+
+        // Sync
+        write(bitMapBlock);
+
+        return new Block(freeBlockAddress, new byte[superBlock.getBlockSize()]);
+    }
+
+    /**
+     * Set a previously used block as free in the VFS
+     *
+     * @param block Block instance that contains the data of the now free block
+     */
+    public void free(Block block)
+    {
+        try
+        {
+            bitMapBlock.setUnused(block.getAddress());
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            // This should never happen
+            e.printStackTrace();
+        }
+
+        // Sync
+        write(bitMapBlock);
     }
 }
