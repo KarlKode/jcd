@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.helpers.FDisk;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import org.junit.Before;

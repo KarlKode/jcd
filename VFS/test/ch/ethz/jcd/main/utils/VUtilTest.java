@@ -8,6 +8,7 @@ import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.helpers.FDisk;
 import org.junit.Test;
 
 import java.io.File;

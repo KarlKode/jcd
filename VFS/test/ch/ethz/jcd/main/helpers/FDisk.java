@@ -1,4 +1,4 @@
-package ch.ethz.jcd.main.utils;
+package ch.ethz.jcd.main.helpers;
 
 import ch.ethz.jcd.main.Config;
 import ch.ethz.jcd.main.blocks.BitMapBlock;
@@ -8,6 +8,7 @@ import ch.ethz.jcd.main.blocks.SuperBlock;
 import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import ch.ethz.jcd.main.utils.ByteArray;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
