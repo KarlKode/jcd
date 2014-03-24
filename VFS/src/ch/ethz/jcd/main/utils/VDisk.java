@@ -1,17 +1,9 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.DirectoryBlock;
-import ch.ethz.jcd.main.blocks.FileBlock;
-import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VInode;
 import ch.ethz.jcd.main.layer.VObject;
-import ch.ethz.jcd.main.visitor.CopyVisitor;
-import ch.ethz.jcd.main.visitor.DeleteVisitor;
-import ch.ethz.jcd.main.visitor.SeekVisitor;
-import ch.ethz.jcd.main.visitor.VTypeToBlockVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;

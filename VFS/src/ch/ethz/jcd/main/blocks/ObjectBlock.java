@@ -1,16 +1,21 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class ObjectBlock extends Block
+import java.util.List;
+
+public abstract class ObjectBlock extends Block
 {
-    public static final int TYPE_SIZE = 1;
-    public static final int NAME_SIZE = 63;
-    public static final int PARENT_BLOCK_ADDRESS_SIZE = 4;
+    public static final int LENGTH_TYPE = 1;
+    public static final int LENGTH_NAME = 63;
+    public static final int LENGTH_PARENT_BLOCK_ADDRESS = 4;
+    public static final int LENGTH_CONTENT_SIZE = 8;
     public static final int OFFSET_TYPE = 0;
-    public static final int OFFSET_NAME = OFFSET_TYPE + TYPE_SIZE;
-    public static final int OFFSET_PARENT_BLOCK_ADDRESS = OFFSET_NAME + NAME_SIZE;
-    public static final int OFFSET_CHILDREN = OFFSET_PARENT_BLOCK_ADDRESS + PARENT_BLOCK_ADDRESS_SIZE;
+    public static final int OFFSET_NAME = OFFSET_TYPE + LENGTH_TYPE;
+    public static final int OFFSET_PARENT_BLOCK_ADDRESS = OFFSET_NAME + LENGTH_NAME;
+    public static final int OFFSET_CONTENT_SIZE = OFFSET_PARENT_BLOCK_ADDRESS + LENGTH_CONTENT_SIZE;
+    public static final int OFFSET_CHILDREN = OFFSET_CONTENT_SIZE + LENGTH_PARENT_BLOCK_ADDRESS;
     public static final byte TYPE_DIRECTORY = 0x00;
     public static final byte TYPE_FILE = 0x01;
 
@@ -19,14 +24,26 @@ public class ObjectBlock extends Block
         super(blockAddress, bytes);
     }
 
+    public byte getType()
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public void setType(byte type)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
     public String getName()
     {
-        return bytes.getString(OFFSET_NAME, NAME_SIZE);
+        return bytes.getString(OFFSET_NAME, LENGTH_NAME);
     }
 
     public void setName(String name) throws InvalidNameException
     {
-        if (name == null || name.getBytes().length > NAME_SIZE) {
+        if (name == null || name.getBytes().length > LENGTH_NAME) {
             throw new InvalidNameException();
         }
 
@@ -39,4 +56,12 @@ public class ObjectBlock extends Block
 
         bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, parent.getAddress());
     }
+
+    public abstract long getSize();
+
+    public abstract List<ObjectBlock> getChildren();
+
+    public abstract void addChild(Block block);
+
+    public abstract void removeChild(Block block);
 }

@@ -7,7 +7,6 @@ import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VInode;
 
 /**
  * This Visitor is used to convert a VInode into a Block.
