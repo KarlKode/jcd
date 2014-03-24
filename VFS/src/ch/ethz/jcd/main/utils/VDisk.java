@@ -5,20 +5,25 @@ import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VInode;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.visitor.CopyVisitor;
 import ch.ethz.jcd.main.visitor.DeleteVisitor;
 import ch.ethz.jcd.main.visitor.SeekVisitor;
 import ch.ethz.jcd.main.visitor.VTypeToBlockVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * Public high level interface that hides the implementation details of all operations on a virtual disk.
  */
 public class VDisk
 {
+    public static final String PATH_SEPARATOR = "/";
     private VUtil vUtil;
 
     /**
@@ -39,145 +44,85 @@ public class VDisk
      *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
      * @param blockSize     block size of the new VFS
      */
-    public static VDisk format(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
+    public static void format(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
     {
         VUtil.format(vDiskFileName, size, blockSize);
-        return new VDisk(vDiskFileName);
     }
 
-    public DirectoryBlock createDirectory(VDirectory destination, String name)
+    public void dispose()
     {
         // TODO
         throw new NotImplementedException();
     }
 
-    public FileBlock createFile(VDirectory destination, String name)
+    // something like cd
+    public VDirectory getDirectory(String path)
     {
         // TODO
         throw new NotImplementedException();
     }
 
-    /**
-     * This method creates either an EMPTY directory or an Empty file.
-     *
-     * @param inode either a VDirectory or a VFile
-     * @param dest  destination
-     * @throws DiskFullException              if there is no space for disk creation left
-     * @throws InvalidNameException           if filename of the source file is invalid
-     * @throws BlockFullException             if the destination directory is full
-     * @throws NoSuchFileOrDirectoryException if the destination is not found
-     */
-    public void create(VInode inode, VDirectory dest) throws DiskFullException, InvalidNameException, BlockFullException, NoSuchFileOrDirectoryException
+    public List<VObject> listDirectory(VDirectory directory)
     {
-        VTypeToBlockVisitor vTypeToBlockVisitor = new VTypeToBlockVisitor();
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock block = vTypeToBlockVisitor.visit(inode, vUtil.allocate());
-        DirectoryBlock destDir = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
-
-        if (destDir == null)
-        {
-            throw new NoSuchFileOrDirectoryException();
-        }
-
-        destDir.add(block);
-        vUtil.write(block);
-        vUtil.write(destDir);
-    }
-
-    /**
-     * This method deletes the given File/Directory from disk.
-     *
-     * @param dest to delete
-     */
-    public void delete(VInode dest) throws NoSuchFileOrDirectoryException
-    {
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock inode = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
-        DirectoryBlock parent = new DirectoryBlock(vUtil.read(inode.getParentBlockAddress()));
-        parent.remove(inode);
-        vUtil.write(inode);
-        DeleteVisitor dv = new DeleteVisitor(vUtil);
-        dv.visit(inode, null);
-    }
-
-    /**
-     * This method moves a given file or directory and its structure to an other
-     * location. Also use it to rename files or directories
-     *
-     * @param src  file/directory to move
-     * @param dest where to move
-     */
-    public void move(VInode src, VInode dest) throws NoSuchFileOrDirectoryException, InvalidNameException
-    {
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        InodeBlock srcInode = sv.visit(vUtil.getRootDirectoryBlock(), src.getPathQueue());
-        InodeBlock destInode = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
-
+        // TODO
         throw new NotImplementedException();
     }
 
-    /**
-     * This method lists the content of the given directory.
-     *
-     * @param dir to list
-     */
-    public void list(VDirectory dir) throws NoSuchFileOrDirectoryException
+    public VDirectory createDirectory(VDirectory destination, String name)
     {
+        // TODO
         throw new NotImplementedException();
     }
 
-    /**
-     * This method copies either a directory or a file. Note that the whole
-     * structure is copied. There are no optimization like "copy on write".
-     *
-     * @param src  source, either a VDirectory or a VFile
-     * @param dest destination
-     * @throws BlockFullException if the destination directory is full
-     */
-    public void copy(VInode src, VDirectory dest) throws BlockFullException, NoSuchFileOrDirectoryException
+    public VFile createFile(VDirectory destination, String name)
     {
-        CopyVisitor cv = new CopyVisitor(vUtil);
-        InodeBlock i = (InodeBlock) cv.visit(src.getInode(), null);
-
-        SeekVisitor<DirectoryBlock> sv = new SeekVisitor<>(vUtil);
-        DirectoryBlock destDir = sv.visit(vUtil.getRootDirectoryBlock(), dest.getPathQueue());
-
-        if (destDir == null)
-        {
-            throw new NoSuchFileOrDirectoryException();
-        }
-
-        destDir.add(i);
-        vUtil.write(destDir);
-    }
-
-    /**
-     * This method stores a file or a directory imported from the host file system
-     *
-     * @param src  source, either a VDirectory or a VFile
-     * @param dest destination
-     */
-    public void store(VInode src, VInode dest)
-    {
+        // TODO
         throw new NotImplementedException();
     }
 
-    /**
-     * This method loads a file or a directory and prepare to export to the
-     * host file system
-     *
-     * @param file
-     */
-    public void load(VInode file)
+    // rm (recursively if necessary)
+    public void delete(VObject object)
     {
+        // TODO
         throw new NotImplementedException();
     }
 
-    /**
-     * This method delivers the stats to the currently loaded disk
-     */
+    // Simple rename (don't change directory hierarchy)
+    public void rename(VObject object)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    // Simple move of object into destination directory
+    public void move(VObject object, VDirectory destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    // Simple copy and rename of object into destination directory with new name
+    public void copy(VObject object, VDirectory destination, String name)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public void importFromHost(File source, VDirectory destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public void exportToHost(VObject source, File destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
     public void stats()
     {
+        // TODO
         throw new NotImplementedException();
     }
 }
