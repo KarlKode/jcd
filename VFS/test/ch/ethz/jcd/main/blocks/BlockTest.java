@@ -15,11 +15,11 @@ public class BlockTest
 
         // Default value for integer
         blockAddress = 0;
-        block = new Block((byte[])null);
+        block = new Block(blockAddress, null);
         assertEquals(blockAddress, block.getAddress());
 
         blockAddress = 1024;
-        block = new Block(blockAddress);
+        block = new Block(blockAddress, null);
         assertEquals(blockAddress, block.getAddress());
 
         blockAddress = 1024;
@@ -31,7 +31,7 @@ public class BlockTest
     public void testSetAddress() throws Exception
     {
         int blockAddress;
-        Block block = new Block((byte[]) null);
+        Block block = new Block(0, null);
         blockAddress = 0;
         block.setAddress(blockAddress);
         assertEquals(blockAddress, block.getAddress());
@@ -51,7 +51,7 @@ public class BlockTest
         byte[] bytes;
         Block block;
 
-        block = new Block((byte[]) null);
+        block = new Block(0, null);
         assertEquals(null, block.getBytes());
 
         bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -65,7 +65,7 @@ public class BlockTest
         byte[] bytes;
         Block block;
 
-        block = new Block((byte[]) null);
+        block = new Block(0, null);
         bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         block.setBytes(bytes);
         assertEquals(bytes, block.getBytes());
@@ -74,7 +74,7 @@ public class BlockTest
     @Test
     public void testGetByteArray() throws Exception
     {
-        Block block = new Block(0);
+        Block block = new Block(0, null);
         block.getByteArray();
         throw new ToDoException();
     }

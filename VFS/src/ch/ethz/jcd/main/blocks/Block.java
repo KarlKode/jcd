@@ -15,26 +15,6 @@ public class Block
     protected int address;
 
     /**
-     * Instantiate a new Block with the given block address
-     *
-     * @param blockAddress the block address of the new Block
-     */
-    public Block(int blockAddress)
-    {
-        address = blockAddress;
-    }
-
-    /**
-     * Instantiate a new Block with the given content
-     *
-     * @param b the content of the new Block
-     */
-    public Block(byte[] b)
-    {
-        this.setBytes(b);
-    }
-
-    /**
      * Instantiate a new Block with the given block address and content
      *
      * @param blockAddress the block address of the new Block

@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
+import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.InodeBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
@@ -42,6 +43,18 @@ public class VDisk
     {
         VUtil.format(vDiskFileName, size, blockSize);
         return new VDisk(vDiskFileName);
+    }
+
+    public DirectoryBlock createDirectory(VDirectory destination, String name)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public FileBlock createFile(VDirectory destination, String name)
+    {
+        // TODO
+        throw new NotImplementedException();
     }
 
     /**

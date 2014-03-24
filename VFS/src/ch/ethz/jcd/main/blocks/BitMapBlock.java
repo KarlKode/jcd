@@ -36,24 +36,6 @@ public class BitMapBlock extends Block
     }
 
     /**
-     * Instantiate a new BitMapBlock
-     *
-     * @param block BitMapBlock read as Block
-     */
-    public BitMapBlock(Block block)
-    {
-        super(block.getAddress(), block.getBytes());
-        bitMap = BitSet.valueOf(block.getBytes());
-
-        usedBlocks = 0;
-        for (int i = bitMap.nextSetBit(0); i >= 0; i = bitMap.nextSetBit(i + 1))
-        {
-            usedBlocks++;
-        }
-        bytes.put(0, bitMap.toByteArray());
-    }
-
-    /**
      * This method is part of the visitor pattern and is called by the visitor.
      * It tells to the visitor which sort of Block he called.
      *

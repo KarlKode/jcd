@@ -25,14 +25,14 @@ public class InodeBlockTest
     {
         ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
         buf.put(0, head);
-        return new InodeBlock(new Block(buf.getBytes()));
+        return new InodeBlock(new Block(0, buf.getBytes()));
     }
 
     private InodeBlock initName(byte[] head, String name) throws InvalidNameException
     {
         ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
         buf.put(0, head);
-        return new InodeBlock(new Block(buf.getBytes()), name);
+        return new InodeBlock(new Block(0, buf.getBytes()), name);
     }
 
 
@@ -41,7 +41,7 @@ public class InodeBlockTest
         ByteArray buf = new ByteArray(new byte[BLOCK_SIZE]);
         buf.put(0, head);
         buf.put(InodeBlock.OFFSET_BLOCKS, list);
-        return new InodeBlock(new Block(buf.getBytes()));
+        return new InodeBlock(new Block(0, buf.getBytes()));
     }
 
 
@@ -53,7 +53,7 @@ public class InodeBlockTest
         {
             buf.put(i, Byte.MAX_VALUE);
         }
-        return new InodeBlock(new Block(buf.getBytes()));
+        return new InodeBlock(new Block(0, buf.getBytes()));
     }
 
 
@@ -68,7 +68,7 @@ public class InodeBlockTest
         buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
         buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
         buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
-        inode = new InodeBlock(new Block(buf.getBytes()));
+        inode = new InodeBlock(new Block(0, buf.getBytes()));
         assertEquals(65, inode.getParentBlockAddress());
     }
 
@@ -84,7 +84,7 @@ public class InodeBlockTest
         buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
         buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
         buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
-        inode = new InodeBlock(new Block(buf.getBytes()));
+        inode = new InodeBlock(new Block(0, buf.getBytes()));
         assertEquals(65, inode.getParentBlockAddress());
     }
 
@@ -101,7 +101,7 @@ public class InodeBlockTest
         Integer blockAddress = 1234;
         InodeBlock inode = init(FILE_HEAD);
         assertEquals(0, inode.getBlockAddressList().size());
-        inode.add(new Block(blockAddress));
+        inode.add(new Block(blockAddress, null));
         assertEquals(1, inode.getBlockAddressList().size());
         assertEquals(blockAddress, inode.getBlockAddressList().get(0));
         InodeBlock expected = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
@@ -113,7 +113,7 @@ public class InodeBlockTest
     {
         Integer blockAddress = 1234;
         InodeBlock inode = initFull(FILE_HEAD);
-        inode.add(new Block(blockAddress));
+        inode.add(new Block(blockAddress, null));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class InodeBlockTest
         InodeBlock inode = initAddressList(FILE_HEAD, ByteBuffer.allocate(4).putInt(blockAddress).array());
         assertEquals(1, inode.getBlockAddressList().size());
         assertEquals(blockAddress, inode.getBlockAddressList().get(0));
-        inode.remove(new Block(blockAddress));
+        inode.remove(new Block(blockAddress, null));
         assertEquals(0, inode.getBlockAddressList().size());
         InodeBlock expected = init(FILE_HEAD);
         assertTrue(Arrays.equals(expected.getBytes(), inode.getBytes()));
@@ -251,7 +251,7 @@ public class InodeBlockTest
         buf.put(InodeBlock.OFFSET_TYPE, InodeBlock.TYPE_FILE);
         buf.putString(InodeBlock.OFFSET_NAME, FILE_NAME);
         buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 65);
-        InodeBlock inode = new InodeBlock(new Block(buf.getBytes()));
+        InodeBlock inode = new InodeBlock(new Block(0, buf.getBytes()));
         assertEquals(65, inode.getParentBlockAddress());
         inode.setParentBlockAddress(127);
         buf.putInt(InodeBlock.OFFSET_PARENT_BLOCK_ADDRESS, 127);

@@ -48,7 +48,10 @@ public class VUtil
         }
 
         // Load bitmap block
-        bitMapBlock = new BitMapBlock(read(superBlock.getFirstBitMapBlock()));
+        Block tmpBitMapBlock = read(superBlock.getFirstBitMapBlock());
+        bitMapBlock = new BitMapBlock(tmpBitMapBlock.getAddress(), tmpBitMapBlock.getBytes());
+
+        // Load directory block
         rootBlock = new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
     }
 

@@ -31,15 +31,20 @@ public class SuperBlock extends Block
      * @param b the content of the new SuperBlock. Must not be null and bytes.size must be >= MIN_SUPER_BLOCK_SIZE
      * @throws InvalidBlockSizeException if bytes == null or bytes.size < MIN_SUPER_BLOCK_SIZE
      */
-    public SuperBlock(byte[] b) throws InvalidBlockSizeException
+    public SuperBlock(int blockAddress, byte[] b) throws InvalidBlockSizeException, InvalidBlockAddressException
     {
-        super(SUPER_BLOCK_ADDRESS);
+        super(blockAddress, b);
+
+        if (blockAddress != SUPER_BLOCK_ADDRESS) {
+            throw new InvalidBlockAddressException();
+        }
 
         if (b == null || b.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
         {
             throw new InvalidBlockSizeException();
         }
 
+        // Parse super block structure
         this.setBytes(b);
     }
 
