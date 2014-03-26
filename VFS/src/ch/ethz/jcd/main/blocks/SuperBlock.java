@@ -3,13 +3,9 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.utils.FileManager;
-import ch.ethz.jcd.main.utils.VUtil;
 
-/**
- * This class represents the SuperBlock. The SuperBlock contains all
- * information about block size, block count, root directory block,
- * BitMapBlocks, etc.
- */
+import java.io.IOException;
+
 public class SuperBlock extends Block
 {
     public static final int OFFSET_BLOCK_COUNT = 0;
@@ -27,62 +23,37 @@ public class SuperBlock extends Block
         }
     }
 
-    /**
-     * Get the number of Blocks of the FS that the SuperBlock belongs to
-     *
-     * @return total number of Blocks of the FS that the SuperBlock belongs to
-     */
-    public int getBlockCount()
+    public int getBlockCount() throws IOException
     {
-        return fileManager.readInt(VUtil.getBlockOffset(blockAddress), OFFSET_BLOCK_COUNT);
+        return fileManager.readInt(getBlockOffset(), OFFSET_BLOCK_COUNT);
     }
 
-    /**
-     * This method sets the number of Blocks the Disk contains
-     *
-     * @param blockCount to set
-     * @throws InvalidBlockCountException if blockCount is invalid
-     */
-    public void setBlockCount(int blockCount) throws InvalidBlockCountException
+    public void setBlockCount(int blockCount) throws InvalidBlockCountException, IOException
     {
-        if (!isValidBlockCount(blockCount))
-        {
+        // Check validity of block count
+        // TODO: Block count > number of supported blocks
+        if (blockCount < 0) {
             throw new InvalidBlockCountException();
         }
-        this.blockCount = blockCount;
-        bytes.putInt(OFFSET_BLOCK_COUNT, this.blockCount);
+
+        fileManager.writeInt(getBlockOffset(), OFFSET_BLOCK_COUNT, blockCount);
     }
 
-    /**
-     * Get the block blockAddress of the DirectoryBlock of the root directory
-     *
-     * @return block blockAddress of the DirectoryBlock of the root directory
-     */
-    public int getRootDirectoryBlock()
+    public int getRootDirectoryBlock() throws IOException
     {
-        return rootDirectoryBlock;
+        return fileManager.readInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK);
     }
 
-    /**
-     * This method sets the root directory's blockAddress
-     *
-     * @param blockAddress to set
-     */
-    public void setRootDirectoryBlock(int blockAddress) throws InvalidBlockAddressException
+    public void setRootDirectoryBlock(int rootDirectoryBlockAddress) throws InvalidBlockAddressException, IOException
     {
-        if (!isValidRootDirectoryBlock(blockAddress))
-        {
+        // Check validity of root directory block address
+        if (!isValidBlockAddress(rootDirectoryBlockAddress)) {
             throw new InvalidBlockAddressException();
         }
-        this.rootDirectoryBlock = blockAddress;
-        bytes.putInt(OFFSET_ROOT_DIRECTORY_BLOCK, this.rootDirectoryBlock);
+
+        fileManager.writeInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK, rootDirectoryBlockAddress);
     }
 
-    /**
-     * Get the block blockAddress of the first BitMapBlock of the FS the SuperBlock belongs to
-     *
-     * @return block blockAddress of the first BitMapBlock of the FS the SuperBlock belongs to
-     */
     public int getFirstBitMapBlock()
     {
         return BIT_MAP_BLOCK_ADDRESS;
@@ -107,32 +78,5 @@ public class SuperBlock extends Block
     public int getFirstDataBlock()
     {
         return DATA_BLOCK_BEGIN_ADDRESS;
-    }
-
-    /**
-     * @param blockSize block size
-     * @return true if the given block size is valid
-     */
-    private boolean isValidBlockSize(int blockSize)
-    {
-        return blockSize >= MIN_BLOCK_SIZE;
-    }
-
-    /**
-     * @param blockCount block count
-     * @return true if the given block size is valid or not
-     */
-    private boolean isValidBlockCount(int blockCount)
-    {
-        return blockCount > 0;
-    }
-
-    /**
-     * @param blockAddress block blockAddress
-     * @return if the the given root directory block blockAddress is valid
-     */
-    private boolean isValidRootDirectoryBlock(int blockAddress)
-    {
-        return blockAddress >= getFirstDataBlock();
     }
 }
