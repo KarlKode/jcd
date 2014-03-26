@@ -3,7 +3,6 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.utils.FileManager;
-import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 
@@ -26,7 +25,7 @@ public class SuperBlock extends Block
 
     public int getBlockCount() throws IOException
     {
-        return fileManager.readInt(VUtil.getBlockOffset(blockAddress), OFFSET_BLOCK_COUNT);
+        return fileManager.readInt(getBlockOffset(), OFFSET_BLOCK_COUNT);
     }
 
     public void setBlockCount(int blockCount) throws InvalidBlockCountException, IOException
@@ -37,12 +36,12 @@ public class SuperBlock extends Block
             throw new InvalidBlockCountException();
         }
 
-        fileManager.writeInt(VUtil.getBlockOffset(blockAddress), OFFSET_BLOCK_COUNT, blockCount);
+        fileManager.writeInt(getBlockOffset(), OFFSET_BLOCK_COUNT, blockCount);
     }
 
     public int getRootDirectoryBlock() throws IOException
     {
-        return fileManager.readInt(VUtil.getBlockOffset(blockAddress), OFFSET_ROOT_DIRECTORY_BLOCK);
+        return fileManager.readInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK);
     }
 
     public void setRootDirectoryBlock(int rootDirectoryBlockAddress) throws InvalidBlockAddressException, IOException
@@ -52,7 +51,7 @@ public class SuperBlock extends Block
             throw new InvalidBlockAddressException();
         }
 
-        fileManager.writeInt(VUtil.getBlockOffset(blockAddress), OFFSET_ROOT_DIRECTORY_BLOCK, rootDirectoryBlockAddress);
+        fileManager.writeInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK, rootDirectoryBlockAddress);
     }
 
     public int getFirstBitMapBlock()
