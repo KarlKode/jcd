@@ -1,64 +1,35 @@
 package ch.ethz.jcd.main.layer;
 
-import ch.ethz.jcd.main.visitor.VTypeVisitor;
+import ch.ethz.jcd.main.blocks.ObjectBlock;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * VDirectory represents a directory from the users view. It includes the path,
- * the name as well as the content.
- */
-public class VDirectory extends VInode
+public class VDirectory extends VObject
 {
-    protected LinkedList<VInode> content = new LinkedList<VInode>();
-
-    /**
-     * Instantiate a new VDirectory by setting the directory's name and path.
-     *
-     * @param path to the directory
-     */
-    public VDirectory(String path)
+    public List<VObject> listChildren()
     {
-        super(path);
+        List<VObject> children = new ArrayList<>();
+        for (ObjectBlock childBlock : block.getChildren())
+        {
+            if (childBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
+            {
+                children.add(new VDirectory());
+            } else {
+                children.add(new VFile());
+            }
+        }
+
+        return children;
     }
 
-    /**
-     * This method is part of the visitor pattern and is called by the visitor.
-     * It tells to the visitor which sort of VInode he called.
-     *
-     * @param visitor calling this method
-     * @param arg     to pass
-     * @param <R>     generic return type
-     * @param <A>     generic argument type
-     * @return the visitors return value
-     */
-    @Override
-    public <R, A> R accept(VTypeVisitor<R, A> visitor, A arg)
+    public void addChild(VObject object)
     {
-        return visitor.directory(this, arg);
+        block.addChild(object.block);
     }
 
-    /**
-     * This method adds either a file or directory to the directory. The path of
-     * the added inode will be updated.
-     *
-     * @param type either VDirectory or VFile
-     */
-    public void add(VInode type)
+    public void removeChild(VObject object)
     {
-        LinkedList<String> newInodePath = new LinkedList<String>(this.path);
-        newInodePath.add(type.getName());
-        type.setPath(newInodePath);
-        content.add(type);
-    }
-
-    /**
-     * This method returns the directory's content
-     *
-     * @return a list of directories and files
-     */
-    public LinkedList<VInode> list()
-    {
-        return content;
+        block.removeChild(object.block);
     }
 }

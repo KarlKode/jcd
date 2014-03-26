@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -21,10 +22,12 @@ public abstract class VObject
         if (parent != null)
         {
             parent.removeChild(this);
+            parent.addChild(this);
+
+            // TODO Check cast
+            block.setParent((DirectoryBlock) parent.getBlock());
         }
-        parent.addChild(this);
         this.parent = parent;
-        block.setParent(parent.getBlock());
     }
 
     public String getName()
@@ -44,6 +47,11 @@ public abstract class VObject
         }
 
         return VDisk.PATH_SEPARATOR + getName();
+    }
+
+    public long getSize()
+    {
+        return block.getSize();
     }
 
     public ObjectBlock getBlock()

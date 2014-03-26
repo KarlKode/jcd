@@ -3,61 +3,49 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.exceptions.ToDoException;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.List;
 
 /**
  * This class represents a FileBlock. Each FileBlock contains n BlockAddresses where
  * n is in [0, (blockSize - head)/addressSize]. If the a FileBlock contains no
  * Block, the file is empty. For the user a FileBlock is visible as regular file.
  */
-public class FileBlock extends InodeBlock
+public class FileBlock extends ObjectBlock
 {
-    /**
-     * Instantiate a new FileBlock by cloning the given Block and adding the
-     * given name.
-     *
-     * @param b    to clone
-     * @param name to set
-     * @throws InvalidNameException if the given name is invalid
-     */
-    public FileBlock(Block b, String name) throws InvalidNameException
+
+    public FileBlock(int blockAddress, byte[] bytes)
     {
-        super(b, name);
+        super(blockAddress, bytes);
     }
 
-    /**
-     * Instantiate a new FileBlock by cloning the given Block without naming
-     * the FileBlock.
-     *
-     * @param b to clone
-     */
-    public FileBlock(Block b)
-    {
-        super(b);
-    }
-
-    /**
-     * This method is part of the visitor pattern and is called by the visitor.
-     * It tells to the visitor which sort of Block he called.
-     *
-     * @param visitor calling this method
-     * @param arg     to pass
-     * @param <R>     generic return type
-     * @param <A>     generic argument type
-     * @return the visitors return value
-     */
     @Override
-    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
+    public long getSize()
     {
-        return visitor.file(this, arg);
+        // TODO
+        throw new NotImplementedException();
     }
 
-    /**
-     * @return size of the file
-     */
     @Override
-    public int size()
+    public List<ObjectBlock> getChildren()
     {
-        throw new ToDoException();
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void addChild(Block block)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void removeChild(Block block)
+    {
+        // TODO
+        throw new NotImplementedException();
     }
 }
 

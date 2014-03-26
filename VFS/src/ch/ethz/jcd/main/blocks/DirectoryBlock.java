@@ -3,63 +3,47 @@ package ch.ethz.jcd.main.blocks;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.exceptions.ToDoException;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.List;
 
 /**
  * This class represents a DirectoryBlock. Each DirectoryBlock contains n BlockAddresses where
  * n is in [0, (blockSize - head)/addressSize]. If the a DirectoryBlock contains no
  * Block, the directory is empty. For the user a DirectoryBlock is visible as regular directory.
  */
-public class DirectoryBlock extends InodeBlock
+public class DirectoryBlock extends ObjectBlock
 {
-    public static final String ROOT_DIRECTORY_BLOCK_NAME = "";
-    public static final String ROOT_DIRECTORY_BLOCK_PATH = "/";
-
-    /**
-     * Instantiate a new DirectoryBlock by cloning the given Block and adding the
-     * given name.
-     *
-     * @param block to clone
-     * @param name  to set
-     * @throws InvalidNameException if the given name is invalid
-     */
-    public DirectoryBlock(Block block, String name) throws InvalidNameException
+    public DirectoryBlock(int blockAddress, byte[] bytes)
     {
-        super(block, name);
+        super(blockAddress, bytes);
     }
 
-    /**
-     * Instantiate a new DirectoryBlock by cloning the given Block without naming
-     * the DirectoryBlock.
-     *
-     * @param block to clone
-     */
-    public DirectoryBlock(Block block)
-    {
-        super(block);
-    }
-
-    /**
-     * This method is part of the visitor pattern and is called by the visitor.
-     * It tells to the visitor which sort of Block he called.
-     *
-     * @param visitor calling this method
-     * @param arg     to pass
-     * @param <R>     generic return type
-     * @param <A>     generic argument type
-     * @return the visitors return value
-     */
     @Override
-    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
+    public long getSize()
     {
-        return visitor.directory(this, arg);
+        // TODO
+        throw new NotImplementedException();
     }
 
-    /**
-     * @return size of the directory
-     */
     @Override
-    public int size()
+    public List<ObjectBlock> getChildren()
     {
-        throw new ToDoException();
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void addChild(Block block)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void removeChild(Block block)
+    {
+        // TODO
+        throw new NotImplementedException();
     }
 }

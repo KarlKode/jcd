@@ -2,7 +2,6 @@ package ch.ethz.jcd.main.visitor;
 
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VInode;
 
 /**
  * This interface is an implementation of the visitor pattern and provides the
