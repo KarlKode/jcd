@@ -54,7 +54,7 @@ public abstract class ObjectBlock extends Block
     {
         // TODO Remove block from old parent and add as child to new parent
 
-        bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, parent.getAddress());
+        bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, parent.getBlockAddress());
     }
 
     public abstract long getSize();

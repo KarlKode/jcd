@@ -2,8 +2,8 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
-import ch.ethz.jcd.main.visitor.BlockVisitor;
+import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 
 /**
  * This class represents the SuperBlock. The SuperBlock contains all
@@ -12,97 +12,19 @@ import ch.ethz.jcd.main.visitor.BlockVisitor;
  */
 public class SuperBlock extends Block
 {
-    public static final int MIN_SUPER_BLOCK_SIZE = 16;
-    public static final int MIN_BLOCK_SIZE = InodeBlock.OFFSET_NAME + InodeBlock.MAX_NAME_SIZE;
-    public static final int OFFSET_BLOCK_SIZE = 0;
-    public static final int OFFSET_BLOCK_COUNT = 4;
-    public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 8;
+    public static final int OFFSET_BLOCK_COUNT = 0;
+    public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 4;
     public static final int SUPER_BLOCK_ADDRESS = 0;
     public static final int BIT_MAP_BLOCK_ADDRESS = 1;
     public static final int DATA_BLOCK_BEGIN_ADDRESS = 2;
 
-    private int blockSize;
-    private int blockCount;
-    private int rootDirectoryBlock;
-
-    /**
-     * Instantiate a new SuperBlock with the given content
-     *
-     * @param b the content of the new SuperBlock. Must not be null and bytes.size must be >= MIN_SUPER_BLOCK_SIZE
-     * @throws InvalidBlockSizeException if bytes == null or bytes.size < MIN_SUPER_BLOCK_SIZE
-     */
-    public SuperBlock(int blockAddress, byte[] b) throws InvalidBlockSizeException, InvalidBlockAddressException
+    public SuperBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        super(blockAddress, b);
+        super(fileManager, blockAddress);
 
         if (blockAddress != SUPER_BLOCK_ADDRESS) {
             throw new InvalidBlockAddressException();
         }
-
-        if (b == null || b.length < SuperBlock.MIN_SUPER_BLOCK_SIZE)
-        {
-            throw new InvalidBlockSizeException();
-        }
-
-        // Parse super block structure
-        this.setBytes(b);
-    }
-
-    /**
-     * This method is part of the visitor pattern and is called by the visitor.
-     * It tells to the visitor which sort of Block he called.
-     *
-     * @param visitor calling this method
-     * @param arg     to pass
-     * @param <R>     generic return type
-     * @param <A>     generic argument type
-     * @return the visitors return value
-     */
-    @Override
-    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
-    {
-        return visitor.superBlock(this, arg);
-    }
-
-    /**
-     * This method sets the ByteArray of the SuperBlock and then resets blockSize, blockCount
-     * and rootDirectoryBlock
-     *
-     * @param b new content of the Block
-     */
-    @Override
-    public void setBytes(byte[] b)
-    {
-        super.setBytes(b);
-        blockSize = bytes.getInt(OFFSET_BLOCK_SIZE);
-        blockCount = bytes.getInt(OFFSET_BLOCK_COUNT);
-        rootDirectoryBlock = bytes.getInt(OFFSET_ROOT_DIRECTORY_BLOCK);
-    }
-
-    /**
-     * Get the block size of the SuperBlock
-     *
-     * @return block size of the SuperBlock in bytes
-     */
-    public int getBlockSize()
-    {
-        return blockSize;
-    }
-
-    /**
-     * Set the block size of the SuperBlock
-     *
-     * @param blockSize the new block size in bytes
-     * @throws InvalidBlockSizeException if the new block size is invalid
-     */
-    public void setBlockSize(int blockSize) throws InvalidBlockSizeException
-    {
-        if (!isValidBlockSize(blockSize))
-        {
-            throw new InvalidBlockSizeException();
-        }
-        this.blockSize = blockSize;
-        bytes.putInt(OFFSET_BLOCK_SIZE, this.blockSize);
     }
 
     /**
@@ -112,7 +34,7 @@ public class SuperBlock extends Block
      */
     public int getBlockCount()
     {
-        return blockCount;
+        return fileManager.readInt(VUtil.getBlockOffset(blockAddress), OFFSET_BLOCK_COUNT);
     }
 
     /**
@@ -132,9 +54,9 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the block address of the DirectoryBlock of the root directory
+     * Get the block blockAddress of the DirectoryBlock of the root directory
      *
-     * @return block address of the DirectoryBlock of the root directory
+     * @return block blockAddress of the DirectoryBlock of the root directory
      */
     public int getRootDirectoryBlock()
     {
@@ -157,9 +79,9 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the block address of the first BitMapBlock of the FS the SuperBlock belongs to
+     * Get the block blockAddress of the first BitMapBlock of the FS the SuperBlock belongs to
      *
-     * @return block address of the first BitMapBlock of the FS the SuperBlock belongs to
+     * @return block blockAddress of the first BitMapBlock of the FS the SuperBlock belongs to
      */
     public int getFirstBitMapBlock()
     {
@@ -167,9 +89,9 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the block address of the last BitMapBlock of the FS the SuperBlock belongs to
+     * Get the block blockAddress of the last BitMapBlock of the FS the SuperBlock belongs to
      *
-     * @return block address of the last BitMapBlock of the FS the SuperBlock belongs to
+     * @return block blockAddress of the last BitMapBlock of the FS the SuperBlock belongs to
      */
     public int getLastBitMapBlock()
     {
@@ -178,9 +100,9 @@ public class SuperBlock extends Block
     }
 
     /**
-     * Get the block address of the first Block with real data of the FS the SuperBlock belongs to
+     * Get the block blockAddress of the first Block with real data of the FS the SuperBlock belongs to
      *
-     * @return block address of the first Block with real data of the FS the SuperBlock belongs to
+     * @return block blockAddress of the first Block with real data of the FS the SuperBlock belongs to
      */
     public int getFirstDataBlock()
     {
@@ -206,8 +128,8 @@ public class SuperBlock extends Block
     }
 
     /**
-     * @param blockAddress block address
-     * @return if the the given root directory block address is valid
+     * @param blockAddress block blockAddress
+     * @return if the the given root directory block blockAddress is valid
      */
     private boolean isValidRootDirectoryBlock(int blockAddress)
     {

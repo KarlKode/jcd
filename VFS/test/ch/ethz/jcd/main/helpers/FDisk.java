@@ -33,15 +33,15 @@ public class FDisk
             BitMapBlock bitMapBlock = new BitMapBlock(superBlock.getFirstBitMapBlock(), new byte[blockSize]);
             DirectoryBlock rootBlock = new DirectoryBlock(new Block(superBlock.getRootDirectoryBlock(), new byte[blockSize]), DirectoryBlock.ROOT_DIRECTORY_BLOCK_NAME);
             // Set the SuperBlock, the BitMapBlock and the rootBlock as used
-            bitMapBlock.setUsed(superBlock.getAddress());
-            bitMapBlock.setUsed(bitMapBlock.getAddress());
-            bitMapBlock.setUsed(rootBlock.getAddress());
+            bitMapBlock.setUsed(superBlock.getBlockAddress());
+            bitMapBlock.setUsed(bitMapBlock.getBlockAddress());
+            bitMapBlock.setUsed(rootBlock.getBlockAddress());
 
-            raf.seek(getBlockOffset(superBlock.getAddress(), blockSize));
+            raf.seek(getBlockOffset(superBlock.getBlockAddress(), blockSize));
             raf.write(superBlock.getBytes());
-            raf.seek(getBlockOffset(bitMapBlock.getAddress(), blockSize));
+            raf.seek(getBlockOffset(bitMapBlock.getBlockAddress(), blockSize));
             raf.write(bitMapBlock.getBytes());
-            raf.seek(getBlockOffset(rootBlock.getAddress(), blockSize));
+            raf.seek(getBlockOffset(rootBlock.getBlockAddress(), blockSize));
             raf.write(rootBlock.getBytes());
             raf.close();
         } catch (BlockAddressOutOfBoundException | InvalidBlockSizeException | InvalidNameException | IOException e)

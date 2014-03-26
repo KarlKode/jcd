@@ -16,10 +16,16 @@ import java.io.RandomAccessFile;
  */
 public class VUtil
 {
-    private RandomAccessFile raf;
+    public static final int BLOCK_SIZE = 1024;
+
+    private FileManager fileManager;
     private SuperBlock superBlock;
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
+
+    public static long getBlockOffset(int blockAddress) {
+        return ((long) blockAddress) * ((long) BLOCK_SIZE);
+    }
 
     /**
      * Create a new VUtil instance for the VFS in the file at vDiskFileName
@@ -27,12 +33,14 @@ public class VUtil
      * @param vDiskFileName name of the file that contains the VFS
      * @throws FileNotFoundException the VFS file can not be found
      */
-    public VUtil(String vDiskFileName) throws FileNotFoundException
+    public VUtil(File vDiskFile) throws FileNotFoundException
     {
-        raf = new RandomAccessFile(vDiskFileName, "rwd");
+
+        fileManager = new FileManager(vDiskFile);
 
         // Load super block
-        byte[] superBlockBytes = new byte[SuperBlock.MIN_SUPER_BLOCK_SIZE];
+        // TODO: Ugly constant blockAddress and offset
+        byte[] superBlockBytes = fileManager.readBytes(0, 0, SuperBlock.MIN_SUPER_BLOCK_SIZE);
         try
         {
             raf.read(superBlockBytes);
@@ -49,7 +57,7 @@ public class VUtil
 
         // Load bitmap block
         Block tmpBitMapBlock = read(superBlock.getFirstBitMapBlock());
-        bitMapBlock = new BitMapBlock(tmpBitMapBlock.getAddress(), tmpBitMapBlock.getBytes());
+        bitMapBlock = new BitMapBlock(tmpBitMapBlock.getBlockAddress(), tmpBitMapBlock.getBytes());
 
         // Load directory block
         rootBlock = new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
@@ -112,9 +120,9 @@ public class VUtil
             rootBlock = new DirectoryBlock(new Block(superBlock.getRootDirectoryBlock(), new byte[blockSize]));
 
             // Set the SuperBlock, the BitMapBlock and the rootBlock as used
-            bitMapBlock.setUsed(superBlock.getAddress());
-            bitMapBlock.setUsed(bitMapBlock.getAddress());
-            bitMapBlock.setUsed(rootBlock.getAddress());
+            bitMapBlock.setUsed(superBlock.getBlockAddress());
+            bitMapBlock.setUsed(bitMapBlock.getBlockAddress());
+            bitMapBlock.setUsed(rootBlock.getBlockAddress());
         } catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
@@ -156,7 +164,7 @@ public class VUtil
     {
         try
         {
-            file.seek(getBlockOffset(superBlock.getBlockSize(), block.getAddress()));
+            file.seek(getBlockOffset(superBlock.getBlockSize(), block.getBlockAddress()));
             file.write(block.getBytes());
         } catch (IOException e)
         {
@@ -186,7 +194,7 @@ public class VUtil
     }
 
     /**
-     * This method reads the Block to a given block address
+     * This method reads the Block to a given block blockAddress
      *
      * @param blockAddress to read at
      * @return read Block
@@ -238,15 +246,6 @@ public class VUtil
     }
 
     /**
-     * @param blockAddress to compute the offset
-     * @return offset to the given blockAddress in bytes
-     */
-    private long getBlockOffset(int blockAddress)
-    {
-        return getBlockOffset(superBlock.getBlockSize(), blockAddress);
-    }
-
-    /**
      * Allocate a previously free block in the VFS
      *
      * @return Block instance that contains the data of the now used block
@@ -279,7 +278,7 @@ public class VUtil
     {
         try
         {
-            bitMapBlock.setUnused(block.getAddress());
+            bitMapBlock.setUnused(block.getBlockAddress());
         } catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen

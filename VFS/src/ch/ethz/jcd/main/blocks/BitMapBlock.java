@@ -19,7 +19,7 @@ public class BitMapBlock extends Block
     /**
      * Instantiate a new BitMapBlock
      *
-     * @param blockAddress block address of the new BitMapBlock
+     * @param blockAddress block blockAddress of the new BitMapBlock
      * @param b            content of the new BitMapBlock
      */
     public BitMapBlock(int blockAddress, byte[] b)
@@ -54,7 +54,7 @@ public class BitMapBlock extends Block
     /**
      * Allocate a new Block out of the unused Blocks this BitMapBlock controls
      *
-     * @return block address of the newly allocated Block
+     * @return block blockAddress of the newly allocated Block
      */
     public int allocateBlock() throws BlockAddressOutOfBoundException
     {
@@ -66,7 +66,7 @@ public class BitMapBlock extends Block
     /**
      * Set a Block as used
      *
-     * @param blockAddress block address of the Block that should be set as used
+     * @param blockAddress block blockAddress of the Block that should be set as used
      */
     public void setUsed(int blockAddress) throws BlockAddressOutOfBoundException
     {
@@ -86,7 +86,7 @@ public class BitMapBlock extends Block
     /**
      * Set a Block as unused
      *
-     * @param blockAddress block address of the Block that should be set as unused
+     * @param blockAddress block blockAddress of the Block that should be set as unused
      */
     public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException
     {
@@ -116,7 +116,7 @@ public class BitMapBlock extends Block
     /**
      * Check if a Block is unused
      *
-     * @param blockAddress block address of the Block that should be checked
+     * @param blockAddress block blockAddress of the Block that should be checked
      * @return true if the Block is not used
      */
     public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException
@@ -131,7 +131,7 @@ public class BitMapBlock extends Block
     /**
      * Get the capacity of the BitMapBlock
      *
-     * @return maximum block address the BitMapBlock can store
+     * @return maximum block blockAddress the BitMapBlock can store
      */
     public int capacity()
     {

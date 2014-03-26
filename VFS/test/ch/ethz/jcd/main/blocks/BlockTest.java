@@ -16,15 +16,15 @@ public class BlockTest
         // Default value for integer
         blockAddress = 0;
         block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getAddress());
+        assertEquals(blockAddress, block.getBlockAddress());
 
         blockAddress = 1024;
         block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getAddress());
+        assertEquals(blockAddress, block.getBlockAddress());
 
         blockAddress = 1024;
         block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getAddress());
+        assertEquals(blockAddress, block.getBlockAddress());
     }
 
     @Test
@@ -33,16 +33,16 @@ public class BlockTest
         int blockAddress;
         Block block = new Block(0, null);
         blockAddress = 0;
-        block.setAddress(blockAddress);
-        assertEquals(blockAddress, block.getAddress());
+        block.setBlockAddress(blockAddress);
+        assertEquals(blockAddress, block.getBlockAddress());
 
         blockAddress = 1024;
-        block.setAddress(blockAddress);
-        assertEquals(blockAddress, block.getAddress());
+        block.setBlockAddress(blockAddress);
+        assertEquals(blockAddress, block.getBlockAddress());
 
         blockAddress = Integer.MAX_VALUE;
-        block.setAddress(blockAddress);
-        assertEquals(blockAddress, block.getAddress());
+        block.setBlockAddress(blockAddress);
+        assertEquals(blockAddress, block.getBlockAddress());
     }
 
     @Test

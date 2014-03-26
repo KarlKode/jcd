@@ -1,30 +1,44 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.utils.FileManager;
+
 /**
  * This class represents the general Block. It also holds the byte
  * structure that it could be easily written to or read from disk.
  */
 public class Block
 {
-    protected int address;
+    protected final FileManager fileManager;
+    protected int blockAddress;
 
-    /**
-     * Get the block address of the Block
-     *
-     * @return block address of the Block
-     */
-    public int getAddress()
+    public Block(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        return address;
+        if (blockAddress < 0) {
+            throw new InvalidBlockAddressException();
+        }
+
+        this.fileManager = fileManager;
+        this.blockAddress = blockAddress;
     }
 
     /**
-     * Set the block address of the Block
+     * Get the block blockAddress of the Block
      *
-     * @param address new block address of the block
+     * @return block blockAddress of the Block
      */
-    public void setAddress(int address)
+    public int getBlockAddress()
     {
-        this.address = address;
+        return blockAddress;
+    }
+
+    /**
+     * Set the block blockAddress of the Block
+     *
+     * @param blockAddress new block blockAddress of the block
+     */
+    public void setBlockAddress(int blockAddress)
+    {
+        this.blockAddress = blockAddress;
     }
 }

@@ -94,7 +94,7 @@ public class InodeBlock extends Block
         {
             throw new BlockFullException();
         }
-        blockAddressList.add(b.getAddress());
+        blockAddressList.add(b.getBlockAddress());
         this.storeLinkedBlocks();
     }
 
@@ -121,7 +121,7 @@ public class InodeBlock extends Block
      */
     public void remove(Block b)
     {
-        blockAddressList.removeFirstOccurrence(b.getAddress());
+        blockAddressList.removeFirstOccurrence(b.getBlockAddress());
         this.storeLinkedBlocks();
     }
 
@@ -251,7 +251,7 @@ public class InodeBlock extends Block
     }
 
     /**
-     * @return the block address of the parent inode
+     * @return the block blockAddress of the parent inode
      */
     public int getParentBlockAddress()
     {
@@ -259,7 +259,7 @@ public class InodeBlock extends Block
     }
 
     /**
-     * This method sets the parent's block address
+     * This method sets the parent's block blockAddress
      *
      * @param blockAddress to set
      */

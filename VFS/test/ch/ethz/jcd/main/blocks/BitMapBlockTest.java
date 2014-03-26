@@ -16,7 +16,7 @@ public class BitMapBlockTest
         byte[] bytes = new byte[16];
 
         BitMapBlock block = new BitMapBlock(blockAddress, bytes);
-        assertEquals(blockAddress, block.getAddress());
+        assertEquals(blockAddress, block.getBlockAddress());
         assertEquals(bytes, block.getBytes());
         assertTrue(block.isUnused(blockAddress));
     }
