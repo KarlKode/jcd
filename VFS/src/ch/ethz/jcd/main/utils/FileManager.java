@@ -58,6 +58,16 @@ public class FileManager {
         rand.writeLong(value);
     }
 
+    public void writeByte(long address, int offset, byte value) throws IOException {
+        rand.seek(address + offset);
+        rand.writeByte(value);
+    }
+
+    public byte readByte(long address, int offset) throws IOException {
+        rand.seek(address + offset);
+
+        return rand.readByte();
+    }
 
     public long readLong(long address, int offset) throws IOException {
         rand.seek(address + offset);
