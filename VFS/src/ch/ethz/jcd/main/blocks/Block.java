@@ -14,7 +14,7 @@ public class Block
 
     public Block(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        if (blockAddress < 0) {
+        if (!isValidBlockAddress(blockAddress)) {
             throw new InvalidBlockAddressException();
         }
 
@@ -40,5 +40,9 @@ public class Block
     public void setBlockAddress(int blockAddress)
     {
         this.blockAddress = blockAddress;
+    }
+
+    protected boolean isValidBlockAddress(int blockAddress) {
+        return blockAddress >= 0;
     }
 }
