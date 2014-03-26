@@ -61,7 +61,7 @@ public class BitMapBlock extends Block
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
         //awesome solution (but not sure if correct)
-        byte newByte = (byte) (val | (freeBitInByte >> USED_MASK));
+        byte newByte = (byte) (val | (USED_MASK >> freeBitInByte));
         fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
 
         //readable solution
