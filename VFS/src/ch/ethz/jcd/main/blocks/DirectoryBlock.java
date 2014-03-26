@@ -57,6 +57,7 @@ public class DirectoryBlock extends ObjectBlock
             {
                 // TODO: Throw new error or something
                 e.printStackTrace();
+                throw new NotImplementedException();
             }
         }
 
