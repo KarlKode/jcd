@@ -6,81 +6,80 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 
-/**
- * Created by leo on 24/03/14.
- */
 public class FileManager {
-    private File vdiskFile;
+    private final RandomAccessFile rand;
 
-    public FileManager(File file){
-        this.vdiskFile = file;
+    public FileManager(File file) throws FileNotFoundException {
+        this.rand = new RandomAccessFile(file, "rw");
     }
 
-    private int readInt(int address, int offset) throws IOException {
-        int retValue;
+    public int readInt(long address, int offset) throws IOException {
+        rand.seek(address + offset);
 
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "r")){
-            rand.seek(address + offset);
-            retValue = rand.readInt();
-        }
+        return rand.readInt();
+    }
+
+    public byte[] readBytes(long address, int offset, int length) throws IOException {
+        final byte[] retValue = new byte[length];
+
+        rand.seek(address + offset);
+        rand.readFully(retValue);
+
         return retValue;
     }
 
-    private byte[] readBytes(int address, int offset, int length) throws IOException {
+    public String readString(long address, int offset, int length) throws IOException {
         final byte[] retValue = new byte[length];
 
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "r")){
-            rand.seek(address + offset);
-            rand.readFully(retValue);
-        }
-        return retValue;
-    }
+        rand.seek(address + offset);
+        rand.readFully(retValue);
 
-    private String readString(int address, int offset, int length) throws IOException {
-        final byte[] retValue = new byte[length];
-
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "r")){
-            rand.seek(address + offset);
-            rand.readFully(retValue);
-        }
         return new String(retValue);
     }
 
 
-    private void writeInt(int address, int offset, int value) throws IOException {
-        int retValue;
-
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "w")){
-            rand.seek(address + offset);
-            rand.writeInt(value);
-        }
+    public void writeInt(long address, int offset, int value) throws IOException {
+        rand.seek(address + offset);
+        rand.writeInt(value);
     }
 
-    private void writeBytes(int address, int offset, final byte[] value) throws IOException {
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "w")){
-            rand.seek(address + offset);
-            rand.write(value);
-        }
+    public void writeBytes(long address, int offset, final byte[] value) throws IOException {
+        rand.seek(address + offset);
+        rand.write(value);
     }
 
-    private void writeString(int address, int offset, String value) throws IOException {
-        try(RandomAccessFile rand = new RandomAccessFile(vdiskFile, "w")){
-            rand.seek(address + offset);
-            rand.writeChars(value);
-        }
+    private void writeString(long address, int offset, String value) throws IOException {
+        rand.seek(address + offset);
+        rand.writeChars(value);
     }
 
-    private long readLong(int address, int offset){
-        throw new NotImplementedException();
+    public void writeLong(long address, int offset, long value) throws IOException {
+        rand.seek(address + offset);
+        rand.writeLong(value);
     }
 
-    public void writeLong(int address, int offset){
-        throw new NotImplementedException();
+
+    public long readLong(long address, int offset) throws IOException {
+        rand.seek(address + offset);
+
+        return rand.readLong();
     }
+
 
     public static void main(String[] args) throws IOException {
-        FileManager dd = new FileManager(new File("TestVDisk.txt"));
+        File a = new File("/Users/leo/TestVDisk.txt");
+        if(!a.exists()){
+            a.createNewFile();
+        }
 
-        dd.writeBytes(0, 112, new String("fooo").getBytes());
+        FileManager dd = new FileManager(a);
+
+        int i1 = 5;
+        String foo = "foo";
+
+
+        dd.writeBytes(0, 4, foo.getBytes());
+        dd.writeInt(0, 0, i1);
+
     }
 }
