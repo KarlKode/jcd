@@ -23,10 +23,6 @@ public class VUtil
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
 
-    public static long getBlockOffset(int blockAddress) {
-        return ((long) blockAddress) * ((long) BLOCK_SIZE);
-    }
-
     /**
      * Create a new VUtil instance for the VFS in the file at vDiskFileName
      *
@@ -61,6 +57,11 @@ public class VUtil
 
         // Load directory block
         rootBlock = new DirectoryBlock(read(superBlock.getRootDirectoryBlock()));
+    }
+
+    public static long getBlockOffset(int blockAddress)
+    {
+        return ((long) blockAddress) * ((long) BLOCK_SIZE);
     }
 
     /**

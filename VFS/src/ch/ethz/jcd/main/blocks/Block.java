@@ -15,7 +15,8 @@ public class Block
 
     public Block(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        if (!isValidBlockAddress(blockAddress)) {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new InvalidBlockAddressException();
         }
 
@@ -43,11 +44,13 @@ public class Block
         this.blockAddress = blockAddress;
     }
 
-    protected long getBlockOffset() {
+    protected long getBlockOffset()
+    {
         return VUtil.getBlockOffset(blockAddress);
     }
 
-    protected boolean isValidBlockAddress(int blockAddress) {
+    protected boolean isValidBlockAddress(int blockAddress)
+    {
         return blockAddress >= 0;
     }
 }

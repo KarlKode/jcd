@@ -32,7 +32,8 @@ public class ObjectBlock extends Block
     public void setType(byte type) throws InvalidTypeException
     {
         // Check type for validity
-        if (type != TYPE_DIRECTORY && type != TYPE_FILE) {
+        if (type != TYPE_DIRECTORY && type != TYPE_FILE)
+        {
             throw new InvalidTypeException();
         }
     }
@@ -46,7 +47,8 @@ public class ObjectBlock extends Block
     public void setName(String name) throws InvalidNameException, IOException
     {
         // TODO: Ugly length check!
-        if (name == null || name.getBytes().length > LENGTH_NAME) {
+        if (name == null || name.getBytes().length > LENGTH_NAME)
+        {
             throw new InvalidNameException();
         }
 

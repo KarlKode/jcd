@@ -15,7 +15,8 @@ public class VDirectory extends VObject
             if (childBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
             {
                 children.add(new VDirectory());
-            } else {
+            } else
+            {
                 children.add(new VFile());
             }
         }
