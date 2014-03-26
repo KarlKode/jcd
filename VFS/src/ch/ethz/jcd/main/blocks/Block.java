@@ -2,6 +2,7 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 
 /**
  * This class represents the general Block. It also holds the byte
@@ -40,6 +41,10 @@ public class Block
     public void setBlockAddress(int blockAddress)
     {
         this.blockAddress = blockAddress;
+    }
+
+    protected long getBlockOffset() {
+        return VUtil.getBlockOffset(blockAddress);
     }
 
     protected boolean isValidBlockAddress(int blockAddress) {
