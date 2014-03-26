@@ -1,8 +1,14 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
+import ch.ethz.jcd.main.exceptions.DiskFullException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.main.visitor.BlockVisitor;
+import sun.jvm.hotspot.utilities.BitMap;
 
+import java.io.IOException;
 import java.util.BitSet;
 
 /**
@@ -13,42 +19,14 @@ import java.util.BitSet;
  */
 public class BitMapBlock extends Block
 {
+    private byte ZERO_BYTE = 0x00;
+
     private BitSet bitMap;
     private int usedBlocks;
 
-    /**
-     * Instantiate a new BitMapBlock
-     *
-     * @param blockAddress block blockAddress of the new BitMapBlock
-     * @param b            content of the new BitMapBlock
-     */
-    public BitMapBlock(int blockAddress, byte[] b)
+    public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        super(blockAddress, b);
-        bitMap = BitSet.valueOf(b);
-
-        usedBlocks = 0;
-        for (int i = bitMap.nextSetBit(0); i >= 0; i = bitMap.nextSetBit(i + 1))
-        {
-            usedBlocks++;
-        }
-        bytes.put(0, bitMap.toByteArray());
-    }
-
-    /**
-     * This method is part of the visitor pattern and is called by the visitor.
-     * It tells to the visitor which sort of Block he called.
-     *
-     * @param visitor calling this method
-     * @param arg     to pass
-     * @param <R>     generic return type
-     * @param <A>     generic argument type
-     * @return the visitors return value
-     */
-    @Override
-    public <R, A> R accept(BlockVisitor<R, A> visitor, A arg)
-    {
-        return visitor.bitMapBlock(this, arg);
+       super(fileManager, blockAddress);
     }
 
     /**
@@ -56,31 +34,50 @@ public class BitMapBlock extends Block
      *
      * @return block blockAddress of the newly allocated Block
      */
-    public int allocateBlock() throws BlockAddressOutOfBoundException
-    {
-        int newBlock = bitMap.nextClearBit(0);
-        setUsed(newBlock);
-        return newBlock;
+    public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException {
+        int pos = 0;
+
+        byte val;
+        do {
+            val = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
+            pos++;
+
+            if(pos >= VUtil.BLOCK_SIZE){
+                throw new DiskFullException();
+            }
+        }while(val == 0xFF);
+
+        final BitSet freeBlocks = new BitSet(val);
+
+        int freeBitInByte = freeBlocks.nextClearBit(0);
+        int freeBlockAddress = pos * 8 + freeBitInByte;
+
+        //awesome solution (but not sure if correct)
+        byte newByte = (byte) (val | (freeBitInByte >> 0b10000000));
+        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
+
+        //readable solution
+        //freeBlocks.set(freeBitInByte, true);
+        //fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, freeBlocks.toByteArray()[0]);
+
+        return freeBlockAddress;
     }
 
-    /**
-     * Set a Block as used
-     *
-     * @param blockAddress block blockAddress of the Block that should be set as used
-     */
-    public void setUsed(int blockAddress) throws BlockAddressOutOfBoundException
-    {
-        if (!isValidBlockAddress(blockAddress))
-        {
-            throw new BlockAddressOutOfBoundException();
-        }
 
-        if (isUnused(blockAddress))
-        {
-            bitMap.set(blockAddress);
-            bytes.put(0, bitMap.toByteArray());
-            usedBlocks++;
-        }
+    public void initialize() throws IOException {
+        byte[] freeVDisk = new byte[VUtil.BLOCK_SIZE];
+        byte firstBlock = ZERO_BYTE;
+
+        //initialize superblock
+        firstBlock |= 0b10000000;
+        //initialize bitmapblock
+        firstBlock |= 0b01000000;
+        //initialize root directoryblock
+        firstBlock |= 0b00100000;
+
+        freeVDisk[0] = firstBlock;
+
+        fileManager.writeBytes(VUtil.getBlockOffset(this.blockAddress), 0, freeVDisk);
     }
 
     /**
@@ -88,29 +85,26 @@ public class BitMapBlock extends Block
      *
      * @param blockAddress block blockAddress of the Block that should be set as unused
      */
-    public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException
-    {
-        if (!isValidBlockAddress(blockAddress))
-        {
+    public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException {
+        if (!isValidBlockAddress(blockAddress)) {
             throw new BlockAddressOutOfBoundException();
         }
 
-        if (!isUnused(blockAddress))
-        {
-            bitMap.clear(blockAddress);
-            bytes.put(0, bitMap.toByteArray());
-            usedBlocks--;
-        }
+        int pos = blockAddress / 8;
+        int bit = blockAddress % 8;
+
+        final byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
+        final BitSet set = new BitSet(value);
+        set.clear(bit);
+
+        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, set.toByteArray()[0]);
     }
 
     /**
      * Set all Blocks as unused
      */
-    public void clear()
-    {
-        bitMap.clear();
-        bytes.setBytes(new byte[bitMap.size()]);
-        usedBlocks = 0;
+    public void reset() throws IOException {
+        this.initialize();
     }
 
     /**
@@ -119,41 +113,16 @@ public class BitMapBlock extends Block
      * @param blockAddress block blockAddress of the Block that should be checked
      * @return true if the Block is not used
      */
-    public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException
-    {
-        if (!isValidBlockAddress(blockAddress))
-        {
+    public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException {
+        if (!isValidBlockAddress(blockAddress)) {
             throw new BlockAddressOutOfBoundException();
         }
-        return !bitMap.get(blockAddress);
-    }
 
-    /**
-     * Get the capacity of the BitMapBlock
-     *
-     * @return maximum block blockAddress the BitMapBlock can store
-     */
-    public int capacity()
-    {
-        return bytes.size() * 8;
-    }
+        int pos = blockAddress/8;
+        int bit = blockAddress % 8;
 
-    /**
-     * Get the number of used Block in this BitMapBlock
-     *
-     * @return the number of used Blocks
-     */
-    public int getUsedBlocks()
-    {
-        return usedBlocks;
-    }
+        byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
 
-    /**
-     * @param blockAddress to check
-     * @return whether the given blockAddress is valid or not
-     */
-    private boolean isValidBlockAddress(int blockAddress)
-    {
-        return blockAddress < capacity();
+        return new BitSet(value).get(bit);
     }
 }
