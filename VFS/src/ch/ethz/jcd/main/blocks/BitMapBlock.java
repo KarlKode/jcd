@@ -19,7 +19,14 @@ import java.util.BitSet;
  */
 public class BitMapBlock extends Block
 {
-    private byte ZERO_BYTE = 0x00;
+    private final byte ZERO_BYTE = 0x00;
+    private final byte FULL_BYTE = (byte)0xFF;
+
+    private final byte USED_SUPERBLOCK_MASK = (byte)0b10000000;
+    private final byte USED_BITMAPBLOCK_USED = (byte)0b01000000;
+    private final byte USED_ROOTBLOCK_USED = (byte)0b00100000;
+
+    private final byte USED_MASK = (byte)0b10000000;
 
     private BitSet bitMap;
     private int usedBlocks;
@@ -45,7 +52,7 @@ public class BitMapBlock extends Block
             if(pos >= VUtil.BLOCK_SIZE){
                 throw new DiskFullException();
             }
-        }while(val == 0xFF);
+        }while(val == FULL_BYTE);
 
         final BitSet freeBlocks = new BitSet(val);
 
@@ -53,7 +60,7 @@ public class BitMapBlock extends Block
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
         //awesome solution (but not sure if correct)
-        byte newByte = (byte) (val | (freeBitInByte >> 0b10000000));
+        byte newByte = (byte) (val | (freeBitInByte >> USED_MASK));
         fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
 
         //readable solution
@@ -69,11 +76,11 @@ public class BitMapBlock extends Block
         byte firstBlock = ZERO_BYTE;
 
         //initialize superblock
-        firstBlock |= 0b10000000;
+        firstBlock |= USED_SUPERBLOCK_MASK;
         //initialize bitmapblock
-        firstBlock |= 0b01000000;
+        firstBlock |= USED_BITMAPBLOCK_USED;
         //initialize root directoryblock
-        firstBlock |= 0b00100000;
+        firstBlock |= USED_ROOTBLOCK_USED;
 
         freeVDisk[0] = firstBlock;
 
