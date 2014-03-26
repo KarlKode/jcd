@@ -48,7 +48,7 @@ public class FileManager {
         rand.write(value);
     }
 
-    private void writeString(long address, int offset, String value) throws IOException {
+    public void writeString(long address, int offset, String value) throws IOException {
         rand.seek(address + offset);
         rand.writeChars(value);
     }
