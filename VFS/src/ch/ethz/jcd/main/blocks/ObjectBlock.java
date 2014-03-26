@@ -1,67 +1,62 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ch.ethz.jcd.main.exceptions.InvalidTypeException;
+import ch.ethz.jcd.main.utils.FileManager;
 
-import java.util.List;
+import java.io.IOException;
 
-public abstract class ObjectBlock extends Block
+public class ObjectBlock extends Block
 {
     public static final int LENGTH_TYPE = 1;
     public static final int LENGTH_NAME = 63;
     public static final int LENGTH_PARENT_BLOCK_ADDRESS = 4;
-    public static final int LENGTH_CONTENT_SIZE = 8;
     public static final int OFFSET_TYPE = 0;
     public static final int OFFSET_NAME = OFFSET_TYPE + LENGTH_TYPE;
     public static final int OFFSET_PARENT_BLOCK_ADDRESS = OFFSET_NAME + LENGTH_NAME;
-    public static final int OFFSET_CONTENT_SIZE = OFFSET_PARENT_BLOCK_ADDRESS + LENGTH_CONTENT_SIZE;
-    public static final int OFFSET_CHILDREN = OFFSET_CONTENT_SIZE + LENGTH_PARENT_BLOCK_ADDRESS;
+    public static final int OFFSET_CONTENT = OFFSET_PARENT_BLOCK_ADDRESS + LENGTH_PARENT_BLOCK_ADDRESS;
     public static final byte TYPE_DIRECTORY = 0x00;
     public static final byte TYPE_FILE = 0x01;
 
-    public ObjectBlock(int blockAddress, byte[] bytes)
+    public ObjectBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-        super(blockAddress, bytes);
+        super(fileManager, blockAddress);
     }
 
-    public byte getType()
+    public byte getType() throws IOException
     {
-        // TODO
-        throw new NotImplementedException();
+        return fileManager.readByte(getBlockOffset(), OFFSET_TYPE);
     }
 
-    public void setType(byte type)
+    public void setType(byte type) throws InvalidTypeException
     {
-        // TODO
-        throw new NotImplementedException();
+        // Check type for validity
+        if (type != TYPE_DIRECTORY && type != TYPE_FILE) {
+            throw new InvalidTypeException();
+        }
     }
 
-    public String getName()
+    public String getName() throws IOException
     {
-        return bytes.getString(OFFSET_NAME, LENGTH_NAME);
+        // TODO: Check if length is correct
+        return fileManager.readString(getBlockOffset(), OFFSET_NAME, LENGTH_NAME);
     }
 
-    public void setName(String name) throws InvalidNameException
+    public void setName(String name) throws InvalidNameException, IOException
     {
+        // TODO: Ugly length check!
         if (name == null || name.getBytes().length > LENGTH_NAME) {
             throw new InvalidNameException();
         }
 
-        bytes.putString(OFFSET_NAME, name);
+        fileManager.writeString(getBlockOffset(), OFFSET_NAME, name);
     }
 
-    public void setParent(DirectoryBlock parent)
+    public void setParent(DirectoryBlock parent) throws IOException
     {
         // TODO Remove block from old parent and add as child to new parent
 
-        bytes.putInt(OFFSET_PARENT_BLOCK_ADDRESS, parent.getBlockAddress());
+        fileManager.writeInt(getBlockOffset(), OFFSET_PARENT_BLOCK_ADDRESS, parent.getBlockAddress());
     }
-
-    public abstract long getSize();
-
-    public abstract List<ObjectBlock> getChildren();
-
-    public abstract void addChild(Block block);
-
-    public abstract void removeChild(Block block);
 }
