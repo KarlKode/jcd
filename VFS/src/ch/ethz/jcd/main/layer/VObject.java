@@ -5,10 +5,10 @@ import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.VDisk;
 
-public abstract class VObject
+public abstract class VObject<T extends ObjectBlock>
 {
     protected VDirectory parent;
-    protected ObjectBlock block;
+    protected T block;
 
     public VDirectory getParent()
     {

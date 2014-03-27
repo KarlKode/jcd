@@ -23,8 +23,8 @@ public class BitMapBlock extends Block
     private final byte FULL_BYTE = (byte)0xFF;
 
     private final byte USED_SUPERBLOCK_MASK = (byte)0b10000000;
-    private final byte USED_BITMAPBLOCK_USED = (byte)0b01000000;
-    private final byte USED_ROOTBLOCK_USED = (byte)0b00100000;
+    private final byte USED_BITMAPBLOCK_MASK = (byte)0b01000000;
+    private final byte USED_ROOTBLOCK_MASK = (byte)0b00100000;
 
     private final byte USED_MASK = (byte)0b10000000;
 
@@ -78,9 +78,9 @@ public class BitMapBlock extends Block
         //initialize superblock
         firstBlock |= USED_SUPERBLOCK_MASK;
         //initialize bitmapblock
-        firstBlock |= USED_BITMAPBLOCK_USED;
+        firstBlock |= USED_BITMAPBLOCK_MASK;
         //initialize root directoryblock
-        firstBlock |= USED_ROOTBLOCK_USED;
+        firstBlock |= USED_ROOTBLOCK_MASK;
 
         freeVDisk[0] = firstBlock;
 

@@ -1,11 +1,12 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VDirectory extends VObject
+public class VDirectory extends VObject<DirectoryBlock>
 {
     public List<VObject> listChildren()
     {

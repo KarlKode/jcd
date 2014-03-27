@@ -13,9 +13,28 @@ public class DataBlock extends Block
         super(fileManager, blockAddress);
     }
 
-    public byte[] getContent() throws IOException
+    public byte[] getContent(int contentOffset, int length) throws IOException
     {
-        return fileManager.readBytes(getBlockOffset(), 0, VUtil.BLOCK_SIZE);
+        return fileManager.readBytes(getBlockOffset(), contentOffset, length);
+    }
+
+    /**
+     * Reads the Content of the DataBlock from offset until end
+     * @param contentOffset
+     * @return
+     * @throws IOException
+     */
+    public byte[] getContent(int contentOffset) throws IOException {
+        return getContent(contentOffset, VUtil.BLOCK_SIZE);
+    }
+
+    /**
+     * Reads the whole content of the DataBlock
+     * @return
+     * @throws IOException
+     */
+    public byte[] getContent() throws IOException {
+        return getContent(0, VUtil.BLOCK_SIZE);
     }
 
     public void setContent(byte[] content) throws IOException
