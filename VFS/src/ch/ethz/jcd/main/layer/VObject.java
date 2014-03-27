@@ -42,7 +42,8 @@ public abstract class VObject<T extends ObjectBlock>
 
     public String getPath()
     {
-        if (parent != null) {
+        if (parent != null)
+        {
             return parent.getPath() + VDisk.PATH_SEPARATOR + getName();
         }
 

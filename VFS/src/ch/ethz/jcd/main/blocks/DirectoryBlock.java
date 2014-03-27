@@ -2,18 +2,11 @@ package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
-import ch.ethz.jcd.main.exceptions.ToDoException;
 import ch.ethz.jcd.main.utils.FileManager;
-import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
-import ch.ethz.jcd.main.visitor.BlockVisitor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class DirectoryBlock extends ObjectBlock
 {
@@ -37,7 +30,8 @@ public class DirectoryBlock extends ObjectBlock
         int entryCount = getEntryCount();
         ObjectBlock[] entries = new ObjectBlock[entryCount];
 
-        for (int i = 0; i < entryCount; i++) {
+        for (int i = 0; i < entryCount; i++)
+        {
             int entryBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (i * SIZE_ENTRY));
 
             try
@@ -45,11 +39,14 @@ public class DirectoryBlock extends ObjectBlock
                 // TODO: Should we just check the type of the entry here without instantiating a new ObjectBlock?
                 ObjectBlock objectBlock = new ObjectBlock(fileManager, entryBlockAddress);
 
-                if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY) {
-                    entries[i]= new DirectoryBlock(fileManager, entryBlockAddress);
-                } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE) {
+                if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
+                {
+                    entries[i] = new DirectoryBlock(fileManager, entryBlockAddress);
+                } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE)
+                {
                     entries[i] = new FileBlock(fileManager, entryBlockAddress);
-                } else {
+                } else
+                {
                     // TODO: Throw correct exception
                     throw new NotImplementedException();
                 }
@@ -70,7 +67,8 @@ public class DirectoryBlock extends ObjectBlock
 
         // Check if the directory has room for an additional entry
         int maxEntries = (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY;
-        if (entryCount >= maxEntries) {
+        if (entryCount >= maxEntries)
+        {
             throw new BlockFullException();
         }
 
@@ -93,19 +91,23 @@ public class DirectoryBlock extends ObjectBlock
         // Example:
         //     Remove entry with index i (out of n) (i < n)
         //     Entry i will be overwritten with entry i + 1, entry i + 1 with i + 2 ... n - 1 with n
-        for (int i = 0; i < entryCount; i++) {
-            if (entry.equals(entries[i])) {
+        for (int i = 0; i < entryCount; i++)
+        {
+            if (entry.equals(entries[i]))
+            {
                 // Do not start the overwriting process here, i could be zero and therefore i - 1 = -1!
                 found = true;
                 // Write new entry count
                 fileManager.writeInt(getBlockOffset(), OFFSET_ENTRY_COUNT, entryCount - 1);
-            } else if (found) {
+            } else if (found)
+            {
                 // Overwrite the last entry with the current one (the last entry will not be modified)
                 fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + ((i - 1) * SIZE_ENTRY), entries[i].getBlockAddress());
             }
         }
 
-        if (!found) {
+        if (!found)
+        {
             // TODO: Throw correct exception
             throw new NotImplementedException();
         }

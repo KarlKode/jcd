@@ -1,6 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.BlockFullException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.exceptions.InvalidDataBlockOffsetException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -26,7 +28,8 @@ public class FileBlock extends ObjectBlock
 
     public DataBlock getDataBlock(int dataBlockOffset) throws IOException, InvalidDataBlockOffsetException
     {
-        if (dataBlockOffset < 0 || dataBlockOffset >= getMaxDataBlocks()) {
+        if (dataBlockOffset < 0 || dataBlockOffset >= getMaxDataBlocks())
+        {
             throw new InvalidDataBlockOffsetException();
         }
 
@@ -48,7 +51,8 @@ public class FileBlock extends ObjectBlock
         long currentSize = getSize();
         long newSize = currentSize + (currentSize % VUtil.BLOCK_SIZE) + usedBytes;
         int dataBlockCount = (int) (currentSize / VUtil.BLOCK_SIZE);
-        if (dataBlockCount >= getMaxDataBlocks()) {
+        if (dataBlockCount >= getMaxDataBlocks())
+        {
             throw new BlockFullException();
         }
 
@@ -61,18 +65,22 @@ public class FileBlock extends ObjectBlock
     public void removeLastDataBlock() throws IOException
     {
         long currentSize = getSize();
-        if (currentSize > 0) {
+        if (currentSize > 0)
+        {
             long newSize;
-            if (currentSize % VUtil.BLOCK_SIZE == 0) {
+            if (currentSize % VUtil.BLOCK_SIZE == 0)
+            {
                 newSize = currentSize - VUtil.BLOCK_SIZE;
-            } else {
+            } else
+            {
                 newSize = currentSize - (currentSize % VUtil.BLOCK_SIZE);
             }
             fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
         }
     }
 
-    private int getMaxDataBlocks() {
+    private int getMaxDataBlocks()
+    {
         return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY;
     }
 }

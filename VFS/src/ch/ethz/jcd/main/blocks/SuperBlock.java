@@ -18,7 +18,8 @@ public class SuperBlock extends Block
     {
         super(fileManager, blockAddress);
 
-        if (blockAddress != SUPER_BLOCK_ADDRESS) {
+        if (blockAddress != SUPER_BLOCK_ADDRESS)
+        {
             throw new InvalidBlockAddressException();
         }
     }
@@ -32,7 +33,8 @@ public class SuperBlock extends Block
     {
         // Check validity of block count
         // TODO: Block count > number of supported blocks
-        if (blockCount < 0) {
+        if (blockCount < 0)
+        {
             throw new InvalidBlockCountException();
         }
 
@@ -47,7 +49,8 @@ public class SuperBlock extends Block
     public void setRootDirectoryBlock(int rootDirectoryBlockAddress) throws InvalidBlockAddressException, IOException
     {
         // Check validity of root directory block address
-        if (!isValidBlockAddress(rootDirectoryBlockAddress)) {
+        if (!isValidBlockAddress(rootDirectoryBlockAddress))
+        {
             throw new InvalidBlockAddressException();
         }
 
