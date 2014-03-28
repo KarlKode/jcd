@@ -1,36 +1,49 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.DirectoryBlock;
+import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
+import ch.ethz.jcd.main.exceptions.BlockFullException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VDirectory extends VObject
 {
-    public List<VObject> listChildren()
+    public VDirectory(DirectoryBlock block, VDirectory parent)
     {
-        List<VObject> children = new ArrayList<>();
-        for (ObjectBlock childBlock : block.getChildren())
-        {
-            if (childBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
-            {
-                children.add(new VDirectory());
-            } else
-            {
-                children.add(new VFile());
+        super(block, parent);
+    }
+
+    public VObject[] getEntries() throws IOException
+    {
+        ObjectBlock[] entryBlocks = getDirectoryBlock().getEntries();
+        VObject[] entryObjects = new VObject[entryBlocks.length];
+
+        for (int i = 0; i < entryBlocks.length; i++) {
+            if (entryBlocks[i] instanceof DirectoryBlock) {
+                entryObjects[i] = new VDirectory((DirectoryBlock) entryBlocks[i], this);
+            } else {
+                entryObjects[i] = new VFile((FileBlock) entryBlocks[i], this);
             }
         }
 
-        return children;
+        return entryObjects;
     }
 
-    public void addChild(VObject object)
+    public void addEntry(VObject entry) throws IOException, BlockFullException
     {
-        block.addChild(object.block);
+        getDirectoryBlock().addEntry(entry.getBlock());
     }
 
-    public void removeChild(VObject object)
+    public void removeEntry(VObject entry) throws IOException
     {
-        block.removeChild(object.block);
+        getDirectoryBlock().removeEntry(entry.getBlock());
+    }
+
+    private DirectoryBlock getDirectoryBlock()
+    {
+        return (DirectoryBlock) block;
     }
 }

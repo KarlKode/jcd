@@ -5,8 +5,6 @@ import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
-import ch.ethz.jcd.main.visitor.BlockVisitor;
-import sun.jvm.hotspot.utilities.BitMap;
 
 import java.io.IOException;
 import java.util.BitSet;
