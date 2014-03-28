@@ -8,12 +8,12 @@ import ch.ethz.jcd.main.utils.VDisk;
 
 import java.io.IOException;
 
-public abstract class VObject
+public abstract class VObject<T extends ObjectBlock>
 {
     protected VDirectory parent;
-    protected ObjectBlock block;
+    protected T block;
 
-    public VObject(ObjectBlock block, VDirectory parent)
+    public VObject(T block, VDirectory parent)
     {
         this.block = block;
         this.parent = parent;

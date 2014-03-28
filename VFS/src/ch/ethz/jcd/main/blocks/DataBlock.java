@@ -17,17 +17,6 @@ public class DataBlock extends Block
     {
         return fileManager.readBytes(getBlockOffset(), contentOffset, length);
     }
-
-    /**
-     * Reads the Content of the DataBlock from offset until end
-     * @param contentOffset
-     * @return
-     * @throws IOException
-     */
-    public byte[] getContent(int contentOffset) throws IOException {
-        return getContent(contentOffset, VUtil.BLOCK_SIZE);
-    }
-
     /**
      * Reads the whole content of the DataBlock
      * @return
@@ -39,6 +28,11 @@ public class DataBlock extends Block
 
     public void setContent(byte[] content) throws IOException
     {
-        fileManager.writeBytes(getBlockOffset(), 0, content);
+        setContent(content, 0);
+    }
+
+    public void setContent(byte[] content, int offset) throws IOException
+    {
+        fileManager.writeBytes(getBlockOffset(), offset, content);
     }
 }
