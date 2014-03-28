@@ -17,12 +17,15 @@ public class DataBlock extends Block
     {
         return fileManager.readBytes(getBlockOffset(), contentOffset, length);
     }
+
     /**
      * Reads the whole content of the DataBlock
+     *
      * @return
      * @throws IOException
      */
-    public byte[] getContent() throws IOException {
+    public byte[] getContent() throws IOException
+    {
         return getContent(0, VUtil.BLOCK_SIZE);
     }
 

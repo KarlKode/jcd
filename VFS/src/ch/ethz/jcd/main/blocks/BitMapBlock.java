@@ -18,20 +18,20 @@ import java.util.BitSet;
 public class BitMapBlock extends Block
 {
     private final byte ZERO_BYTE = 0x00;
-    private final byte FULL_BYTE = (byte)0xFF;
+    private final byte FULL_BYTE = (byte) 0xFF;
 
-    private final byte USED_SUPERBLOCK_MASK = (byte)0b10000000;
-    private final byte USED_BITMAPBLOCK_MASK = (byte)0b01000000;
-    private final byte USED_ROOTBLOCK_MASK = (byte)0b00100000;
+    private final byte USED_SUPERBLOCK_MASK = (byte) 0b10000000;
+    private final byte USED_BITMAPBLOCK_MASK = (byte) 0b01000000;
+    private final byte USED_ROOTBLOCK_MASK = (byte) 0b00100000;
 
-    private final byte USED_MASK = (byte)0b10000000;
+    private final byte USED_MASK = (byte) 0b10000000;
 
     private BitSet bitMap;
     private int usedBlocks;
 
     public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
-       super(fileManager, blockAddress);
+        super(fileManager, blockAddress);
     }
 
     /**
@@ -39,18 +39,21 @@ public class BitMapBlock extends Block
      *
      * @return block blockAddress of the newly allocated Block
      */
-    public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException {
+    public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException
+    {
         int pos = 0;
 
         byte val;
-        do {
+        do
+        {
             val = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
             pos++;
 
-            if(pos >= VUtil.BLOCK_SIZE){
+            if (pos >= VUtil.BLOCK_SIZE)
+            {
                 throw new DiskFullException();
             }
-        }while(val == FULL_BYTE);
+        } while (val == FULL_BYTE);
 
         final BitSet freeBlocks = new BitSet(val);
 
@@ -69,7 +72,8 @@ public class BitMapBlock extends Block
     }
 
 
-    public void initialize() throws IOException {
+    public void initialize() throws IOException
+    {
         byte[] freeVDisk = new byte[VUtil.BLOCK_SIZE];
         byte firstBlock = ZERO_BYTE;
 
@@ -90,8 +94,10 @@ public class BitMapBlock extends Block
      *
      * @param blockAddress block blockAddress of the Block that should be set as unused
      */
-    public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException {
-        if (!isValidBlockAddress(blockAddress)) {
+    public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException
+    {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new BlockAddressOutOfBoundException();
         }
 
@@ -108,7 +114,8 @@ public class BitMapBlock extends Block
     /**
      * Set all Blocks as unused
      */
-    public void reset() throws IOException {
+    public void reset() throws IOException
+    {
         this.initialize();
     }
 
@@ -118,12 +125,14 @@ public class BitMapBlock extends Block
      * @param blockAddress block blockAddress of the Block that should be checked
      * @return true if the Block is not used
      */
-    public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException {
-        if (!isValidBlockAddress(blockAddress)) {
+    public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException
+    {
+        if (!isValidBlockAddress(blockAddress))
+        {
             throw new BlockAddressOutOfBoundException();
         }
 
-        int pos = blockAddress/8;
+        int pos = blockAddress / 8;
         int bit = blockAddress % 8;
 
         byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);

@@ -1,17 +1,14 @@
 package ch.ethz.jcd.main.layer;
 
-import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.InvalidDataBlockOffsetException;
 import ch.ethz.jcd.main.exceptions.FileTooSmallException;
-import ch.ethz.jcd.main.utils.ByteArray;
+import ch.ethz.jcd.main.exceptions.InvalidDataBlockOffsetException;
 import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class VFile extends VObject<FileBlock>
 {
@@ -27,7 +24,8 @@ public class VFile extends VObject<FileBlock>
         // Add new blocks to the end of the file if needed
         for (long remainingBytes = startPosition + bytes.length - getFileBlock().getSize();
              remainingBytes > 0;
-             remainingBytes = startPosition + bytes.length - getFileBlock().getSize()) {
+             remainingBytes = startPosition + bytes.length - getFileBlock().getSize())
+        {
             int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
 
             // TODO: Create new DataBlock
@@ -43,7 +41,8 @@ public class VFile extends VObject<FileBlock>
         int firstDataBlockOffset = (int) (VUtil.BLOCK_SIZE - (startPosition % VUtil.BLOCK_SIZE));
         int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE);
         buffer = new byte[firstDataBlockLength];
-        if (in.read(buffer) != buffer.length) {
+        if (in.read(buffer) != buffer.length)
+        {
             throw new IOException();
         }
         block.getDataBlock(firstDataBlockIndex).setContent(buffer, firstDataBlockOffset);
@@ -52,7 +51,8 @@ public class VFile extends VObject<FileBlock>
         for (int currentBlockIndex = firstDataBlockIndex + 1; currentBlockIndex < lastDataBlockIndex; currentBlockIndex++)
         {
             buffer = new byte[VUtil.BLOCK_SIZE];
-            if (in.read(buffer) != buffer.length) {
+            if (in.read(buffer) != buffer.length)
+            {
                 throw new IOException();
             }
             block.getDataBlock(currentBlockIndex).setContent(buffer);
@@ -63,7 +63,8 @@ public class VFile extends VObject<FileBlock>
         {
             int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
             buffer = new byte[lastDataBlockIndex];
-            if (in.read(buffer) != buffer.length) {
+            if (in.read(buffer) != buffer.length)
+            {
                 throw new IOException();
             }
             block.getDataBlock(lastDataBlockIndex).setContent(buffer);
@@ -72,7 +73,8 @@ public class VFile extends VObject<FileBlock>
 
     public byte[] read(long startPosition, int length) throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
     {
-        if (startPosition + length > getFileBlock().getSize()) {
+        if (startPosition + length > getFileBlock().getSize())
+        {
             throw new FileTooSmallException();
         }
 
@@ -106,9 +108,11 @@ public class VFile extends VObject<FileBlock>
         return (FileBlock) block;
     }
 
-    private int getDataBlockIndex(long offset) {
+    private int getDataBlockIndex(long offset)
+    {
         int dataBlockIndex = (int) (offset / VUtil.BLOCK_SIZE);
-        if (offset % VUtil.BLOCK_SIZE > 0) {
+        if (offset % VUtil.BLOCK_SIZE > 0)
+        {
             dataBlockIndex++;
         }
         return dataBlockIndex;

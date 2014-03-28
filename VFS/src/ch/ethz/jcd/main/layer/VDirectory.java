@@ -6,8 +6,6 @@ import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class VDirectory extends VObject
 {
@@ -21,10 +19,13 @@ public class VDirectory extends VObject
         ObjectBlock[] entryBlocks = getDirectoryBlock().getEntries();
         VObject[] entryObjects = new VObject[entryBlocks.length];
 
-        for (int i = 0; i < entryBlocks.length; i++) {
-            if (entryBlocks[i] instanceof DirectoryBlock) {
+        for (int i = 0; i < entryBlocks.length; i++)
+        {
+            if (entryBlocks[i] instanceof DirectoryBlock)
+            {
                 entryObjects[i] = new VDirectory((DirectoryBlock) entryBlocks[i], this);
-            } else {
+            } else
+            {
                 entryObjects[i] = new VFile((FileBlock) entryBlocks[i], this);
             }
         }
