@@ -10,6 +10,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -18,6 +19,8 @@ import java.util.List;
 public class VDisk
 {
     public static final String PATH_SEPARATOR = "/";
+
+    private File diskFile;
     private VUtil vUtil;
 
     /**
@@ -25,9 +28,10 @@ public class VDisk
      *
      * @param vDiskFile path to the VDisk file
      */
-    public VDisk(String vDiskFile) throws FileNotFoundException
+    public VDisk(File diskFile) throws FileNotFoundException
     {
-        vUtil = new VUtil(vDiskFile);
+        this.diskFile = diskFile;
+        vUtil = new VUtil(diskFile);
     }
 
     /**
@@ -45,21 +49,38 @@ public class VDisk
 
     public void dispose()
     {
-        // TODO
-        throw new NotImplementedException();
+        if (!diskFile.delete()) {
+            // TODO: Throw correct exception
+            throw new NotImplementedException();
+        }
     }
 
-    // something like cd
-    public VDirectory getDirectory(String path)
+    public VDirectory getDirectory(String path) throws FileNotFoundException
     {
-        // TODO
-        throw new NotImplementedException();
-    }
+        if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR)) {
+            // TODO: Throw correct exception
+            throw new FileNotFoundException();
+        }
 
-    public List<VObject> listDirectory(VDirectory directory)
-    {
-        // TODO
-        throw new NotImplementedException();
+        VDirectory destination = vUtil.getRootDirectory();
+
+        String[] directories = path.split(PATH_SEPARATOR);
+
+        for (int i = 1; i < directories.length; i++) {
+            try
+            {
+                VObject object = destination.getEntry(directories[i]);
+                if (object == null || !(object instanceof VDirectory)) {
+                    throw new FileNotFoundException();
+                }
+            } catch (IOException e)
+            {
+                // TODO
+                e.printStackTrace();
+            }
+        }
+
+        return destination;
     }
 
     public VDirectory createDirectory(VDirectory destination, String name)

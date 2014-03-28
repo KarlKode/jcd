@@ -6,6 +6,8 @@ import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VDirectory extends VObject<DirectoryBlock>
 {
@@ -14,20 +16,13 @@ public class VDirectory extends VObject<DirectoryBlock>
         super(block, parent);
     }
 
-    public VObject[] getEntries() throws IOException
+    public List<VObject> getEntries() throws IOException
     {
         ObjectBlock[] entryBlocks = block.getEntries();
-        VObject[] entryObjects = new VObject[entryBlocks.length];
+        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.length);
 
-        for (int i = 0; i < entryBlocks.length; i++)
-        {
-            if (entryBlocks[i] instanceof DirectoryBlock)
-            {
-                entryObjects[i] = new VDirectory((DirectoryBlock) entryBlocks[i], this);
-            } else
-            {
-                entryObjects[i] = new VFile((FileBlock) entryBlocks[i], this);
-            }
+        for (ObjectBlock entryBlock : entryBlocks) {
+            entryObjects.add(createCorrectVObject(entryBlock));
         }
 
         return entryObjects;
@@ -41,5 +36,26 @@ public class VDirectory extends VObject<DirectoryBlock>
     public void removeEntry(VObject entry) throws IOException
     {
         block.removeEntry(entry.getBlock());
+    }
+
+    public VObject getEntry(String name) throws IOException
+    {
+        for (VObject entry : getEntries()) {
+            if (entry.getName().equals(name)) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
+    private VObject createCorrectVObject(ObjectBlock block) {
+        if (block instanceof DirectoryBlock) {
+            return new VDirectory((DirectoryBlock) block, this);
+        } else if (block instanceof FileBlock) {
+            return new VFile((FileBlock) block,this);
+        }
+
+        return null;
     }
 }

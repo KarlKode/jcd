@@ -5,6 +5,7 @@ import ch.ethz.jcd.main.blocks.Block;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.SuperBlock;
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.layer.VDirectory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ public class VUtil
     private SuperBlock superBlock;
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
+    private VDirectory rootDirectory;
 
     /**
      * Create a new VUtil instance for the VFS in the file at vDiskFileName
@@ -288,5 +290,10 @@ public class VUtil
 
         // Sync
         write(bitMapBlock);
+    }
+
+    public VDirectory getRootDirectory()
+    {
+        return rootDirectory;
     }
 }
