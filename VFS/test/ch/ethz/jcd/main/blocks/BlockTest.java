@@ -19,7 +19,7 @@ public class BlockTest
     @Before
     public void setUp() throws Exception
     {
-        File tmpFile = File.createTempFile("", "");
+        File tmpFile = File.createTempFile("test", "vfs");
         tmpFile.deleteOnExit();
         fileManager = new FileManager(tmpFile);
         block = new Block(fileManager, BLOCK_ADDRESS);
