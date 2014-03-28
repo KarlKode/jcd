@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 
 /**
  * Basic block.
@@ -26,7 +27,6 @@ public class Block
         this.blockAddress = blockAddress;
     }
 
-
     /**
      * Gets block address of instance
      *
@@ -46,5 +46,15 @@ public class Block
     protected boolean isInvalidBlockAddress(int blockAddress)
     {
         return blockAddress < 0;
+    }
+
+    /**
+     * Gets the offset of the block in the VFS file
+     *
+     * @return offset of block
+     */
+    protected long getBlockOffset()
+    {
+        return VUtil.getBlockOffset(blockAddress);
     }
 }

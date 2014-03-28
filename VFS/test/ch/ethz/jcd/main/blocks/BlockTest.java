@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,5 +61,11 @@ public class BlockTest
         assertEquals(false, block.isInvalidBlockAddress(Integer.MAX_VALUE));
         assertEquals(true, block.isInvalidBlockAddress(-1));
         assertEquals(true, block.isInvalidBlockAddress(Integer.MIN_VALUE));
+    }
+
+    @Test
+    public void testGetBlockOffset() throws Exception
+    {
+        assertEquals((long) BLOCK_ADDRESS * VUtil.BLOCK_SIZE, block.getBlockOffset());
     }
 }

@@ -96,7 +96,7 @@ public class BitMapBlock extends Block
      */
     public void setUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException
     {
-        if (!isValidBlockAddress(blockAddress))
+        if (isInvalidBlockAddress(blockAddress))
         {
             throw new BlockAddressOutOfBoundException();
         }
@@ -127,7 +127,7 @@ public class BitMapBlock extends Block
      */
     public boolean isUnused(int blockAddress) throws BlockAddressOutOfBoundException, IOException
     {
-        if (!isValidBlockAddress(blockAddress))
+        if (isInvalidBlockAddress(blockAddress))
         {
             throw new BlockAddressOutOfBoundException();
         }
