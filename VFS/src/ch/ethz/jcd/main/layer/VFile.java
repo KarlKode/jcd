@@ -22,14 +22,14 @@ public class VFile extends VObject<FileBlock>
     public void write(byte[] bytes, long startPosition) throws IOException, InvalidDataBlockOffsetException, BlockFullException
     {
         // Add new blocks to the end of the file if needed
-        for (long remainingBytes = startPosition + bytes.length - getFileBlock().getSize();
+        for (long remainingBytes = startPosition + bytes.length - block.getSize();
              remainingBytes > 0;
-             remainingBytes = startPosition + bytes.length - getFileBlock().getSize())
+             remainingBytes = startPosition + bytes.length - block.getSize())
         {
             int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
 
             // TODO: Create new DataBlock
-            getFileBlock().addDataBlock(null, usedBytes);
+            block.addDataBlock(null, usedBytes);
         }
 
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
@@ -62,7 +62,7 @@ public class VFile extends VObject<FileBlock>
         if (firstDataBlockIndex != lastDataBlockIndex)
         {
             int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
-            buffer = new byte[lastDataBlockIndex];
+            buffer = new byte[lastDataBlockLength];
             if (in.read(buffer) != buffer.length)
             {
                 throw new IOException();
@@ -73,7 +73,7 @@ public class VFile extends VObject<FileBlock>
 
     public byte[] read(long startPosition, int length) throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
     {
-        if (startPosition + length > getFileBlock().getSize())
+        if (startPosition + length > block.getSize())
         {
             throw new FileTooSmallException();
         }
@@ -101,20 +101,5 @@ public class VFile extends VObject<FileBlock>
         }
 
         return out.toByteArray();
-    }
-
-    private FileBlock getFileBlock()
-    {
-        return (FileBlock) block;
-    }
-
-    private int getDataBlockIndex(long offset)
-    {
-        int dataBlockIndex = (int) (offset / VUtil.BLOCK_SIZE);
-        if (offset % VUtil.BLOCK_SIZE > 0)
-        {
-            dataBlockIndex++;
-        }
-        return dataBlockIndex;
     }
 }

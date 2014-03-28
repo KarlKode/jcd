@@ -7,7 +7,7 @@ import ch.ethz.jcd.main.exceptions.BlockFullException;
 
 import java.io.IOException;
 
-public class VDirectory extends VObject
+public class VDirectory extends VObject<DirectoryBlock>
 {
     public VDirectory(DirectoryBlock block, VDirectory parent)
     {
@@ -16,7 +16,7 @@ public class VDirectory extends VObject
 
     public VObject[] getEntries() throws IOException
     {
-        ObjectBlock[] entryBlocks = getDirectoryBlock().getEntries();
+        ObjectBlock[] entryBlocks = block.getEntries();
         VObject[] entryObjects = new VObject[entryBlocks.length];
 
         for (int i = 0; i < entryBlocks.length; i++)
@@ -35,16 +35,11 @@ public class VDirectory extends VObject
 
     public void addEntry(VObject entry) throws IOException, BlockFullException
     {
-        getDirectoryBlock().addEntry(entry.getBlock());
+        block.addEntry(entry.getBlock());
     }
 
     public void removeEntry(VObject entry) throws IOException
     {
-        getDirectoryBlock().removeEntry(entry.getBlock());
-    }
-
-    private DirectoryBlock getDirectoryBlock()
-    {
-        return (DirectoryBlock) block;
+        block.removeEntry(entry.getBlock());
     }
 }
