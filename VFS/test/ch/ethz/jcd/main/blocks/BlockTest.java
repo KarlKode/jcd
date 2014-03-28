@@ -12,14 +12,13 @@ import static org.junit.Assert.fail;
 public class BlockTest
 {
     private static final int BLOCK_ADDRESS = 12345;
-    private File tmpFile;
     private FileManager fileManager;
     private Block block;
 
     @Before
     public void setUp() throws Exception
     {
-        tmpFile = File.createTempFile("", "");
+        File tmpFile = File.createTempFile("", "");
         tmpFile.deleteOnExit();
         fileManager = new FileManager(tmpFile);
         block = new Block(fileManager, BLOCK_ADDRESS);
