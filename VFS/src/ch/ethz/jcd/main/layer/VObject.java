@@ -2,36 +2,27 @@ package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
-import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.VDisk;
-
-import java.io.IOException;
 
 public abstract class VObject
 {
     protected VDirectory parent;
     protected ObjectBlock block;
 
-    public VObject(ObjectBlock block, VDirectory parent)
-    {
-        this.block = block;
-        this.parent = parent;
-    }
-
     public VDirectory getParent()
     {
         return parent;
     }
 
-    public void setParent(VDirectory parent) throws IOException, BlockFullException
+    public void setParent(VDirectory parent)
     {
         // TODO prevent renaming of root directory
 
         if (parent != null)
         {
-            parent.removeEntry(this);
-            parent.addEntry(this);
+            parent.removeChild(this);
+            parent.addChild(this);
 
             // TODO Check cast
             block.setParent((DirectoryBlock) parent.getBlock());
@@ -39,17 +30,17 @@ public abstract class VObject
         this.parent = parent;
     }
 
-    public String getName() throws IOException
+    public String getName()
     {
         return block.getName();
     }
 
-    public void setName(String name) throws InvalidNameException, IOException
+    public void setName(String name) throws InvalidNameException
     {
         block.setName(name);
     }
 
-    public String getPath() throws IOException
+    public String getPath()
     {
         if (parent != null)
         {
@@ -57,6 +48,11 @@ public abstract class VObject
         }
 
         return VDisk.PATH_SEPARATOR + getName();
+    }
+
+    public long getSize()
+    {
+        return block.getSize();
     }
 
     public ObjectBlock getBlock()
