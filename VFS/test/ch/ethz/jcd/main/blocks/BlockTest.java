@@ -1,81 +1,63 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.ToDoException;
+import ch.ethz.jcd.main.utils.FileManager;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class BlockTest
 {
-    @Test
-    public void testGetAddress() throws Exception
+    private static final int BLOCK_ADDRESS = 12345;
+    private File tmpFile;
+    private FileManager fileManager;
+    private Block block;
+
+    @Before
+    public void setUp() throws Exception
     {
-        int blockAddress;
-        Block block;
-
-        // Default value for integer
-        blockAddress = 0;
-        block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getBlockAddress());
-
-        blockAddress = 1024;
-        block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getBlockAddress());
-
-        blockAddress = 1024;
-        block = new Block(blockAddress, null);
-        assertEquals(blockAddress, block.getBlockAddress());
+        tmpFile = File.createTempFile("", "");
+        tmpFile.deleteOnExit();
+        fileManager = new FileManager(tmpFile);
+        block = new Block(fileManager, BLOCK_ADDRESS);
     }
 
     @Test
-    public void testSetAddress() throws Exception
+    public void testConstructor() throws Exception
     {
-        int blockAddress;
-        Block block = new Block(0, null);
-        blockAddress = 0;
-        block.setBlockAddress(blockAddress);
-        assertEquals(blockAddress, block.getBlockAddress());
-
-        blockAddress = 1024;
-        block.setBlockAddress(blockAddress);
-        assertEquals(blockAddress, block.getBlockAddress());
-
-        blockAddress = Integer.MAX_VALUE;
-        block.setBlockAddress(blockAddress);
-        assertEquals(blockAddress, block.getBlockAddress());
+        new Block(fileManager, 0);
+        new Block(fileManager, BLOCK_ADDRESS);
+        new Block(fileManager, Integer.MAX_VALUE);
+        try {
+            new Block(null, 0);
+            fail("Exception was expected for invalid file manager");
+        } catch (IllegalArgumentException e)
+        {
+        }
+        try {
+            new Block(fileManager, -1);
+            fail("Exception was expected for invalid block address");
+        } catch (IllegalArgumentException e)
+        {
+        }
     }
 
     @Test
-    public void testGetBytes() throws Exception
+    public void testGetBlockAddress() throws Exception
     {
-        byte[] bytes;
-        Block block;
-
-        block = new Block(0, null);
-        assertEquals(null, block.getBytes());
-
-        bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        block = new Block(0, bytes);
-        assertEquals(bytes, block.getBytes());
+        assertEquals(BLOCK_ADDRESS, block.getBlockAddress());
     }
 
     @Test
-    public void testSetBytes() throws Exception
+    public void testIsInvalidBlockAddress() throws Exception
     {
-        byte[] bytes;
-        Block block;
-
-        block = new Block(0, null);
-        bytes = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        block.setBytes(bytes);
-        assertEquals(bytes, block.getBytes());
-    }
-
-    @Test
-    public void testGetByteArray() throws Exception
-    {
-        Block block = new Block(0, null);
-        block.getByteArray();
-        throw new ToDoException();
+        assertEquals(false, block.isInvalidBlockAddress(0));
+        assertEquals(false, block.isInvalidBlockAddress(BLOCK_ADDRESS));
+        assertEquals(false, block.isInvalidBlockAddress(Integer.MAX_VALUE));
+        assertEquals(true, block.isInvalidBlockAddress(-1));
+        assertEquals(true, block.isInvalidBlockAddress(Integer.MIN_VALUE));
     }
 }

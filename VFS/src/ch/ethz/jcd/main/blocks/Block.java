@@ -5,29 +5,33 @@ import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 
 /**
- * This class represents the general Block. It also holds the byte
- * structure that it could be easily written to or read from disk.
+ * Basic block.
  */
 public class Block
 {
     protected final FileManager fileManager;
     protected int blockAddress;
 
-    public Block(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
+    /**
+     *
+     * @param fileManager file manager instance
+     * @param blockAddress block address of instance
+     * @throws IllegalArgumentException if fileManager is null or block address is invalid
+     */
+    public Block(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
-        if (!isValidBlockAddress(blockAddress))
-        {
-            throw new InvalidBlockAddressException();
+        if (fileManager == null || isInvalidBlockAddress(blockAddress)) {
+            throw new IllegalArgumentException();
         }
 
         this.fileManager = fileManager;
         this.blockAddress = blockAddress;
     }
 
+
     /**
-     * Get the block blockAddress of the Block
-     *
-     * @return block blockAddress of the Block
+     * Gets block address of instance
+     * @return block address
      */
     public int getBlockAddress()
     {
@@ -35,22 +39,12 @@ public class Block
     }
 
     /**
-     * Set the block blockAddress of the Block
-     *
-     * @param blockAddress new block blockAddress of the block
+     * Checks if the block address is invalid
+     * @param blockAddress block address to test
+     * @return true if block address is invalid
      */
-    public void setBlockAddress(int blockAddress)
+    protected boolean isInvalidBlockAddress(int blockAddress)
     {
-        this.blockAddress = blockAddress;
-    }
-
-    protected long getBlockOffset()
-    {
-        return VUtil.getBlockOffset(blockAddress);
-    }
-
-    protected boolean isValidBlockAddress(int blockAddress)
-    {
-        return blockAddress >= 0;
+        return blockAddress < 0;
     }
 }
