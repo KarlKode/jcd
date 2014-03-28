@@ -31,13 +31,15 @@ public class BlockTest
         new Block(fileManager, 0);
         new Block(fileManager, BLOCK_ADDRESS);
         new Block(fileManager, Integer.MAX_VALUE);
-        try {
+        try
+        {
             new Block(null, 0);
             fail("Exception was expected for invalid file manager");
         } catch (IllegalArgumentException e)
         {
         }
-        try {
+        try
+        {
             new Block(fileManager, -1);
             fail("Exception was expected for invalid block address");
         } catch (IllegalArgumentException e)

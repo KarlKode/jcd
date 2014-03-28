@@ -1,8 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.utils.FileManager;
-import ch.ethz.jcd.main.utils.VUtil;
 
 /**
  * Basic block.
@@ -13,14 +11,14 @@ public class Block
     protected int blockAddress;
 
     /**
-     *
-     * @param fileManager file manager instance
+     * @param fileManager  file manager instance
      * @param blockAddress block address of instance
      * @throws IllegalArgumentException if fileManager is null or block address is invalid
      */
     public Block(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
-        if (fileManager == null || isInvalidBlockAddress(blockAddress)) {
+        if (fileManager == null || isInvalidBlockAddress(blockAddress))
+        {
             throw new IllegalArgumentException();
         }
 
@@ -31,6 +29,7 @@ public class Block
 
     /**
      * Gets block address of instance
+     *
      * @return block address
      */
     public int getBlockAddress()
@@ -40,6 +39,7 @@ public class Block
 
     /**
      * Checks if the block address is invalid
+     *
      * @param blockAddress block address to test
      * @return true if block address is invalid
      */
