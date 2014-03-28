@@ -26,15 +26,15 @@ public class FileBlock extends ObjectBlock
         return fileManager.readLong(getBlockOffset(), OFFSET_FILE_SIZE);
     }
 
-    public DataBlock getDataBlock(int dataBlockOffset) throws IOException, InvalidDataBlockOffsetException
+    public DataBlock getDataBlock(int dataBlockIndex) throws IOException, InvalidDataBlockOffsetException
     {
-        if (dataBlockOffset < 0 || dataBlockOffset >= getMaxDataBlocks())
+        if (dataBlockIndex < 0 || dataBlockIndex >= getMaxDataBlocks())
         {
             throw new InvalidDataBlockOffsetException();
         }
 
-        // Create a new DataBlock instance that wraps the part of the file that corresponds to dataBlockOffset
-        int dataBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (dataBlockOffset * SIZE_ENTRY));
+        // Create a new DataBlock instance that wraps the part of the file that corresponds to dataBlockIndex
+        int dataBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (dataBlockIndex * SIZE_ENTRY));
         try
         {
             return new DataBlock(fileManager, dataBlockAddress);
