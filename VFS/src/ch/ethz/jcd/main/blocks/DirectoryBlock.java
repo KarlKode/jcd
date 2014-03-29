@@ -8,8 +8,13 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * Block that contains metadata of directories. This includes the name of the directory and all entries in it.
+ */
 public class DirectoryBlock extends ObjectBlock
 {
     public static final int SIZE_ENTRY_COUNT = 4;
@@ -22,11 +27,22 @@ public class DirectoryBlock extends ObjectBlock
         super(fileManager, blockAddress);
     }
 
+    /**
+     * @return number of entries in this directory
+     * @throws IOException
+     */
     public int getEntryCount() throws IOException
     {
         return fileManager.readInt(getBlockOffset(), OFFSET_ENTRY_COUNT);
     }
 
+    /**
+     *
+     * @param entryCount new entry count
+     * @throws IOException
+     * @throws BlockFullException if there is no room for more entries
+     * @throws IllegalArgumentException
+     */
     public void setEntryCount(int entryCount) throws IOException, BlockFullException, IllegalArgumentException
     {
         if (entryCount < 0)
@@ -42,6 +58,11 @@ public class DirectoryBlock extends ObjectBlock
         fileManager.writeInt(getBlockOffset(), OFFSET_ENTRY_COUNT, entryCount);
     }
 
+    /**
+     *
+     * @return list containing all the entries of the directory
+     * @throws IOException
+     */
     public List<ObjectBlock> getEntries() throws IOException
     {
         int entryCount = getEntryCount();
@@ -78,8 +99,25 @@ public class DirectoryBlock extends ObjectBlock
         return entries;
     }
 
+    /**
+     *
+     * @param entries new list containing the entries of this directory
+     * @throws BlockFullException if there is no room for more entries
+     * @throws IOException
+     */
     public void setEntries(List<ObjectBlock> entries) throws BlockFullException, IOException
     {
+        // Check for duplicate names
+        Set<String> names = new HashSet<>();
+        for (ObjectBlock entry : entries)
+        {
+            if (names.contains(entry.getName()))
+            {
+                throw new IllegalArgumentException();
+            }
+            names.add(entry.getName());
+        }
+
         // Write new entry count
         setEntryCount(entries.size());
 
@@ -90,6 +128,12 @@ public class DirectoryBlock extends ObjectBlock
         }
     }
 
+    /**
+     *
+     * @param entry ObjectBlock to add to the directory
+     * @throws IOException
+     * @throws BlockFullException if there is no room for more entries
+     */
     public void addEntry(ObjectBlock entry) throws IOException, BlockFullException
     {
         List<ObjectBlock> entries = getEntries();
@@ -97,6 +141,12 @@ public class DirectoryBlock extends ObjectBlock
         setEntries(entries);
     }
 
+    /**
+     *
+     * @param entry ObjectBlock to remove from the directory
+     * @throws IOException
+     * @throws BlockFullException if there is no room for more entries
+     */
     public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
     {
         List<ObjectBlock> entries = getEntries();

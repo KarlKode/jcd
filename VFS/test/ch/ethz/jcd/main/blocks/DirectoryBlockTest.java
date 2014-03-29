@@ -27,15 +27,17 @@ public class DirectoryBlockTest
         fileManager = new FileManager(tmpFile);
 
         // Entries
+        ENTRIES.clear();
         ENTRIES.add(new DirectoryBlock(fileManager, 1));
         ENTRIES.add(new DirectoryBlock(fileManager, 2));
         ENTRIES.add(new FileBlock(fileManager, 3));
         for (int i = 0; i < ENTRIES.size(); i++)
         {
             fileManager.writeInt(0, DirectoryBlock.OFFSET_FIRST_ENTRY + i * DirectoryBlock.SIZE_ENTRY, ENTRIES.get(i).getBlockAddress());
-            fileManager.writeByte(ENTRIES.get(i).getBlockOffset(), ObjectBlock.OFFSET_TYPE, (ENTRIES.get(i) instanceof DirectoryBlock) ? ObjectBlock.TYPE_DIRECTORY : ObjectBlock.TYPE_FILE);
-            fileManager.writeString(ENTRIES.get(i).getBlockOffset(), ObjectBlock.OFFSET_NAME, String.valueOf(i));
+            ENTRIES.get(i).setType((ENTRIES.get(i) instanceof DirectoryBlock) ? ObjectBlock.TYPE_DIRECTORY : ObjectBlock.TYPE_FILE);
+            ENTRIES.get(i).setName("test_" + String.valueOf(i));
         }
+
         // Entry count
         fileManager.writeInt(BLOCK_ADDRESS, DirectoryBlock.OFFSET_ENTRY_COUNT, ENTRIES.size());
 
@@ -99,28 +101,39 @@ public class DirectoryBlockTest
     public void testGetEntries() throws Exception
     {
         List<ObjectBlock> entries = block.getEntries();
-        assertEquals(ENTRIES.size(), entries.size());
-        for (int i = 0; i < ENTRIES.size(); i++)
-        {
-            assertEquals(ENTRIES.get(i), entries.get(i));
-        }
+        assertEquals(ENTRIES, entries);
     }
 
     @Test
     public void testSetEntries() throws Exception
     {
+        ObjectBlock newEntry = new FileBlock(fileManager, 4);
+        newEntry.setName("new file");
 
+        List<ObjectBlock> newEntries = new ArrayList<>(ENTRIES);
+        newEntries.add(newEntry);
+        block.setEntries(newEntries);
+
+        assertEquals(newEntries, block.getEntries());
     }
 
     @Test
     public void testAddEntry() throws Exception
     {
-
+        ObjectBlock newEntry = new FileBlock(fileManager, 4);
+        newEntry.setType(ObjectBlock.TYPE_FILE);
+        newEntry.setName("test file");
+        ENTRIES.add(newEntry);
+        block.addEntry(newEntry);
+        assertEquals(ENTRIES, block.getEntries());
     }
 
     @Test
     public void testRemoveEntry() throws Exception
     {
-
+        ObjectBlock entry = ENTRIES.get(0);
+        ENTRIES.remove(entry);
+        block.removeEntry(entry);
+        assertEquals(ENTRIES, block.getEntries());
     }
 }
