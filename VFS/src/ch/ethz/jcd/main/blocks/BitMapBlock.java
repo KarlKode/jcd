@@ -40,25 +40,25 @@ public class BitMapBlock extends Block
     {
         int pos = 0;
 
-        byte val;
+        byte[] val = new byte[1];
         do
         {
-            val = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
+            val[0] = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
             pos++;
 
             if (pos >= VUtil.BLOCK_SIZE)
             {
                 throw new DiskFullException();
             }
-        } while (val == FULL_BYTE);
+        } while (val[0] == FULL_BYTE);
 
-        final BitSet freeBlocks = new BitSet(val);
+        final BitSet freeBlocks = BitSet.valueOf(val);
 
         int freeBitInByte = freeBlocks.nextClearBit(0);
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
         //awesome solution (but not sure if correct)
-        byte newByte = (byte) (val | (USED_MASK >> freeBitInByte));
+        byte newByte = (byte) (val[0] | (USED_MASK >> freeBitInByte));
         fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
 
         //readable solution

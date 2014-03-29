@@ -1,9 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.blocks.DirectoryBlock;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
@@ -87,10 +85,17 @@ public class VDisk
         return destination;
     }
 
-    public VDirectory createDirectory(VDirectory destination, String name)
+    public VDirectory createDirectory(VDirectory destination, String name) throws IOException, BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException
     {
-        // TODO
-        throw new NotImplementedException();
+        DirectoryBlock block = vUtil.allocateDirectoryBlock();
+        VDirectory directory = new VDirectory(block, destination);
+
+        directory.clear();
+        directory.setName(name);
+        directory.setParent(destination);
+        destination.addEntry(directory);
+
+        return directory;
     }
 
     public VFile createFile(VDirectory destination, String name)

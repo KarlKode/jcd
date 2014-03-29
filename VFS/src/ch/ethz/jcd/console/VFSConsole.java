@@ -1,8 +1,13 @@
 package ch.ethz.jcd.console;
 
+import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.layer.VObject;
+import ch.ethz.jcd.main.utils.VDisk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class VFSConsole
@@ -53,7 +58,18 @@ public class VFSConsole
 
     private static void vfsCreate(String[] arguments)
     {
-        throw new NotImplementedException();
+        quitWithUsageIfLessThan(arguments, 2);
+
+        File diskFile = new File(arguments[0]);
+        long diskSize = Long.parseLong(arguments[1]);
+
+        try
+        {
+            VDisk.format(diskFile, diskSize);
+        } catch (InvalidBlockAddressException | InvalidSizeException | VDiskCreationException | InvalidBlockCountException | IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private static void vfsDestroy(String[] arguments)
@@ -79,7 +95,40 @@ public class VFSConsole
 
     private static void vfsLs(String[] arguments)
     {
-        throw new NotImplementedException();
+        quitWithUsageIfLessThan(arguments, 2);
+
+        File diskFile = new File(arguments[0]);
+        String path = arguments[1];
+
+        try
+        {
+            VDisk disk = new VDisk(diskFile);
+            System.out.println(disk.getDirectory(path).getEntries());
+            disk.createDirectory(disk.getDirectory(path), "test");
+            System.out.println(disk.getDirectory(path).getEntries());
+            for (VObject b : disk.getDirectory(path).getEntries())
+            {
+                System.out.println(b.getName());
+            }
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        } catch (InvalidBlockAddressException e)
+        {
+            e.printStackTrace();
+        } catch (DiskFullException e)
+        {
+            e.printStackTrace();
+        } catch (BlockFullException e)
+        {
+            e.printStackTrace();
+        } catch (InvalidNameException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private static void vfsGet(String[] arguments)

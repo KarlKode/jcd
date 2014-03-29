@@ -10,6 +10,7 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class VUtil
 {
@@ -43,6 +44,7 @@ public class VUtil
         try
         {
             rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
+            rootDirectory = new VDirectory(rootBlock, null);
         } catch (InvalidBlockAddressException e)
         {
             // This should never happen
@@ -81,6 +83,12 @@ public class VUtil
         {
             throw new VDiskCreationException();
         }
+
+        // Allocate data
+        RandomAccessFile file = new RandomAccessFile(diskFile, "rw");
+        file.seek(diskSize - 1);
+        file.write((byte) 0x00);
+        file.close();
 
         VUtil vUtil = new VUtil(diskFile);
 
@@ -138,7 +146,7 @@ public class VUtil
      * @return Block instance that contains the data of the now used block
      * @throws DiskFullException
      */
-    public Block allocate() throws DiskFullException, IOException
+    public Block allocateBlock() throws DiskFullException, IOException
     {
         // Get the next free block and set it to used
         int freeBlockAddress;
@@ -151,6 +159,21 @@ public class VUtil
         }
 
         return new Block(fileManager, freeBlockAddress);
+    }
+
+    public DirectoryBlock allocateDirectoryBlock() throws DiskFullException, IOException, InvalidBlockAddressException
+    {
+        // Get the next free block and set it to used
+        int freeBlockAddress;
+        try
+        {
+            freeBlockAddress = bitMapBlock.allocateBlock();
+        } catch (BlockAddressOutOfBoundException e)
+        {
+            throw new DiskFullException();
+        }
+
+        return new DirectoryBlock(fileManager, freeBlockAddress);
     }
 
     /**
