@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class BlockTest
 {
@@ -45,6 +44,16 @@ public class BlockTest
         } catch (IllegalArgumentException e)
         {
         }
+    }
+
+    @Test
+    public void testEquals()
+    {
+        assertFalse(block.equals(null));
+        assertFalse(block.equals(new Object()));
+        assertFalse(block.equals(new Block(fileManager, BLOCK_ADDRESS - 1)));
+        assertTrue(block.equals(block));
+        assertTrue(block.equals(new Block(fileManager, BLOCK_ADDRESS)));
     }
 
     @Test

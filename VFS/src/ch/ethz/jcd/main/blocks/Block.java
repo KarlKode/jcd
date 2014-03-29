@@ -27,6 +27,12 @@ public class Block
         this.blockAddress = blockAddress;
     }
 
+    public boolean equals(Object other)
+    {
+        // The other has to be on the same VFS and have the same block address
+        return other instanceof Block && !(((Block) other).fileManager != fileManager || ((Block) other).blockAddress != blockAddress);
+    }
+
     /**
      * Gets block address of instance
      *
