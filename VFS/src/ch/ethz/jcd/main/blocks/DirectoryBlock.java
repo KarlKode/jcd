@@ -7,6 +7,8 @@ import ch.ethz.jcd.main.utils.VUtil;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DirectoryBlock extends ObjectBlock
 {
@@ -25,10 +27,25 @@ public class DirectoryBlock extends ObjectBlock
         return fileManager.readInt(getBlockOffset(), OFFSET_ENTRY_COUNT);
     }
 
-    public ObjectBlock[] getEntries() throws IOException
+    public void setEntryCount(int entryCount) throws IOException, BlockFullException, IllegalArgumentException
+    {
+        if (entryCount < 0)
+        {
+            throw new IllegalArgumentException();
+        }
+        int maxEntries = (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY;
+        if (entryCount > maxEntries)
+        {
+            throw new BlockFullException();
+        }
+
+        fileManager.writeInt(getBlockOffset(), OFFSET_ENTRY_COUNT, entryCount);
+    }
+
+    public List<ObjectBlock> getEntries() throws IOException
     {
         int entryCount = getEntryCount();
-        ObjectBlock[] entries = new ObjectBlock[entryCount];
+        List<ObjectBlock> entries = new ArrayList<>(entryCount);
 
         for (int i = 0; i < entryCount; i++)
         {
@@ -41,10 +58,10 @@ public class DirectoryBlock extends ObjectBlock
 
                 if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
                 {
-                    entries[i] = new DirectoryBlock(fileManager, entryBlockAddress);
+                    entries.add(new DirectoryBlock(fileManager, entryBlockAddress));
                 } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE)
                 {
-                    entries[i] = new FileBlock(fileManager, entryBlockAddress);
+                    entries.add(new FileBlock(fileManager, entryBlockAddress));
                 } else
                 {
                     // TODO: Throw correct exception
@@ -61,55 +78,29 @@ public class DirectoryBlock extends ObjectBlock
         return entries;
     }
 
-    public void addEntry(ObjectBlock entry) throws IOException, BlockFullException
+    public void setEntries(List<ObjectBlock> entries) throws BlockFullException, IOException
     {
-        int entryCount = getEntryCount();
+        // Write new entry count
+        setEntryCount(entries.size());
 
-        // Check if the directory has room for an additional entry
-        int maxEntries = (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY;
-        if (entryCount >= maxEntries)
+        // Write new entry list
+        for (int i = 0; i < entries.size(); i++)
         {
-            throw new BlockFullException();
+            fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (i * SIZE_ENTRY), entries.get(i).getBlockAddress());
         }
-
-        // Write the block address of the new entry
-        fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (entryCount * SIZE_ENTRY), entry.getBlockAddress());
-        // Write the new entry count
-        fileManager.writeInt(getBlockOffset(), OFFSET_ENTRY_COUNT, entryCount + 1);
     }
 
-    public void removeEntry(ObjectBlock entry) throws IOException
+    public void addEntry(ObjectBlock entry) throws IOException, BlockFullException
     {
-        int entryCount = getEntryCount();
-        ObjectBlock[] entries = getEntries();
+        List<ObjectBlock> entries = getEntries();
+        entries.add(entry);
+        setEntries(entries);
+    }
 
-        boolean found = false;
-
-        // Check each entry of the directory if it is equal to the one from the parameter.
-        // If yes overwrite all entries beginning with it with their successor.
-        // The last entry won't be overwritten but will be ignored in the future because of the updated entry count.
-        // Example:
-        //     Remove entry with index i (out of n) (i < n)
-        //     Entry i will be overwritten with entry i + 1, entry i + 1 with i + 2 ... n - 1 with n
-        for (int i = 0; i < entryCount; i++)
-        {
-            if (entry.equals(entries[i]))
-            {
-                // Do not start the overwriting process here, i could be zero and therefore i - 1 = -1!
-                found = true;
-                // Write new entry count
-                fileManager.writeInt(getBlockOffset(), OFFSET_ENTRY_COUNT, entryCount - 1);
-            } else if (found)
-            {
-                // Overwrite the last entry with the current one (the last entry will not be modified)
-                fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + ((i - 1) * SIZE_ENTRY), entries[i].getBlockAddress());
-            }
-        }
-
-        if (!found)
-        {
-            // TODO: Throw correct exception
-            throw new NotImplementedException();
-        }
+    public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
+    {
+        List<ObjectBlock> entries = getEntries();
+        entries.remove(entry);
+        setEntries(entries);
     }
 }
