@@ -18,10 +18,11 @@ public class VDirectory extends VObject<DirectoryBlock>
 
     public List<VObject> getEntries() throws IOException
     {
-        ObjectBlock[] entryBlocks = block.getEntries();
-        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.length);
+        List<ObjectBlock> entryBlocks = block.getEntries();
+        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.size());
 
-        for (ObjectBlock entryBlock : entryBlocks) {
+        for (ObjectBlock entryBlock : entryBlocks)
+        {
             entryObjects.add(createCorrectVObject(entryBlock));
         }
 
@@ -33,15 +34,17 @@ public class VDirectory extends VObject<DirectoryBlock>
         block.addEntry(entry.getBlock());
     }
 
-    public void removeEntry(VObject entry) throws IOException
+    public void removeEntry(VObject entry) throws IOException, BlockFullException
     {
         block.removeEntry(entry.getBlock());
     }
 
     public VObject getEntry(String name) throws IOException
     {
-        for (VObject entry : getEntries()) {
-            if (entry.getName().equals(name)) {
+        for (VObject entry : getEntries())
+        {
+            if (entry.getName().equals(name))
+            {
                 return entry;
             }
         }
@@ -49,13 +52,28 @@ public class VDirectory extends VObject<DirectoryBlock>
         return null;
     }
 
-    private VObject createCorrectVObject(ObjectBlock block) {
-        if (block instanceof DirectoryBlock) {
+    private VObject createCorrectVObject(ObjectBlock block)
+    {
+        if (block instanceof DirectoryBlock)
+        {
             return new VDirectory((DirectoryBlock) block, this);
-        } else if (block instanceof FileBlock) {
-            return new VFile((FileBlock) block,this);
+        } else if (block instanceof FileBlock)
+        {
+            return new VFile((FileBlock) block, this);
         }
 
         return null;
+    }
+
+    public void clear() throws IOException
+    {
+        try
+        {
+            block.setEntryCount(0);
+        } catch (BlockFullException e)
+        {
+            // TODO Handle this
+            e.printStackTrace();
+        }
     }
 }

@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.layer;
 
-import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
@@ -8,7 +7,7 @@ import ch.ethz.jcd.main.utils.VDisk;
 
 import java.io.IOException;
 
-public abstract class VObject<T extends ObjectBlock>
+public class VObject<T extends ObjectBlock>
 {
     protected VDirectory parent;
     protected T block;
@@ -32,9 +31,6 @@ public abstract class VObject<T extends ObjectBlock>
         {
             parent.removeEntry(this);
             parent.addEntry(this);
-
-            // TODO Check cast
-            block.setParent((DirectoryBlock) parent.getBlock());
         }
         this.parent = parent;
     }

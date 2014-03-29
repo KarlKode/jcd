@@ -52,12 +52,8 @@ public class FileManager
 
     public String readString(long address, int offset, int length) throws IOException
     {
-        final byte[] retValue = new byte[length];
-
         rand.seek(address + offset);
-        rand.readFully(retValue);
-
-        return new String(retValue);
+        return rand.readUTF();
     }
 
     public void writeInt(long address, int offset, int value) throws IOException
@@ -75,7 +71,8 @@ public class FileManager
     public void writeString(long address, int offset, String value) throws IOException
     {
         rand.seek(address + offset);
-        rand.writeChars(value);
+        //rand.writeChars(value);
+        rand.writeUTF(value);
     }
 
     public void writeLong(long address, int offset, long value) throws IOException
@@ -102,5 +99,10 @@ public class FileManager
         rand.seek(address + offset);
 
         return rand.readLong();
+    }
+
+    public void close() throws IOException
+    {
+        rand.close();
     }
 }

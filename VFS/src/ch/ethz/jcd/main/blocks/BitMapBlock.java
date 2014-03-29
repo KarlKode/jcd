@@ -17,17 +17,14 @@ import java.util.BitSet;
  */
 public class BitMapBlock extends Block
 {
-    private final byte ZERO_BYTE = 0x00;
-    private final byte FULL_BYTE = (byte) 0xFF;
+    private static final byte ZERO_BYTE = 0x00;
+    private static final byte FULL_BYTE = (byte) 0xFF;
 
-    private final byte USED_SUPERBLOCK_MASK = (byte) 0b10000000;
-    private final byte USED_BITMAPBLOCK_MASK = (byte) 0b01000000;
-    private final byte USED_ROOTBLOCK_MASK = (byte) 0b00100000;
+    private static final byte USED_SUPERBLOCK_MASK = (byte) 0b10000000;
+    private static final byte USED_BITMAPBLOCK_MASK = (byte) 0b01000000;
+    private static final byte USED_ROOTBLOCK_MASK = (byte) 0b00100000;
 
-    private final byte USED_MASK = (byte) 0b10000000;
-
-    private BitSet bitMap;
-    private int usedBlocks;
+    private static final byte USED_MASK = (byte) 0b10000000;
 
     public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {

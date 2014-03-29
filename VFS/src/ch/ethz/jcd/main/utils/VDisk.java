@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
 import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.layer.VDirectory;
@@ -11,7 +12,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Public high level interface that hides the implementation details of all operations on a virtual disk.
@@ -20,8 +20,8 @@ public class VDisk
 {
     public static final String PATH_SEPARATOR = "/";
 
-    private File diskFile;
-    private VUtil vUtil;
+    private final File diskFile;
+    private final VUtil vUtil;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -42,14 +42,15 @@ public class VDisk
      *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
      * @param blockSize     block size of the new VFS
      */
-    public static void format(String vDiskFileName, long size, int blockSize) throws InvalidBlockSizeException, InvalidSizeException, VDiskCreationException, FileNotFoundException
+    public static void format(File diskFile, long size) throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
-        VUtil.format(vDiskFileName, size, blockSize);
+        VUtil.format(diskFile, size);
     }
 
     public void dispose()
     {
-        if (!diskFile.delete()) {
+        if (!diskFile.delete())
+        {
             // TODO: Throw correct exception
             throw new NotImplementedException();
         }
@@ -57,7 +58,8 @@ public class VDisk
 
     public VDirectory getDirectory(String path) throws FileNotFoundException
     {
-        if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR)) {
+        if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR))
+        {
             // TODO: Throw correct exception
             throw new FileNotFoundException();
         }
@@ -66,11 +68,13 @@ public class VDisk
 
         String[] directories = path.split(PATH_SEPARATOR);
 
-        for (int i = 1; i < directories.length; i++) {
+        for (int i = 1; i < directories.length; i++)
+        {
             try
             {
                 VObject object = destination.getEntry(directories[i]);
-                if (object == null || !(object instanceof VDirectory)) {
+                if (!(object instanceof VDirectory))
+                {
                     throw new FileNotFoundException();
                 }
             } catch (IOException e)
