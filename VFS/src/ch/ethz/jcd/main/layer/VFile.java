@@ -80,10 +80,12 @@ public class VFile extends VObject<FileBlock>
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
+
+        //(VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE) is equivalent to Math.ceil()
         int lastDataBlockIndex = (int) ((startPosition + length + (VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE);
 
         // Read first block
-        int firstDataBlockOffset = (int) (VUtil.BLOCK_SIZE - (startPosition % VUtil.BLOCK_SIZE));
+        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
         int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE);
         out.write(block.getDataBlock(firstDataBlockIndex).getContent(firstDataBlockOffset, firstDataBlockLength));
 
