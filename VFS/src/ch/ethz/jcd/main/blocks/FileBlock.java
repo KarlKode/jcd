@@ -1,11 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidDataBlockOffsetException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 
@@ -16,7 +13,7 @@ public class FileBlock extends ObjectBlock
     public static final int OFFSET_FILE_SIZE = OFFSET_CONTENT;
     public static final int OFFSET_FIRST_ENTRY = OFFSET_FILE_SIZE + SIZE_FILE_SIZE;
 
-    public FileBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
+    public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
     }
@@ -26,24 +23,21 @@ public class FileBlock extends ObjectBlock
         return fileManager.readLong(getBlockOffset(), OFFSET_FILE_SIZE);
     }
 
-    public DataBlock getDataBlock(int dataBlockIndex) throws IOException, InvalidDataBlockOffsetException
+    public DataBlock getDataBlock(int dataBlockIndex) throws IOException, IllegalArgumentException
     {
         if (dataBlockIndex < 0 || dataBlockIndex >= getMaxDataBlocks())
         {
-            throw new InvalidDataBlockOffsetException();
+            throw new IllegalArgumentException();
+        }
+
+        if (dataBlockIndex > getSize() / VUtil.BLOCK_SIZE)
+        {
+            throw new IllegalArgumentException();
         }
 
         // Create a new DataBlock instance that wraps the part of the file that corresponds to dataBlockIndex
         int dataBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (dataBlockIndex * SIZE_ENTRY));
-        try
-        {
-            return new DataBlock(fileManager, dataBlockAddress);
-        } catch (InvalidBlockAddressException e)
-        {
-            // TODO: Throw correct exception
-            e.printStackTrace();
-            throw new NotImplementedException();
-        }
+        return new DataBlock(fileManager, dataBlockAddress);
     }
 
     public void addDataBlock(DataBlock dataBlock, int usedBytes) throws BlockFullException, IOException

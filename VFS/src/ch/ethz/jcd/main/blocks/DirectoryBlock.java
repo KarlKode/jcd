@@ -1,10 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ public class DirectoryBlock extends ObjectBlock
     public static final int OFFSET_ENTRY_COUNT = OFFSET_CONTENT;
     public static final int OFFSET_FIRST_ENTRY = OFFSET_ENTRY_COUNT + SIZE_ENTRY_COUNT;
 
-    public DirectoryBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
+    public DirectoryBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
     }
@@ -37,10 +35,9 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @param entryCount new entry count
      * @throws IOException
-     * @throws BlockFullException if there is no room for more entries
+     * @throws BlockFullException       if there is no room for more entries
      * @throws IllegalArgumentException
      */
     public void setEntryCount(int entryCount) throws IOException, BlockFullException, IllegalArgumentException
@@ -59,7 +56,6 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @return list containing all the entries of the directory
      * @throws IOException
      */
@@ -72,27 +68,15 @@ public class DirectoryBlock extends ObjectBlock
         {
             int entryBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (i * SIZE_ENTRY));
 
-            try
-            {
-                // TODO: Should we just check the type of the entry here without instantiating a new ObjectBlock?
-                ObjectBlock objectBlock = new ObjectBlock(fileManager, entryBlockAddress);
+            // TODO: Should we just check the type of the entry here without instantiating a new ObjectBlock?
+            ObjectBlock objectBlock = new ObjectBlock(fileManager, entryBlockAddress);
 
-                if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
-                {
-                    entries.add(new DirectoryBlock(fileManager, entryBlockAddress));
-                } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE)
-                {
-                    entries.add(new FileBlock(fileManager, entryBlockAddress));
-                } else
-                {
-                    // TODO: Throw correct exception
-                    throw new NotImplementedException();
-                }
-            } catch (InvalidBlockAddressException e)
+            if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
             {
-                // TODO: Throw new error or something
-                e.printStackTrace();
-                throw new NotImplementedException();
+                entries.add(new DirectoryBlock(fileManager, entryBlockAddress));
+            } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE)
+            {
+                entries.add(new FileBlock(fileManager, entryBlockAddress));
             }
         }
 
@@ -100,7 +84,6 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @param entries new list containing the entries of this directory
      * @throws BlockFullException if there is no room for more entries
      * @throws IOException
@@ -129,7 +112,6 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @param entry ObjectBlock to add to the directory
      * @throws IOException
      * @throws BlockFullException if there is no room for more entries
@@ -142,7 +124,6 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @param entry ObjectBlock to remove from the directory
      * @throws IOException
      * @throws BlockFullException if there is no room for more entries

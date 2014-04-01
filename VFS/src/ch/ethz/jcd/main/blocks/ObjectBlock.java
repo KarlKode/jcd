@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.utils.FileManager;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class ObjectBlock extends Block
     public static final byte TYPE_DIRECTORY = 0x00;
     public static final byte TYPE_FILE = 0x01;
 
-    public ObjectBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
+    public ObjectBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
     }
