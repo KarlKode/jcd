@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.FileTooSmallException;
@@ -33,9 +34,10 @@ public class VFile extends VObject<FileBlock>
      * @param destination where to put the copied VObject
      */
     @Override
-    public void copy(VDirectory destination)
+    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException
     {
-        VFile copy = new VFile(this.block.clone( ), destination);
+        FileBlock fileBlock = vUtil.allocateBlock();
+        VFile copy = new VFile(, destination);
         destination.addEntry(copy);
     }
 
@@ -43,9 +45,14 @@ public class VFile extends VObject<FileBlock>
      * This Method deletes the VFile
      */
     @Override
-    public void delete()
+    public void delete(VUtil vUtil) throws IOException
     {
-        this.block.delete( );
+        for(DataBlock b: block.getDataBlockList( ))
+        {
+            vUtil.free(b);
+        }
+
+        vUtil.free(block);
     }
 
     // TODO fix exceptions

@@ -32,7 +32,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      * @param destination where to put the copied VDirectory
      */
     @Override
-    public void copy(VDirectory destination) throws BlockFullException
+    public void copy(VDirectory destination) throws BlockFullException, IOException
     {
         VDirectory copy = new VDirectory(this.block.clone( ), destination);
 
@@ -47,7 +47,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      * This Method recursively deletes the VDirectory
      */
     @Override
-    public void delete()
+    public void delete() throws IOException
     {
         for(VObject<ObjectBlock> obj : this.getEntries())
         {
@@ -56,17 +56,17 @@ public class VDirectory extends VObject<DirectoryBlock>
         this.block.delete( );
     }
 
-    public void addEntry(VObject entry) throws BlockFullException
+    public void addEntry(VObject entry) throws BlockFullException, IOException
     {
         block.addEntry(entry.getBlock());
     }
 
-    public void removeEntry(VObject entry) throws BlockFullException
+    public void removeEntry(VObject entry) throws BlockFullException, IOException
     {
         block.removeEntry(entry.getBlock());
     }
 
-    public VObject getEntry(String name)
+    public VObject getEntry(String name) throws IOException
     {
         for (VObject entry : getEntries())
         {
@@ -79,31 +79,17 @@ public class VDirectory extends VObject<DirectoryBlock>
         return null;
     }
 
-    public List<VObject> getEntries()
+    public List<VObject> getEntries() throws IOException
     {
         List<ObjectBlock> entryBlocks = block.getEntries();
         List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.size());
 
         for (ObjectBlock entryBlock : entryBlocks)
         {
-            entryObjects.add(entryBlock.toVObject());
+            entryObjects.add(entryBlock.toVObject(this));
         }
 
         return entryObjects;
-    }
-
-    // TODO refactor
-    private VObject createCorrectVObject(ObjectBlock block)
-    {
-        if (block instanceof DirectoryBlock)
-        {
-            return new VDirectory((DirectoryBlock) block, this);
-        } else if (block instanceof FileBlock)
-        {
-            return new VFile((FileBlock) block, this);
-        }
-
-        return null;
     }
 
     public void clear()
@@ -114,6 +100,10 @@ public class VDirectory extends VObject<DirectoryBlock>
         } catch (BlockFullException e)
         {
             // TODO Handle this
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }

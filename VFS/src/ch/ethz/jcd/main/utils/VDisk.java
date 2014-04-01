@@ -3,7 +3,6 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
-import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -57,7 +56,7 @@ public class VDisk
         }
     }
 
-    public VObject create(VDirectory destination, String name) throws BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException
+    public VObject create(VDirectory destination, String name) throws BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException, IOException
     {
         DirectoryBlock block = vUtil.allocateDirectoryBlock();
         VDirectory directory = new VDirectory(block, destination);

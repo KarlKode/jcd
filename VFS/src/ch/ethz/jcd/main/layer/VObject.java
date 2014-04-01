@@ -4,6 +4,7 @@ import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.InvalidNameException;
 import ch.ethz.jcd.main.utils.VDisk;
+import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 
@@ -33,14 +34,20 @@ public abstract class VObject<T extends ObjectBlock>
     /**
      * This Method recursively copies the VObject
      *
+     * @param vUtil used to allocate Blocks
      * @param destination where to put the copied VObject
+     * @throws BlockFullException
+     * @throws IOException
      */
-    public abstract void copy(VDirectory destination) throws BlockFullException;
+    public abstract void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException;
 
     /**
      * This Method recursively deletes the VObject
+     *
+     * @param vUtil used to free the corresponding Blocks
+     * @throws IOException
      */
-    public abstract void delete();
+    public abstract void delete(VUtil vUtil) throws IOException;
 
     /**
      *
@@ -56,7 +63,7 @@ public abstract class VObject<T extends ObjectBlock>
      * @param parent VDirectory to set
      * @throws BlockFullException if
      */
-    public void setParent(VDirectory parent) throws BlockFullException
+    public void setParent(VDirectory parent) throws BlockFullException, IOException
     {
         // TODO prevent renaming of root directory
 
@@ -73,7 +80,7 @@ public abstract class VObject<T extends ObjectBlock>
      * @return block name of the VObject
      * @throws IOException
      */
-    public String getName()
+    public String getName() throws IOException
     {
         return block.getName();
     }
@@ -83,7 +90,7 @@ public abstract class VObject<T extends ObjectBlock>
      * @param name of the block to set
      * @throws InvalidNameException if the given name is invalid
      */
-    public void setName(String name) throws InvalidNameException
+    public void setName(String name) throws InvalidNameException, IOException
     {
         block.setName(name);
     }
@@ -92,7 +99,7 @@ public abstract class VObject<T extends ObjectBlock>
      *
      * @return absolut path of the VObject
      */
-    public String getPath()
+    public String getPath() throws IOException
     {
         if (parent != null) {
             return parent.getPath() + VDisk.PATH_SEPARATOR + getName();

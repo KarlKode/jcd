@@ -24,7 +24,7 @@ public class VUtil
 
     public VUtil(File vDiskFile) throws FileNotFoundException
     {
-        fileManager = new FileManager(this, vDiskFile);
+        fileManager = new FileManager(vDiskFile);
 
         // Load super block
         superBlock = new SuperBlock(fileManager, SuperBlock.SUPER_BLOCK_ADDRESS);
@@ -33,24 +33,18 @@ public class VUtil
         try
         {
             bitMapBlock = new BitMapBlock(fileManager, superBlock.getFirstBitMapBlock());
-        } catch (InvalidBlockAddressException e)
+            rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
+            rootDirectory = new VDirectory(rootBlock, null);
+        }
+        catch (InvalidBlockAddressException e)
         {
             // This should never happen
             throw new InternalError();
         }
 
-        // Load directory bloc
-        try
+        catch (IOException e)
         {
-            rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
-            rootDirectory = new VDirectory(rootBlock, null);
-        } catch (InvalidBlockAddressException e)
-        {
-            // This should never happen
-            throw new InternalError();
-        } catch (IOException e)
-        {
-            throw new InternalError("Could not load root directory");
+            e.printStackTrace();
         }
     }
 
@@ -78,7 +72,8 @@ public class VUtil
             {
                 throw new VDiskCreationException();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new VDiskCreationException();
         }
@@ -145,13 +140,14 @@ public class VUtil
      * @return Block instance that contains the data of the now used block
      * @throws DiskFullException
      */
-    public int allocateBlock() throws DiskFullException, IOException
+    public Block allocateBlock() throws DiskFullException, IOException
     {
         // Get the next free block and set it to used
         try
         {
-            return bitMapBlock.allocateBlock();
-        } catch (BlockAddressOutOfBoundException e)
+            return new Block(fileManager, bitMapBlock.allocateBlock());
+        }
+        catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
@@ -159,17 +155,14 @@ public class VUtil
 
     public DirectoryBlock allocateDirectoryBlock() throws DiskFullException, IOException, InvalidBlockAddressException
     {
-        // Get the next free block and set it to used
-        int freeBlockAddress;
         try
         {
-            freeBlockAddress = bitMapBlock.allocateBlock();
-        } catch (BlockAddressOutOfBoundException e)
+            return new DirectoryBlock(fileManager, bitMapBlock.allocateBlock());
+        }
+        catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
-
-        return new DirectoryBlock(fileManager, freeBlockAddress);
     }
 
     /**
@@ -182,7 +175,8 @@ public class VUtil
         try
         {
             bitMapBlock.setUnused(block.getBlockAddress());
-        } catch (BlockAddressOutOfBoundException e)
+        }
+        catch (BlockAddressOutOfBoundException e)
         {
             // This should never happen
             e.printStackTrace();
