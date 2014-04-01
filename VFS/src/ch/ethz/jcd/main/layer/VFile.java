@@ -34,13 +34,14 @@ public class VFile extends VObject<FileBlock>
 
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
-        int lastDataBlockIndex = (int) ((startPosition + bytes.length + (VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE);
+        int lastDataBlockIndex = (int) ((startPosition + bytes.length) / VUtil.BLOCK_SIZE);
         byte[] buffer;
 
         // Write first block
-        int firstDataBlockOffset = (int) (VUtil.BLOCK_SIZE - (startPosition % VUtil.BLOCK_SIZE));
-        int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE);
+        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
+        int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
         buffer = new byte[firstDataBlockLength];
+        // TODO: read might not fill the whole buffer
         if (in.read(buffer) != buffer.length)
         {
             throw new IOException();
@@ -51,6 +52,7 @@ public class VFile extends VObject<FileBlock>
         for (int currentBlockIndex = firstDataBlockIndex + 1; currentBlockIndex < lastDataBlockIndex; currentBlockIndex++)
         {
             buffer = new byte[VUtil.BLOCK_SIZE];
+            // TODO: read might not fill the whole buffer
             if (in.read(buffer) != buffer.length)
             {
                 throw new IOException();
@@ -63,6 +65,7 @@ public class VFile extends VObject<FileBlock>
         {
             int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
             buffer = new byte[lastDataBlockLength];
+            // TODO: read might not fill the whole buffer
             if (in.read(buffer) != buffer.length)
             {
                 throw new IOException();
@@ -82,11 +85,11 @@ public class VFile extends VObject<FileBlock>
         int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
 
         //(VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE) is equivalent to Math.ceil()
-        int lastDataBlockIndex = (int) ((startPosition + length + (VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE);
+        int lastDataBlockIndex = (int) ((startPosition + length) / VUtil.BLOCK_SIZE);
 
         // Read first block
         int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
-        int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE);
+        int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
         out.write(block.getDataBlock(firstDataBlockIndex).getContent(firstDataBlockOffset, firstDataBlockLength));
 
         // Read all block between the first and the last block

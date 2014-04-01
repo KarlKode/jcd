@@ -126,6 +126,36 @@ public class DirectoryBlockTest
         ENTRIES.add(newEntry);
         block.addEntry(newEntry);
         assertEquals(ENTRIES, block.getEntries());
+        try
+        {
+            block.addEntry(newEntry);
+            fail("Exception was expected for duplicate entry");
+        } catch (IllegalArgumentException e)
+        {
+        }
+        ObjectBlock newEntry2 = new FileBlock(fileManager, 5);
+        newEntry2.setType(ObjectBlock.TYPE_FILE);
+        newEntry2.setName("test file");
+        try
+        {
+            block.addEntry(newEntry2);
+            fail("Exception was expected for duplicate name");
+        } catch (IllegalArgumentException e)
+        {
+        }
+        try
+        {
+            for (int i = 6; i < 1024; i++)
+            {
+                ObjectBlock newEntry3 = new FileBlock(fileManager, i);
+                newEntry3.setType(ObjectBlock.TYPE_DIRECTORY);
+                newEntry3.setName("test" + i);
+                block.addEntry(newEntry3);
+            }
+            fail("Exception was expected for an unsupported amount of entries in a directory");
+        } catch (BlockFullException e)
+        {
+        }
     }
 
     @Test

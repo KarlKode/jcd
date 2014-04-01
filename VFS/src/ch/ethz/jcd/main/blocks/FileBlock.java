@@ -30,7 +30,7 @@ public class FileBlock extends ObjectBlock
             throw new IllegalArgumentException();
         }
 
-        if (dataBlockIndex > getSize() / VUtil.BLOCK_SIZE)
+        if (dataBlockIndex > (getSize() - 1) / VUtil.BLOCK_SIZE)
         {
             throw new IllegalArgumentException();
         }
@@ -42,6 +42,11 @@ public class FileBlock extends ObjectBlock
 
     public void addDataBlock(DataBlock dataBlock, int usedBytes) throws BlockFullException, IOException
     {
+        if (usedBytes < 0 || usedBytes > VUtil.BLOCK_SIZE)
+        {
+            throw new IllegalArgumentException();
+        }
+
         long currentSize = getSize();
         long newSize = currentSize + (currentSize % VUtil.BLOCK_SIZE) + usedBytes;
         int dataBlockCount = (int) (currentSize / VUtil.BLOCK_SIZE);
