@@ -47,8 +47,7 @@ public class VObject<T extends ObjectBlock>
 
     public String getPath() throws IOException
     {
-        if (parent != null)
-        {
+        if (parent != null) {
             return parent.getPath() + VDisk.PATH_SEPARATOR + getName();
         }
 
