@@ -9,8 +9,11 @@ public class FileManager
 {
     private final RandomAccessFile rand;
 
-    public FileManager(File file) throws FileNotFoundException
+    private final VUtil vUtil;
+
+    public FileManager(VUtil vUtil, File file) throws FileNotFoundException
     {
+        this.vUtil = vUtil;
         this.rand = new RandomAccessFile(file, "rw");
     }
 
@@ -22,7 +25,7 @@ public class FileManager
             a.createNewFile();
         }
 
-        FileManager dd = new FileManager(a);
+        FileManager dd = new FileManager(null, a);
 
         int i1 = 5;
         String foo = "foo";

@@ -7,45 +7,92 @@ import ch.ethz.jcd.main.utils.VDisk;
 
 import java.io.IOException;
 
-public class VObject<T extends ObjectBlock>
+/**
+ * Abstract representation of VFile and VDirectory. Provides the general
+ * properties and functionality.
+ *
+ * @param <T> either a FileBlock or a DirectoryBlock
+ */
+public abstract class VObject<T extends ObjectBlock>
 {
     protected VDirectory parent;
     protected T block;
 
+    /**
+     * Instantiation of a new VObject.
+     *
+     * @param block containing the byte structure of the VObject
+     * @param parent of the VObject
+     */
     public VObject(T block, VDirectory parent)
     {
         this.block = block;
-        this.parent = parent;
+        this.parent = parent; // TODO why we don't use the setter here?
     }
 
+    /**
+     * This Method recursively copies the VObject
+     *
+     * @param destination where to put the copied VObject
+     */
+    public abstract void copy(VDirectory destination) throws BlockFullException;
+
+    /**
+     * This Method recursively deletes the VObject
+     */
+    public abstract void delete();
+
+    /**
+     *
+     * @return parent VDiretory of the VObject
+     */
     public VDirectory getParent()
     {
         return parent;
     }
 
-    public void setParent(VDirectory parent) throws IOException, BlockFullException
+    /**
+     *
+     * @param parent VDirectory to set
+     * @throws BlockFullException if
+     */
+    public void setParent(VDirectory parent) throws BlockFullException
     {
         // TODO prevent renaming of root directory
 
         if (parent != null)
         {
-            parent.removeEntry(this);
+            parent.removeEntry(this); //TODO what?
             parent.addEntry(this);
         }
         this.parent = parent;
     }
 
-    public String getName() throws IOException
+    /**
+     *
+     * @return block name of the VObject
+     * @throws IOException
+     */
+    public String getName()
     {
         return block.getName();
     }
 
-    public void setName(String name) throws InvalidNameException, IOException
+    /**
+     *
+     * @param name of the block to set
+     * @throws InvalidNameException if the given name is invalid
+     */
+    public void setName(String name) throws InvalidNameException
     {
         block.setName(name);
     }
 
-    public String getPath() throws IOException
+    /**
+     *
+     * @return absolut path of the VObject
+     */
+    public String getPath()
     {
         if (parent != null) {
             return parent.getPath() + VDisk.PATH_SEPARATOR + getName();
@@ -54,6 +101,10 @@ public class VObject<T extends ObjectBlock>
         return VDisk.PATH_SEPARATOR + getName();
     }
 
+    /**
+     *
+     * @return underlying ObjectBlock either a FileBlock or a DirectoryBlock of the VObject
+     */
     public ObjectBlock getBlock()
     {
         return block;

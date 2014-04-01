@@ -24,8 +24,7 @@ public class VUtil
 
     public VUtil(File vDiskFile) throws FileNotFoundException
     {
-
-        fileManager = new FileManager(vDiskFile);
+        fileManager = new FileManager(this, vDiskFile);
 
         // Load super block
         superBlock = new SuperBlock(fileManager, SuperBlock.SUPER_BLOCK_ADDRESS);
@@ -146,19 +145,16 @@ public class VUtil
      * @return Block instance that contains the data of the now used block
      * @throws DiskFullException
      */
-    public Block allocateBlock() throws DiskFullException, IOException
+    public int allocateBlock() throws DiskFullException, IOException
     {
         // Get the next free block and set it to used
-        int freeBlockAddress;
         try
         {
-            freeBlockAddress = bitMapBlock.allocateBlock();
+            return bitMapBlock.allocateBlock();
         } catch (BlockAddressOutOfBoundException e)
         {
             throw new DiskFullException();
         }
-
-        return new Block(fileManager, freeBlockAddress);
     }
 
     public DirectoryBlock allocateDirectoryBlock() throws DiskFullException, IOException, InvalidBlockAddressException

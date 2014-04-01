@@ -24,7 +24,7 @@ public class VDisk
     /**
      * Open an existing VDisk file that contains a valid VFS
      *
-     * @param vDiskFile path to the VDisk file
+     * @param diskFile path to the VDisk file
      */
     public VDisk(File diskFile) throws FileNotFoundException
     {
@@ -35,16 +35,19 @@ public class VDisk
     /**
      * Create a new VDisk file that contains an almost empty VFS
      *
-     * @param vDiskFileName path to the VDisk file
-     * @param size          total size of the VDisk (in bytes).
-     *                      has to be a multiple of blockSize and have space for at least 16 blocks (size >= blockSize * 16)
-     * @param blockSize     block size of the new VFS
+     * @param diskFile  path to the VDisk file
+     * @param size      total size of the VDisk (in bytes). Has to be a multiple
+     *                  of blockSize and have space for at least 16 blocks
+     *                  (size >= blockSize * 16)
      */
     public static void format(File diskFile, long size) throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         VUtil.format(diskFile, size);
     }
 
+    /**
+     *
+     */
     public void dispose()
     {
         if (!diskFile.delete())
@@ -54,6 +57,88 @@ public class VDisk
         }
     }
 
+    public VObject create(VDirectory destination, String name) throws BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException
+    {
+        DirectoryBlock block = vUtil.allocateDirectoryBlock();
+        VDirectory directory = new VDirectory(block, destination);
+
+        directory.clear();
+        directory.setName(name);
+        directory.setParent(destination);
+        destination.addEntry(directory);
+
+        return directory;
+    }
+    /*
+    public VFile createFile(VDirectory destination, String name)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }*/
+
+    /**
+     * This method deletes the given VObject and its underlying
+     * structure
+     *
+     * @param object to delete
+     */
+    public void delete(VObject object)
+    {
+        object.delete();
+    }
+
+    // Simple rename (don't change directory hierarchy)
+    public void rename(VObject object)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    // Simple move of object into destination directory
+    public void move(VObject object, VDirectory destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    // Simple copy and rename of object into destination directory with new name
+
+    /**
+     *
+     * @param object to copy
+     * @param destination where to copy
+     * @param name of copied VObject
+     */
+    public void copy(VObject object, VDirectory destination, String name)
+    {
+
+    }
+
+    public void importFromHost(File source, VDirectory destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public void exportToHost(VObject source, File destination)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    public void stats()
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    /**
+     * This methods resolves a given path and returns the VDirectory.
+     *
+     * @param path given
+     * @return VDirectory to the given path
+     * @throws FileNotFoundException if the given path could not be resolved
+     */
     public VDirectory getDirectory(String path) throws FileNotFoundException
     {
         if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR))
@@ -83,70 +168,5 @@ public class VDisk
         }
 
         return destination;
-    }
-
-    public VDirectory createDirectory(VDirectory destination, String name) throws IOException, BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException
-    {
-        DirectoryBlock block = vUtil.allocateDirectoryBlock();
-        VDirectory directory = new VDirectory(block, destination);
-
-        directory.clear();
-        directory.setName(name);
-        directory.setParent(destination);
-        destination.addEntry(directory);
-
-        return directory;
-    }
-
-    public VFile createFile(VDirectory destination, String name)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    // rm (recursively if necessary)
-    public void delete(VObject object)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    // Simple rename (don't change directory hierarchy)
-    public void rename(VObject object)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    // Simple move of object into destination directory
-    public void move(VObject object, VDirectory destination)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    // Simple copy and rename of object into destination directory with new name
-    public void copy(VObject object, VDirectory destination, String name)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    public void importFromHost(File source, VDirectory destination)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    public void exportToHost(VObject source, File destination)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    public void stats()
-    {
-        // TODO
-        throw new NotImplementedException();
     }
 }
