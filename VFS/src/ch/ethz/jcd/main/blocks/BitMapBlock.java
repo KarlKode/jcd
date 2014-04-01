@@ -20,11 +20,11 @@ public class BitMapBlock extends Block
     private static final byte ZERO_BYTE = 0x00;
     private static final byte FULL_BYTE = (byte) 0xFF;
 
-    private static final byte USED_SUPERBLOCK_MASK = (byte) 0b10000000;
-    private static final byte USED_BITMAPBLOCK_MASK = (byte) 0b01000000;
-    private static final byte USED_ROOTBLOCK_MASK = (byte) 0b00100000;
+    private static final byte USED_SUPERBLOCK_MASK = (byte) 0b00000001;
+    private static final byte USED_BITMAPBLOCK_MASK = (byte) 0b00000010;
+    private static final byte USED_ROOTBLOCK_MASK = (byte) 0b00000100;
 
-    private static final byte USED_MASK = (byte) 0b10000000;
+    private static final byte USED_MASK = (byte) 0b00000001;
 
     public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
@@ -38,13 +38,13 @@ public class BitMapBlock extends Block
      */
     public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException
     {
-        int pos = 0;
+        int pos = -1;
 
         byte[] val = new byte[1];
         do
         {
-            val[0] = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
             pos++;
+            val[0] = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
 
             if (pos >= VUtil.BLOCK_SIZE)
             {
@@ -54,16 +54,19 @@ public class BitMapBlock extends Block
 
         final BitSet freeBlocks = BitSet.valueOf(val);
 
+        // BitSet looks for a clear bit from the right to left side. We fill the bytes from left to right, thus we have to
+        // subtract the position of the free bit from 7
+
+
         int freeBitInByte = freeBlocks.nextClearBit(0);
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
-        //awesome solution (but not sure if correct)
-        byte newByte = (byte) (val[0] | (USED_MASK >> freeBitInByte));
-        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
+        freeBlocks.set(freeBitInByte);
+        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, freeBlocks.toByteArray()[0]);
 
-        //readable solution
-        //freeBlocks.set(freeBitInByte, true);
-        //fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, freeBlocks.toByteArray()[0]);
+        //awesome solution (but not sure if correct)
+        //byte newByte = (byte) (val[0] | (freeBitInByte << USED_MASK));
+        //fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newByte);
 
         return freeBlockAddress;
     }
