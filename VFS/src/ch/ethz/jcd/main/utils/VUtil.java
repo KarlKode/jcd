@@ -45,10 +45,6 @@ public class VUtil
         {
             rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
             rootDirectory = new VDirectory(rootBlock, null);
-        } catch (InvalidBlockAddressException e)
-        {
-            // This should never happen
-            throw new InternalError();
         } catch (IOException e)
         {
             throw new InternalError("Could not load root directory");
