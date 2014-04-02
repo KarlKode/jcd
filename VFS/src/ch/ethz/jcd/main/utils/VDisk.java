@@ -93,7 +93,6 @@ public class VDisk
         directory.clear();
         directory.setName(name);
         directory.setParent(destination);
-        destination.addEntry(directory);
 
         return directory;
     }
