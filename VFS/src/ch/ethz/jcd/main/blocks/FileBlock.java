@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.BlockEmptyException;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
@@ -8,7 +9,7 @@ import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileBlock extends ObjectBlock
@@ -17,8 +18,6 @@ public class FileBlock extends ObjectBlock
     public static final int SIZE_ENTRY = 4;
     public static final int OFFSET_FILE_SIZE = OFFSET_CONTENT;
     public static final int OFFSET_FIRST_ENTRY = OFFSET_FILE_SIZE + SIZE_FILE_SIZE;
-
-    private int dataBlockCount = 0;
 
     public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
@@ -38,19 +37,28 @@ public class FileBlock extends ObjectBlock
      */
     public void addDataBlock(DataBlock dataBlock, int usedBytes) throws BlockFullException, IOException
     {
-        long currentSize = getSize();
-        long newSize = currentSize + (currentSize % VUtil.BLOCK_SIZE) + usedBytes;
+        if (usedBytes < 0)
+        {
+            throw new IllegalArgumentException();
+        }
 
-        if (dataBlockCount >= getMaxDataBlocks())
+        long newSize = getSize();
+        // Round to next block border if necessary
+        if (newSize % VUtil.BLOCK_SIZE != 0)
+        {
+            newSize += VUtil.BLOCK_SIZE - (newSize % VUtil.BLOCK_SIZE);
+        }
+        newSize += usedBytes;
+
+        if (getUsedDataBlocks(newSize) > getMaxDataBlocks())
         {
             throw new BlockFullException();
         }
+
         // Write the block address of the added data block
-        fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (dataBlockCount * SIZE_ENTRY), dataBlock.getBlockAddress());
+        fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (getUsedDataBlocks(newSize) * SIZE_ENTRY), dataBlock.getBlockAddress());
         // Write the new file size
         fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
-
-        dataBlockCount++;
     }
 
     /**
@@ -59,29 +67,30 @@ public class FileBlock extends ObjectBlock
      * @return DataBlock to remove
      * @throws IOException
      */
-    public DataBlock removeLastDataBlock() throws IOException
+    public DataBlock removeLastDataBlock() throws IOException, BlockEmptyException
     {
         int blockAddress = -1;
         long currentSize = getSize();
 
-        if (currentSize > 0)
+        if (currentSize <= 0)
         {
-            int offset = OFFSET_FIRST_ENTRY + ((int) (currentSize / VUtil.BLOCK_SIZE) * SIZE_ENTRY);
-            long newSize = currentSize - VUtil.BLOCK_SIZE;
-
-            if (currentSize % VUtil.BLOCK_SIZE != 0)
-            {
-                newSize = currentSize - (currentSize % VUtil.BLOCK_SIZE);
-            }
-            // read the address of the linked Block
-            blockAddress = fileManager.readInt(getBlockOffset(), offset);
-            // clear the block address of the unlinked DataBlock
-            fileManager.writeInt(getBlockOffset(), offset, 0);
-            // update the file size
-            fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
-
-            dataBlockCount--;
+            throw new BlockEmptyException();
         }
+        int offset = OFFSET_FIRST_ENTRY + ((int) (currentSize / VUtil.BLOCK_SIZE) * SIZE_ENTRY);
+        long newSize = currentSize - VUtil.BLOCK_SIZE;
+
+        if (currentSize % VUtil.BLOCK_SIZE != 0)
+        {
+            newSize = currentSize - (currentSize % VUtil.BLOCK_SIZE);
+        }
+
+        // read the address of the linked Block
+        blockAddress = fileManager.readInt(getBlockOffset(), offset);
+        // clear the block address of the unlinked DataBlock
+        fileManager.writeInt(getBlockOffset(), offset, 0);
+        // update the file size
+        fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
+
         return new DataBlock(fileManager, blockAddress);
     }
 
@@ -92,7 +101,8 @@ public class FileBlock extends ObjectBlock
      */
     public List<DataBlock> getDataBlockList( ) throws IOException
     {
-        LinkedList<DataBlock> list = new LinkedList<>();
+        int dataBlockCount = getUsedDataBlocks(getSize());
+        List<DataBlock> list = new ArrayList<>(dataBlockCount);
 
         for(int i = 0; i < dataBlockCount; i++)
         {
@@ -138,7 +148,7 @@ public class FileBlock extends ObjectBlock
             throw new IllegalArgumentException();
         }
 
-        if (dataBlockIndex > getSize() / VUtil.BLOCK_SIZE)
+        if (dataBlockIndex > getUsedDataBlocks(getSize()))
         {
             throw new IllegalArgumentException();
         }
@@ -155,7 +165,12 @@ public class FileBlock extends ObjectBlock
      */
     private int getMaxDataBlocks()
     {
-        return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY;
+        return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY - 1;
+    }
+
+    private int getUsedDataBlocks(long size)
+    {
+        return 0;
     }
 
     /**
