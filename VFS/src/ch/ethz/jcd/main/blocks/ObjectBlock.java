@@ -1,13 +1,16 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 
 /**
  * Generic container that offers access to properties, that both files and directories have
  */
-public class ObjectBlock extends Block
+public abstract class ObjectBlock extends Block
 {
     public static final int LENGTH_TYPE = 1;
     public static final int LENGTH_NAME = 63;
@@ -16,8 +19,8 @@ public class ObjectBlock extends Block
     public static final int OFFSET_NAME = OFFSET_TYPE + LENGTH_TYPE;
     public static final int OFFSET_PARENT_BLOCK_ADDRESS = OFFSET_NAME + LENGTH_NAME;
     public static final int OFFSET_CONTENT = OFFSET_PARENT_BLOCK_ADDRESS + LENGTH_PARENT_BLOCK_ADDRESS;
-    public static final byte TYPE_DIRECTORY = 0x00;
     public static final byte TYPE_FILE = 0x01;
+    public static final byte TYPE_DIRECTORY = 0x00;
 
     public ObjectBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
@@ -31,6 +34,19 @@ public class ObjectBlock extends Block
     public byte getType() throws IOException
     {
         return fileManager.readByte(getBlockOffset(), OFFSET_TYPE);
+    }
+
+
+    /**
+     *
+     * @param manager used to read the Bloc
+     * @param blockAddress of the ObjectBlock to inspect
+     * @return TYPE_DIRECTORY if this block contains a directory, TYPE_FILE otherwise
+     * @throws IOException
+     */
+    public static byte getType(FileManager manager, int blockAddress) throws IOException
+    {
+        return manager.readByte(VUtil.getBlockOffset(blockAddress), OFFSET_TYPE);
     }
 
     /**
@@ -73,4 +89,12 @@ public class ObjectBlock extends Block
 
         fileManager.writeString(getBlockOffset(), OFFSET_NAME, name);
     }
+
+    /**
+     * This method is used to port an ObjectBlock to a VObject
+     *
+     * @param parent of the VObject
+     * @return the ported ObjectBlock as VObject
+     */
+    public abstract VObject toVObject(VDirectory parent);
 }

@@ -9,32 +9,59 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * VDirectory is a concrete implementation of VObject coming with additional features such as
+ * copy(), delete() and entry manipulation.
+ */
 public class VDirectory extends VObject<DirectoryBlock>
 {
+    /**
+     * Instantiation of a new VDirectory.
+     *
+     * @param block containing the byte structure of the VDirectory
+     * @param parent of the VDirectory
+     */
     public VDirectory(DirectoryBlock block, VDirectory parent)
     {
         super(block, parent);
     }
 
-    public List<VObject> getEntries() throws IOException
+    /**
+     * This Method recursively copies the VDirectory to the given destination
+     *
+     * @param destination where to put the copied VDirectory
+     */
+    @Override
+    public void copy(VDirectory destination) throws BlockFullException, IOException
     {
-        List<ObjectBlock> entryBlocks = block.getEntries();
-        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.size());
+        VDirectory copy = new VDirectory(this.block.clone( ), destination);
 
-        for (ObjectBlock entryBlock : entryBlocks)
+        for(VObject<ObjectBlock> obj : this.getEntries())
         {
-            entryObjects.add(createCorrectVObject(entryBlock));
+            obj.copy(copy);
         }
-
-        return entryObjects;
+        destination.addEntry(copy);
     }
 
-    public void addEntry(VObject entry) throws IOException, BlockFullException
+    /**
+     * This Method recursively deletes the VDirectory
+     */
+    @Override
+    public void delete() throws IOException
+    {
+        for(VObject<ObjectBlock> obj : this.getEntries())
+        {
+            obj.delete();
+        }
+        this.block.delete( );
+    }
+
+    public void addEntry(VObject entry) throws BlockFullException, IOException
     {
         block.addEntry(entry.getBlock());
     }
 
-    public void removeEntry(VObject entry) throws IOException, BlockFullException
+    public void removeEntry(VObject entry) throws BlockFullException, IOException
     {
         block.removeEntry(entry.getBlock());
     }
@@ -52,20 +79,20 @@ public class VDirectory extends VObject<DirectoryBlock>
         return null;
     }
 
-    private VObject createCorrectVObject(ObjectBlock block)
+    public List<VObject> getEntries() throws IOException
     {
-        if (block instanceof DirectoryBlock)
+        List<ObjectBlock> entryBlocks = block.getEntries();
+        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.size());
+
+        for (ObjectBlock entryBlock : entryBlocks)
         {
-            return new VDirectory((DirectoryBlock) block, this);
-        } else if (block instanceof FileBlock)
-        {
-            return new VFile((FileBlock) block, this);
+            entryObjects.add(entryBlock.toVObject(this));
         }
 
-        return null;
+        return entryObjects;
     }
 
-    public void clear() throws IOException
+    public void clear()
     {
         try
         {
@@ -73,6 +100,10 @@ public class VDirectory extends VObject<DirectoryBlock>
         } catch (BlockFullException e)
         {
             // TODO Handle this
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }

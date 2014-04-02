@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.layer;
 
+import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.exceptions.FileTooSmallException;
@@ -10,11 +11,48 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * VFile is a concrete implementation of VObject coming with additional features such as
+ * read(), write(), copy(), delete()
+ */
 public class VFile extends VObject<FileBlock>
 {
+    /**
+     * Instantiation of a new VFile.
+     *
+     * @param block containing the byte structure of the VFile
+     * @param parent of the VFile
+     */
     public VFile(FileBlock block, VDirectory parent)
     {
         super(block, parent);
+    }
+
+    /**
+     * This Method copies the VFile to the given destination
+     *
+     * @param destination where to put the copied VObject
+     */
+    @Override
+    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException
+    {
+        FileBlock fileBlock = vUtil.allocateBlock();
+        VFile copy = new VFile(, destination);
+        destination.addEntry(copy);
+    }
+
+    /**
+     * This Method deletes the VFile
+     */
+    @Override
+    public void delete(VUtil vUtil) throws IOException
+    {
+        for(DataBlock b: block.getDataBlockList( ))
+        {
+            vUtil.free(b);
+        }
+
+        vUtil.free(block);
     }
 
     // TODO fix exceptions

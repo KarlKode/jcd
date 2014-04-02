@@ -1,6 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.exceptions.BlockFullException;
+import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 
@@ -23,6 +25,30 @@ public class DirectoryBlock extends ObjectBlock
     public DirectoryBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
+    }
+
+    /**
+     * @param entry ObjectBlock to add to the directory
+     * @throws IOException
+     * @throws BlockFullException if there is no room for more entries
+     */
+    public void addEntry(ObjectBlock entry) throws IOException, BlockFullException
+    {
+        List<ObjectBlock> entries = getEntries();
+        entries.add(entry);
+        setEntries(entries);
+    }
+
+    /**
+     * @param entry ObjectBlock to remove from the directory
+     * @throws IOException
+     * @throws BlockFullException if there is no room for more entries
+     */
+    public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
+    {
+        List<ObjectBlock> entries = getEntries();
+        entries.remove(entry);
+        setEntries(entries);
     }
 
     /**
@@ -56,6 +82,7 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
+     *
      * @return list containing all the entries of the directory
      * @throws IOException
      */
@@ -67,19 +94,17 @@ public class DirectoryBlock extends ObjectBlock
         for (int i = 0; i < entryCount; i++)
         {
             int entryBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (i * SIZE_ENTRY));
-
-            // TODO: Should we just check the type of the entry here without instantiating a new ObjectBlock?
-            ObjectBlock objectBlock = new ObjectBlock(fileManager, entryBlockAddress);
-
-            if (objectBlock.getType() == ObjectBlock.TYPE_DIRECTORY)
+            byte type = ObjectBlock.getType(fileManager, entryBlockAddress);
+            // TODO: factory?
+            if (type == ObjectBlock.TYPE_DIRECTORY)
             {
                 entries.add(new DirectoryBlock(fileManager, entryBlockAddress));
-            } else if (objectBlock.getType() == ObjectBlock.TYPE_FILE)
+            }
+            else if (type == ObjectBlock.TYPE_FILE)
             {
                 entries.add(new FileBlock(fileManager, entryBlockAddress));
             }
         }
-
         return entries;
     }
 
@@ -112,26 +137,14 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     * @param entry ObjectBlock to add to the directory
-     * @throws IOException
-     * @throws BlockFullException if there is no room for more entries
+     * This method is used to port this DirectoryBlock into a VDirectory.
+     *
+     * @param parent of the VDirectory
+     * @return this DirectoryBlock ported to a VFile
      */
-    public void addEntry(ObjectBlock entry) throws IOException, BlockFullException
+    @Override
+    public VObject toVObject(VDirectory parent)
     {
-        List<ObjectBlock> entries = getEntries();
-        entries.add(entry);
-        setEntries(entries);
-    }
-
-    /**
-     * @param entry ObjectBlock to remove from the directory
-     * @throws IOException
-     * @throws BlockFullException if there is no room for more entries
-     */
-    public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
-    {
-        List<ObjectBlock> entries = getEntries();
-        entries.remove(entry);
-        setEntries(entries);
+        return new VDirectory(this, parent);
     }
 }
