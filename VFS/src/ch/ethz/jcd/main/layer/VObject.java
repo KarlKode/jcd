@@ -1,8 +1,7 @@
 package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.ObjectBlock;
-import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.InvalidNameException;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 
@@ -39,7 +38,7 @@ public abstract class VObject<T extends ObjectBlock>
      * @throws BlockFullException
      * @throws IOException
      */
-    public abstract void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException;
+    public abstract void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException;
 
     /**
      * This Method recursively deletes the VObject
@@ -97,7 +96,7 @@ public abstract class VObject<T extends ObjectBlock>
 
     /**
      *
-     * @return absolut path of the VObject
+     * @return absolute path of the VObject
      */
     public String getPath() throws IOException
     {

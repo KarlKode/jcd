@@ -2,9 +2,7 @@ package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
-import ch.ethz.jcd.main.exceptions.BlockFullException;
-import ch.ethz.jcd.main.exceptions.FileTooSmallException;
-import ch.ethz.jcd.main.exceptions.InvalidDataBlockOffsetException;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.ByteArrayInputStream;
@@ -31,18 +29,35 @@ public class VFile extends VObject<FileBlock>
     /**
      * This Method copies the VFile to the given destination
      *
+     * @param vUtil used to allocate Blocks
      * @param destination where to put the copied VObject
+     *
+     * @throws BlockFullException
+     * @throws IOException
+     * @throws InvalidBlockAddressException
+     * @throws DiskFullException
      */
     @Override
-    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException
+    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
     {
-        FileBlock fileBlock = vUtil.allocateBlock();
-        VFile copy = new VFile(, destination);
+        FileBlock fileBlock = vUtil.allocateFileBlock();
+
+        for(DataBlock src: this.block.getDataBlockList())
+        {
+            DataBlock dest = vUtil.allocateDataBlock();
+            dest.setContent(src.getContent());
+            fileBlock.addDataBlock(dest, src.size());
+        }
+
+        VFile copy = new VFile(fileBlock, destination);
         destination.addEntry(copy);
     }
 
     /**
-     * This Method deletes the VFile
+     *  This Method deletes the VFile
+     *
+     * @param vUtil used to free the corresponding Blocks
+     * @throws IOException
      */
     @Override
     public void delete(VUtil vUtil) throws IOException
@@ -57,7 +72,8 @@ public class VFile extends VObject<FileBlock>
 
     // TODO fix exceptions
     // TODO: Check whole method for off by 1 errors!
-    public void write(byte[] bytes, long startPosition) throws IOException, InvalidDataBlockOffsetException, BlockFullException
+    // TODO: fix usedBytes
+    public void write(byte[] bytes, long startPosition) throws IOException, InvalidDataBlockOffsetException, BlockFullException, InvalidBlockSizeException
     {
         // Add new blocks to the end of the file if needed
         for (long remainingBytes = startPosition + bytes.length - block.getSize();

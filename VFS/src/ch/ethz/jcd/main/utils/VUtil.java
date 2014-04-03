@@ -1,9 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.BitMapBlock;
-import ch.ethz.jcd.main.blocks.Block;
-import ch.ethz.jcd.main.blocks.DirectoryBlock;
-import ch.ethz.jcd.main.blocks.SuperBlock;
+import ch.ethz.jcd.main.blocks.*;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 
@@ -94,7 +91,7 @@ public class VUtil
         vUtil.getBitMapBlock().initialize();
 
         // Initialize root directory
-        vUtil.getRootDirectory().clear();
+        vUtil.getRootDirectory().clear(vUtil);
 
         vUtil.close();
     }
@@ -146,6 +143,30 @@ public class VUtil
         try
         {
             return new Block(fileManager, bitMapBlock.allocateBlock());
+        }
+        catch (BlockAddressOutOfBoundException e)
+        {
+            throw new DiskFullException();
+        }
+    }
+
+    public FileBlock allocateFileBlock() throws DiskFullException, IOException, InvalidBlockAddressException
+    {
+        try
+        {
+            return new FileBlock(fileManager, bitMapBlock.allocateBlock());
+        }
+        catch (BlockAddressOutOfBoundException e)
+        {
+            throw new DiskFullException();
+        }
+    }
+
+    public DataBlock allocateDataBlock() throws DiskFullException, IOException, InvalidBlockAddressException
+    {
+        try
+        {
+            return new DataBlock(fileManager, bitMapBlock.allocateBlock());
         }
         catch (BlockAddressOutOfBoundException e)
         {

@@ -61,7 +61,7 @@ public class VDisk
         DirectoryBlock block = vUtil.allocateDirectoryBlock();
         VDirectory directory = new VDirectory(block, destination);
 
-        directory.clear();
+        directory.clear(vUtil);
         directory.setName(name);
         directory.setParent(destination);
         destination.addEntry(directory);
@@ -83,14 +83,39 @@ public class VDisk
      */
     public void delete(VObject object)
     {
-        object.delete();
+        try
+        {
+            object.delete(vUtil);
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
     }
 
-    // Simple rename (don't change directory hierarchy)
-    public void rename(VObject object)
+
+    /**
+     * This method renames the given VObject
+     *
+     * //TODO think about only using move
+     *
+     * @param object to rename
+     * @param name to set
+     */
+    public void rename(VObject object, String name)
     {
-        // TODO
-        throw new NotImplementedException();
+        try
+        {
+            object.setName(name);
+        }
+        catch (InvalidNameException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
     }
 
     // Simple move of object into destination directory
@@ -100,9 +125,21 @@ public class VDisk
         throw new NotImplementedException();
     }
 
-    // Simple copy and rename of object into destination directory with new name
+    /**
+     * This method copies the given VObject to the given destination without renaming
+     * the VObject
+     *
+     * @param object to copy
+     * @param destination where to copy
+     */
+    public void copy(VObject object, VDirectory destination)
+    {
+        this.copy(object, destination, null);
+    }
 
     /**
+     * This method copies the given VObject to the given destination with renaming
+     * the VObject
      *
      * @param object to copy
      * @param destination where to copy
@@ -110,7 +147,39 @@ public class VDisk
      */
     public void copy(VObject object, VDirectory destination, String name)
     {
+        try
+        {
+            object.copy(vUtil, destination);
 
+            if(name != null)
+            {
+                object.setName(name);
+            }
+        }
+        catch (BlockFullException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockAddressException e)
+        {
+            //TODO do sth
+        }
+        catch (DiskFullException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockSizeException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidNameException e)
+        {
+            //TODO do sth
+        }
     }
 
     public void importFromHost(File source, VDirectory destination)

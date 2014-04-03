@@ -1,9 +1,12 @@
 package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
-import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.BlockFullException;
+import ch.ethz.jcd.main.exceptions.DiskFullException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,43 +32,86 @@ public class VDirectory extends VObject<DirectoryBlock>
     /**
      * This Method recursively copies the VDirectory to the given destination
      *
+     * @param vUtil used to allocate Blocks
      * @param destination where to put the copied VDirectory
+     * @throws BlockFullException
+     * @throws IOException
+     * @throws InvalidBlockAddressException
+     * @throws DiskFullException
+     * @throws InvalidBlockSizeException
      */
     @Override
-    public void copy(VDirectory destination) throws BlockFullException, IOException
+    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
     {
-        VDirectory copy = new VDirectory(this.block.clone( ), destination);
+        DirectoryBlock directoryBlock = vUtil.allocateDirectoryBlock();
+        VDirectory copy = new VDirectory(directoryBlock, destination);
 
         for(VObject<ObjectBlock> obj : this.getEntries())
         {
-            obj.copy(copy);
+            obj.copy(vUtil, copy);
         }
         destination.addEntry(copy);
     }
 
     /**
      * This Method recursively deletes the VDirectory
+     *
+     * @param vUtil used to free the corresponding Blocks
+     * @throws BlockFullException
+     * @throws IOException
      */
     @Override
-    public void delete() throws IOException
+    public void delete(VUtil vUtil) throws IOException
     {
         for(VObject<ObjectBlock> obj : this.getEntries())
         {
-            obj.delete();
+            obj.delete(vUtil);
         }
-        this.block.delete( );
+        vUtil.free(block);
     }
 
+    /**
+     * Deletes all the entries this directory contains
+     */
+    public void clear(VUtil vUtil) throws IOException
+    {
+        for(VObject object : this.getEntries())
+        {
+            this.removeEntry(object);
+            object.delete(vUtil);
+        }
+    }
+
+    /**
+     * This method adds either a file or a directory to this directory
+     *
+     * @param entry to add
+     * @throws BlockFullException
+     * @throws IOException
+     */
     public void addEntry(VObject entry) throws BlockFullException, IOException
     {
         block.addEntry(entry.getBlock());
     }
 
-    public void removeEntry(VObject entry) throws BlockFullException, IOException
+    /**
+     * This method removes either a file or a directory from this directory
+     *
+     * @param entry to remove
+     * @throws IOException
+     */
+    public void removeEntry(VObject entry) throws IOException
     {
         block.removeEntry(entry.getBlock());
     }
 
+    /**
+     * This method searches for an entry by name.
+     *
+     * @param name of object to return
+     * @return either the object or null if not found
+     * @throws IOException
+     */
     public VObject getEntry(String name) throws IOException
     {
         for (VObject entry : getEntries())
@@ -79,6 +125,23 @@ public class VDirectory extends VObject<DirectoryBlock>
         return null;
     }
 
+    /**
+     * Removes all the entries this directory contains
+     */
+    public void removeAll() throws IOException
+    {
+        for(VObject object : this.getEntries())
+        {
+            this.removeEntry(object);
+        }
+    }
+
+    /**
+     * This method returns all the object which this directory contains
+     *
+     * @return a list of all objects
+     * @throws IOException
+     */
     public List<VObject> getEntries() throws IOException
     {
         List<ObjectBlock> entryBlocks = block.getEntries();
@@ -90,21 +153,5 @@ public class VDirectory extends VObject<DirectoryBlock>
         }
 
         return entryObjects;
-    }
-
-    public void clear()
-    {
-        try
-        {
-            block.setEntryCount(0);
-        } catch (BlockFullException e)
-        {
-            // TODO Handle this
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 }

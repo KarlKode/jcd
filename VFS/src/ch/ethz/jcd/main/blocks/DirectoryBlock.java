@@ -42,13 +42,20 @@ public class DirectoryBlock extends ObjectBlock
     /**
      * @param entry ObjectBlock to remove from the directory
      * @throws IOException
-     * @throws BlockFullException if there is no room for more entries
      */
-    public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
+    public void removeEntry(ObjectBlock entry) throws IOException
     {
-        List<ObjectBlock> entries = getEntries();
-        entries.remove(entry);
-        setEntries(entries);
+        try
+        {
+            List<ObjectBlock> entries = getEntries();
+            entries.remove(entry);
+            setEntries(entries);
+        }
+        catch (BlockFullException e)
+        {
+            // impossible since the list shrinks
+            throw new RuntimeException();
+        }
     }
 
     /**
@@ -61,12 +68,14 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
+     * TODO blocks  freigeh
+     *
      * @param entryCount new entry count
      * @throws IOException
      * @throws BlockFullException       if there is no room for more entries
      * @throws IllegalArgumentException
      */
-    public void setEntryCount(int entryCount) throws IOException, BlockFullException, IllegalArgumentException
+    protected void setEntryCount(int entryCount) throws IOException, BlockFullException, IllegalArgumentException
     {
         if (entryCount < 0)
         {
