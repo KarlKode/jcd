@@ -54,10 +54,6 @@ public class BitMapBlock extends Block
 
         final BitSet freeBlocks = BitSet.valueOf(val);
 
-        // BitSet looks for a clear bit from the right to left side. We fill the bytes from left to right, thus we have to
-        // subtract the position of the free bit from 7
-
-
         int freeBitInByte = freeBlocks.nextClearBit(0);
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
@@ -105,10 +101,18 @@ public class BitMapBlock extends Block
         int bit = blockAddress % 8;
 
         final byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
-        final BitSet set = new BitSet(value);
+        final BitSet set = BitSet.valueOf(new byte[]{value});
         set.clear(bit);
 
-        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, set.toByteArray()[0]);
+        //since the bitset is empty, if the byte 0x00 is in it, we need this workaround
+        byte newValue = 0;
+        if(set.isEmpty()){
+            newValue = 0;
+        }else{
+            newValue = set.toByteArray()[0];
+        }
+
+        fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newValue);
     }
 
     /**
@@ -137,6 +141,6 @@ public class BitMapBlock extends Block
 
         byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
 
-        return new BitSet(value).get(bit);
+        return !BitSet.valueOf(new byte[]{value}).get(bit);
     }
 }
