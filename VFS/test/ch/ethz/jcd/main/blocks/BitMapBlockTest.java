@@ -66,13 +66,17 @@ public class BitMapBlockTest
     public void testAllocateBlocks() throws Exception
     {
         for(int i=0;i<VUtil.BLOCK_SIZE*8;i++){
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+            assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i+1));
+            assertTrue(block.getUsedBlocks() == (i+1));
         }
 
         try
         {
             System.out.println(block.allocateBlock());
-            fail("Exception was expected");
+            fail("Exception was expected since disk is full");
         } catch (DiskFullException e)
         {
         }
@@ -82,13 +86,18 @@ public class BitMapBlockTest
     public void testFreeBlocks() throws Exception
     {
         for(int i=0;i<VUtil.BLOCK_SIZE*8;i++){
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+            assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i+1));
+            assertTrue(block.getUsedBlocks() == (i+1));
         }
 
         for(int i=(VUtil.BLOCK_SIZE*8)-1;i>=0;i--){
-            System.out.println(i);
             block.setUnused(i);
             assertTrue(block.isUnused(i));
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+            assertTrue(block.getUsedBlocks() == i);
         }
     }
 
