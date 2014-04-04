@@ -41,7 +41,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      * @throws InvalidBlockSizeException
      */
     @Override
-    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
+    public VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
     {
         DirectoryBlock directoryBlock = vUtil.allocateDirectoryBlock();
         VDirectory copy = new VDirectory(directoryBlock, destination);
@@ -50,7 +50,10 @@ public class VDirectory extends VObject<DirectoryBlock>
         {
             obj.copy(vUtil, copy);
         }
+
         destination.addEntry(copy);
+
+        return copy;
     }
 
     /**

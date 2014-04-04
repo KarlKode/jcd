@@ -52,10 +52,14 @@ public abstract class VObject<T extends ObjectBlock>
      *
      * @param vUtil used to allocate Blocks
      * @param destination where to put the copied VObject
+     * @return the root object of the copied structure
      * @throws BlockFullException
      * @throws IOException
+     * @throws InvalidBlockAddressException
+     * @throws DiskFullException
+     * @throws InvalidBlockSizeException
      */
-    public abstract void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException;
+    public abstract VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException;
 
     /**
      * This Method recursively deletes the VObject
