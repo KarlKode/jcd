@@ -42,7 +42,7 @@ public class FileBlock extends ObjectBlock
             throw new IllegalArgumentException();
         }
 
-        long newSize = getSize();
+        long newSize = size();
         // Round to next block border if necessary
         if (newSize % VUtil.BLOCK_SIZE != 0)
         {
@@ -69,7 +69,7 @@ public class FileBlock extends ObjectBlock
      */
     public DataBlock removeLastDataBlock() throws IOException, BlockEmptyException
     {
-        long currentSize = getSize();
+        long currentSize = size();
 
         if (currentSize <= 0)
         {
@@ -100,7 +100,7 @@ public class FileBlock extends ObjectBlock
      */
     public List<DataBlock> getDataBlockList( ) throws IOException
     {
-        int dataBlockCount = getUsedDataBlocks(getSize());
+        int dataBlockCount = getUsedDataBlocks(size());
         List<DataBlock> list = new ArrayList<>(dataBlockCount);
 
         for(int i = 0; i < dataBlockCount; i++)
@@ -117,7 +117,7 @@ public class FileBlock extends ObjectBlock
      */
     public boolean isEmpty( ) throws IOException
     {
-        return !(getSize() > 0);
+        return !(size() > 0);
     }
 
     /**
@@ -127,10 +127,22 @@ public class FileBlock extends ObjectBlock
      * @return the size of the file
      * @throws IOException
      */
-    public long getSize() throws IOException
+    public long size() throws IOException
     {
         return fileManager.readLong(getBlockOffset(), OFFSET_FILE_SIZE);
     }
+
+    /**
+     * This method computes the number of DataBlocks attached to this file
+     *
+     * @return the number of DataBlocks
+     * @throws IOException
+     */
+    public int count() throws IOException
+    {
+        return getUsedDataBlocks(size());
+    }
+
 
     /**
      * This method reads the DataBlock to a given DataBlock index linked in the FileBlock.
@@ -147,7 +159,7 @@ public class FileBlock extends ObjectBlock
             throw new IllegalArgumentException();
         }
 
-        if (dataBlockIndex > getUsedDataBlocks(getSize()))
+        if (dataBlockIndex > count())
         {
             throw new IllegalArgumentException();
         }
@@ -167,12 +179,6 @@ public class FileBlock extends ObjectBlock
         return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY - 1;
     }
 
-    private int getUsedDataBlocks(long size)
-    {
-        // Math.ceil((float) size / (float) VUtil.BLOCK_SIZE)
-        return (int) ((size + VUtil.BLOCK_SIZE - 1) / VUtil.BLOCK_SIZE);
-    }
-
     /**
      * This method is used to port this FileBlock into a VFile.
      *
@@ -183,6 +189,19 @@ public class FileBlock extends ObjectBlock
     public VObject toVObject(VDirectory parent)
     {
         return new VFile(this, parent);
+    }
+
+    /**
+     * This method computes the theoretically number of used blocks according
+     * to a given file size.
+     *
+     * @param size actual disk size
+     * @return number of used blocks
+     */
+    private int getUsedDataBlocks(long size)
+    {
+        // Math.ceil((float) size / (float) VUtil.BLOCK_SIZE)
+        return (int) ((size + VUtil.BLOCK_SIZE - 1) / VUtil.BLOCK_SIZE);
     }
 }
 
