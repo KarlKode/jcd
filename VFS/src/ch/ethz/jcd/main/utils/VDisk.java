@@ -2,9 +2,11 @@ package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.exceptions.*;
-import ch.ethz.jcd.main.layer.*;
-import ch.ethz.jcd.main.layer.VFile.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VFile;
+import ch.ethz.jcd.main.layer.VFile.VFileImputStream;
+import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
+import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
 import java.util.HashMap;
@@ -441,10 +443,15 @@ public class VDisk
         }
     }
 
-    public void stats()
+    /**
+     * This method returns an object, that could be queried to get statistical
+     * information about the choose virtual file system.
+     *
+     * @return instance of VStats object
+     */
+    public VStats stats()
     {
-        // TODO
-        throw new NotImplementedException();
+        return new VStats(this, vUtil.getRootDirectory(), vUtil.getSuperBlock());
     }
 
     /**
