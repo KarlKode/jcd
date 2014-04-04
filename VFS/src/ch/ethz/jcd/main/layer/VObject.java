@@ -31,6 +31,23 @@ public abstract class VObject<T extends ObjectBlock>
     }
 
     /**
+     * This method removes this object from its current parent and attach it to
+     * the given directory. Short this object is moved to another location.
+     *
+     * @param parent VDirectory to set
+     * @throws BlockFullException
+     */
+    public void move(VDirectory parent) throws BlockFullException, IOException
+    {
+        this.parent.removeEntry(this);
+
+        if(parent != null)
+        {
+            parent.addEntry(this);
+        }
+    }
+
+    /**
      * This Method recursively copies the VObject
      *
      * @param vUtil used to allocate Blocks
@@ -49,29 +66,26 @@ public abstract class VObject<T extends ObjectBlock>
     public abstract void delete(VUtil vUtil) throws IOException;
 
     /**
-     *
-     * @return parent VDiretory of the VObject
+     * This method crops this object from its parent. Cropping an object from
+     * its parent may lead to dead blocks, thus visibility is set to protected
+     * to prevent abuse.
      */
-    public VDirectory getParent()
+    protected void crop( ) throws IOException
     {
-        return parent;
+        if(parent != null)
+        {
+            parent.block.removeEntry(block);
+            parent = null;
+        }
     }
 
     /**
      *
-     * @param parent VDirectory to set
-     * @throws BlockFullException if
+     * @return parent VDirectory of the VObject
      */
-    public void setParent(VDirectory parent) throws BlockFullException, IOException
+    public VDirectory getParent()
     {
-        // TODO prevent renaming of root directory
-
-        if (parent != null)
-        {
-            parent.removeEntry(this); //TODO what?
-            parent.addEntry(this);
-        }
-        this.parent = parent;
+        return parent;
     }
 
     /**

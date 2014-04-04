@@ -62,8 +62,8 @@ public class FileBlockTest
     public void testGetSize() throws Exception
     {
         // TODO Better test
-        assertEquals(fileManager.readLong(0, FileBlock.OFFSET_FILE_SIZE), block.getSize());
-        assertEquals(DATA_BLOCK_1_SIZE + DATA_BLOCK_2_SIZE, block.getSize());
+        assertEquals(fileManager.readLong(0, FileBlock.OFFSET_FILE_SIZE), block.size());
+        assertEquals(DATA_BLOCK_1_SIZE + DATA_BLOCK_2_SIZE, block.size());
     }
 
     @Test
@@ -99,14 +99,14 @@ public class FileBlockTest
     {
         DataBlock block0 = new DataBlock(fileManager, BLOCK_ADDRESS + 3);
         block.addDataBlock(block0, 0);
-        assertEquals(2 * VUtil.BLOCK_SIZE, block.getSize());
+        assertEquals(2 * VUtil.BLOCK_SIZE, block.size());
     }
 
     @Test
     public void testRemoveLastDataBlock() throws Exception
     {
         block.removeLastDataBlock();
-        assertEquals(VUtil.BLOCK_SIZE, block.getSize());
+        assertEquals(VUtil.BLOCK_SIZE, block.size());
         assertEquals(dataBlock1, block.getDataBlock(0));
         try
         {
@@ -119,6 +119,6 @@ public class FileBlockTest
         {
             block.removeLastDataBlock();
         }
-        assertEquals(0, block.getSize());
+        assertEquals(0, block.size());
     }
 }

@@ -8,6 +8,8 @@ import ch.ethz.jcd.main.utils.VUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 /**
  * VFile is a concrete implementation of VObject coming with additional features such as
@@ -70,15 +72,16 @@ public class VFile extends VObject<FileBlock>
         vUtil.free(block);
     }
 
+
     // TODO fix exceptions
     // TODO: Check whole method for off by 1 errors!
     // TODO: fix usedBytes
     public void write(byte[] bytes, long startPosition) throws IOException, InvalidDataBlockOffsetException, BlockFullException, InvalidBlockSizeException
     {
         // Add new blocks to the end of the file if needed
-        for (long remainingBytes = startPosition + bytes.length - block.getSize();
+        for (long remainingBytes = startPosition + bytes.length - block.size();
              remainingBytes > 0;
-             remainingBytes = startPosition + bytes.length - block.getSize())
+             remainingBytes = startPosition + bytes.length - block.size())
         {
             int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
 
@@ -130,7 +133,7 @@ public class VFile extends VObject<FileBlock>
 
     public byte[] read(long startPosition, int length) throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
     {
-        if (startPosition + length > block.getSize())
+        if (startPosition + length > block.size())
         {
             throw new FileTooSmallException();
         }
@@ -160,5 +163,130 @@ public class VFile extends VObject<FileBlock>
         }
 
         return out.toByteArray();
+    }
+
+    /**
+     * This method instantiate an input stream to buffered write into this file.
+     *
+     * @return the input stream
+     */
+    public VFileImputStream inputStream(VUtil vUtil) throws IOException
+    {
+        return new VFileImputStream(vUtil, this);
+    }
+
+    /**
+     * The VFileOutputStream is used to buffered write into a file stored in
+     * the virtual file system. Useful when doing imports to avoid loading big
+     * files completely into memory.
+     */
+    public class VFileImputStream
+    {
+        private VUtil vUtil;
+        private VFile vFile;
+
+        /**
+         * Visibility is set to private to ensure correct instantiation
+         *
+         * @param vUtil used to allocate Blocks
+         */
+        private VFileImputStream(VUtil vUtil, VFile vFile) throws IOException
+        {
+            this.vUtil = vUtil;
+            this.vFile = vFile;
+
+            for(DataBlock b: block.getDataBlockList( ))
+            {
+                this.vUtil.free(b);
+            }
+        }
+
+        public void put(byte[] bytes) throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
+        {
+            DataBlock dataBlock = vUtil.allocateDataBlock();
+            dataBlock.setContent(bytes);
+            vFile.block.addDataBlock(dataBlock, bytes.length);
+        }
+    }
+
+    /**
+     * This method instantiate an iterator to buffered read this file.
+     *
+     * @return the iterator
+     */
+    public VFileOutputStream iterator()
+    {
+        return new VFileOutputStream(this);
+    }
+
+    /**
+     * The VFileOutputStream is used to buffered read a file stored in the virtual
+     * file system. Useful when doing exports to avoid loading big files completely
+     * into memory.
+     */
+    public class VFileOutputStream implements Iterator<ByteBuffer>
+    {
+        private VFile vFile;
+        private int next = 0;
+
+        /**
+         * Visibility is set to private to ensure the iterator is instantiated
+         * correctly
+         *
+         * @param vFile
+         */
+        private VFileOutputStream(VFile vFile)
+        {
+            this.vFile = vFile;
+        }
+
+        /**
+         *
+         *
+         * @return true if there is a next element, false otherwise
+         */
+        @Override
+        public boolean hasNext()
+        {
+            try
+            {
+                return next < vFile.block.count();
+            }
+            catch (IOException e)
+            {
+                return false;
+            }
+        }
+
+        /**
+         * This method read the next DataBlock and extract the bytes stored in
+         * it.
+         *
+         * @return the read bytes
+         */
+        @Override
+        public ByteBuffer next()
+        {
+            try
+            {
+                ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent());
+                next++;
+                return buf;
+            }
+            catch (IOException e)
+            {
+                return ByteBuffer.wrap(null);
+            }
+        }
+
+        /**
+         * This method is not supported thus calling it will throw a runtime
+         * exception.
+         */
+        @Override
+        public void remove( )
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 }

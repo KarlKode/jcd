@@ -1,14 +1,14 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.DirectoryBlock;
+import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VFile;
+import ch.ethz.jcd.main.layer.VFile.*;
 import ch.ethz.jcd.main.layer.VObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Public high level interface that hides the implementation details of all operations on a virtual disk.
@@ -56,23 +56,85 @@ public class VDisk
         }
     }
 
-    public VObject create(VDirectory destination, String name) throws BlockFullException, DiskFullException, InvalidBlockAddressException, InvalidNameException, IOException
+    /**
+     * This method creates a new directory at the given destination.
+     *
+     * @param destination where to create a new directory
+     * @param name to set
+     * @return the created directory
+     */
+    public VDirectory mkdir(VDirectory destination, String name)
     {
-        DirectoryBlock block = vUtil.allocateDirectoryBlock();
-        VDirectory directory = new VDirectory(block, destination);
-
-        directory.clear(vUtil);
-        directory.setName(name);
-        directory.setParent(destination);
-
-        return directory;
+        try
+        {
+            // directory is created unlinked and then is named and linked
+            VDirectory directory = new VDirectory(vUtil.allocateDirectoryBlock(), destination);
+            directory.setName(name);
+            directory.move(destination);
+            return directory;
+        }
+        catch (DiskFullException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockAddressException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidNameException e)
+        {
+            //TODO do sth
+        }
+        catch (BlockFullException e)
+        {
+            //TODO do sth
+        }
+        return null;
     }
-    /*
-    public VFile createFile(VDirectory destination, String name)
+
+    /**
+     * This method creates a new file at the given destination.
+     *
+     * @param destination where to create a new file
+     * @param name to set
+     * @return the created file
+     */
+    public VFile touch(VDirectory destination, String name)
     {
-        // TODO
-        throw new NotImplementedException();
-    }*/
+        try
+        {
+            // file is created unlinked and then is named and linked
+            VFile file = new VFile(vUtil.allocateFileBlock(), destination);
+            file.setName(name);
+            file.move(destination);
+            return file;
+        }
+        catch (InvalidNameException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockAddressException e)
+        {
+            e.printStackTrace();
+        }
+        catch (DiskFullException e)
+        {
+            e.printStackTrace();
+        }
+        catch (BlockFullException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * This method deletes the given VObject and its underlying
@@ -117,16 +179,56 @@ public class VDisk
         }
     }
 
-    // Simple move of object into destination directory
+    /**
+     * This method moves the given object and its underlying structure to the
+     * specified destination.
+     *
+     * @param object to move
+     * @param destination where to move
+     */
     public void move(VObject object, VDirectory destination)
     {
-        // TODO
-        throw new NotImplementedException();
+        try
+        {
+            object.move(destination);
+        }
+        catch (BlockFullException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
+    }
+
+    /**
+     * This method first renames and then moves the given object and its
+     * underlying structure to the specified destination.
+     *
+     * @param object to move
+     * @param destination where to move
+     */
+    public void move(VObject object, VDirectory destination, String name)
+    {
+        try
+        {
+            this.rename(object, name);
+            object.move(destination);
+        }
+        catch (BlockFullException e)
+        {
+            //TODO do sth
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
     }
 
     /**
      * This method copies the given VObject to the given destination without renaming
-     * the VObject
+     * the VObject.
      *
      * @param object to copy
      * @param destination where to copy
@@ -181,16 +283,81 @@ public class VDisk
         }
     }
 
+    /**
+     * This method imports the given source file from the host file system into
+     * this virtual file system.
+     *
+     * @param source file to import
+     * @param destination directory where to import
+     */
     public void importFromHost(File source, VDirectory destination)
     {
-        // TODO
-        throw new NotImplementedException();
+        VFile file = this.touch(destination, source.getName());
+
+        try
+        {
+            FileInputStream stream = new FileInputStream(source);
+            VFileImputStream vfile = file.inputStream(vUtil);
+
+            byte[] bytes = new byte[DataBlock.MAX_DATA_BLOCK_SIZE];
+
+            while(stream.read(bytes) > 0)
+            {
+                vfile.put(bytes);
+            }
+
+            stream.close();
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockSizeException e)
+        {
+            //TODO do sth
+        }
+        catch (InvalidBlockAddressException e)
+        {
+            //TODO do sth
+        }
+        catch (DiskFullException e)
+        {
+            //TODO do sth
+        }
+        catch (BlockFullException e)
+        {
+            //TODO do sth
+        }
     }
 
-    public void exportToHost(VObject source, File destination)
+    /**
+     * This method export the given object from this virtual file system into
+     * the specified file on the host file system.
+     *
+     * @param source object to export
+     * @param destination file to write in
+     */
+    public void exportToHost(VFile source, File destination)
     {
-        // TODO
-        throw new NotImplementedException();
+        try
+        {
+            FileOutputStream stream = new FileOutputStream(destination);
+
+            byte[] bytes = new byte[DataBlock.MAX_DATA_BLOCK_SIZE];
+
+            VFileOutputStream iterator = source.iterator();
+
+            while(iterator.hasNext())
+            {
+                stream.write(iterator.next().array());
+            }
+
+            stream.close();
+        }
+        catch (IOException e)
+        {
+            //TODO do sth
+        }
     }
 
     public void stats()
@@ -229,8 +396,7 @@ public class VDisk
                 }
             } catch (IOException e)
             {
-                // TODO
-                e.printStackTrace();
+                //TODO do sth
             }
         }
 

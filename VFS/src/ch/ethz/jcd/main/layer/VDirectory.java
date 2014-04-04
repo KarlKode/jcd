@@ -83,7 +83,9 @@ public class VDirectory extends VObject<DirectoryBlock>
     }
 
     /**
-     * This method adds either a file or a directory to this directory
+     * This method adds either a file or a directory to this directory. It first
+     * crops the given entry from its current parent and then attach it to this
+     * directory.
      *
      * @param entry to add
      * @throws BlockFullException
@@ -91,18 +93,26 @@ public class VDirectory extends VObject<DirectoryBlock>
      */
     public void addEntry(VObject entry) throws BlockFullException, IOException
     {
+        //TODO throw invalid name / duplicate exception
+
+        entry.crop();
+        entry.parent = this;
         block.addEntry(entry.getBlock());
     }
 
     /**
      * This method removes either a file or a directory from this directory
      *
+     * WARNING: removing an entry without moving oder deleting it leads to
+     * unlinked blocks. Make sure you either relink or free the affected blocks
+     * when using this method.
+     *
      * @param entry to remove
      * @throws IOException
      */
     public void removeEntry(VObject entry) throws IOException
     {
-        block.removeEntry(entry.getBlock());
+        entry.crop( );
     }
 
     /**
@@ -127,12 +137,18 @@ public class VDirectory extends VObject<DirectoryBlock>
 
     /**
      * Removes all the entries this directory contains
+     *
+     * WARNING: removing entries without moving oder deleting it leads to
+     * unlinked blocks. Make sure you either relink or free the affected blocks
+     * when using this method.
+     *
+
      */
     public void removeAll() throws IOException
     {
         for(VObject object : this.getEntries())
         {
-            this.removeEntry(object);
+            object.crop();
         }
     }
 
