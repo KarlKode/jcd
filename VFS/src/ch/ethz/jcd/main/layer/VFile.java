@@ -40,7 +40,7 @@ public class VFile extends VObject<FileBlock>
      * @throws DiskFullException
      */
     @Override
-    public void copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
+    public VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
     {
         FileBlock fileBlock = vUtil.allocateFileBlock();
 
@@ -53,6 +53,8 @@ public class VFile extends VObject<FileBlock>
 
         VFile copy = new VFile(fileBlock, destination);
         destination.addEntry(copy);
+
+        return copy;
     }
 
     /**
