@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import static org.junit.Assert.*;
@@ -60,6 +61,18 @@ public class BitMapBlockTest
         assertFalse(block.equals(new Block(fileManager, BLOCK_ADDRESS - 1)));
         assertTrue(block.equals(block));
         assertTrue(block.equals(new Block(fileManager, BLOCK_ADDRESS)));
+    }
+
+    @Test
+    public void testInit()
+    {
+        try {
+            this.block.initialize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(this.block.getUsedBlocks() == 3);
+        assertTrue(this.block.getFreeBlocks() == VUtil.BLOCK_SIZE*8 - 3);
     }
 
     @Test
