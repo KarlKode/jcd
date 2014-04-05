@@ -5,8 +5,6 @@ import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.utils.VUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -20,7 +18,7 @@ public class VFile extends VObject<FileBlock>
     /**
      * Instantiation of a new VFile.
      *
-     * @param block containing the byte structure of the VFile
+     * @param block  containing the byte structure of the VFile
      * @param parent of the VFile
      */
     public VFile(FileBlock block, VDirectory parent)
@@ -31,7 +29,7 @@ public class VFile extends VObject<FileBlock>
     /**
      * This Method copies the VFile to the given destination
      *
-     * @param vUtil used to allocate Blocks
+     * @param vUtil       used to allocate Blocks
      * @param destination where to put the copied VObject
      *
      * @throws BlockFullException
@@ -40,33 +38,37 @@ public class VFile extends VObject<FileBlock>
      * @throws DiskFullException
      */
     @Override
-    public VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException
+    public VObject copy(VUtil vUtil, VDirectory destination)
+            throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException
     {
         FileBlock fileBlock = vUtil.allocateFileBlock();
 
-        for(DataBlock src: this.block.getDataBlockList())
+        for (DataBlock src : this.block.getDataBlockList())
         {
             DataBlock dest = vUtil.allocateDataBlock();
             dest.setContent(src.getContent());
-            fileBlock.addDataBlock(dest, src.size());
+            fileBlock.addDataBlock(dest);
         }
 
         VFile copy = new VFile(fileBlock, destination);
+        copy.setName(this.getName());
         destination.addEntry(copy);
 
         return copy;
     }
 
     /**
-     *  This Method deletes the VFile
+     * This Method deletes the VFile
      *
      * @param vUtil used to free the corresponding Blocks
+     *
      * @throws IOException
      */
     @Override
-    public void delete(VUtil vUtil) throws IOException
+    public void delete(VUtil vUtil)
+            throws IOException
     {
-        for(DataBlock b: block.getDataBlockList( ))
+        for (DataBlock b : block.getDataBlockList())
         {
             vUtil.free(b);
         }
@@ -74,97 +76,39 @@ public class VFile extends VObject<FileBlock>
         vUtil.free(block);
     }
 
-
-    // TODO fix exceptions
-    // TODO: Check whole method for off by 1 errors!
-    // TODO: fix usedBytes
-    public void write(byte[] bytes, long startPosition) throws IOException, InvalidDataBlockOffsetException, BlockFullException, InvalidBlockSizeException
+    /**
+     * This method compare the given object to this VFile and checks if they
+     * are equal or not. For the equality of two VFile the following
+     * properties must be equal.
+     * - name, path, size
+     * <p/>
+     * WARNING: due to performance reasons, checking the underlying structure
+     * of its equality is skipped
+     *
+     * @param obj to compare with
+     *
+     * @return true if the given object ist equal to this, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj)
     {
-        // Add new blocks to the end of the file if needed
-        for (long remainingBytes = startPosition + bytes.length - block.size();
-             remainingBytes > 0;
-             remainingBytes = startPosition + bytes.length - block.size())
+        boolean equal = true;
+
+        if (obj != null && obj instanceof VFile)
         {
-            int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
-
-            // TODO: Create new DataBlock
-            block.addDataBlock(null, usedBytes);
-        }
-
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
-        int lastDataBlockIndex = (int) ((startPosition + bytes.length) / VUtil.BLOCK_SIZE);
-        byte[] buffer;
-
-        // Write first block
-        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
-        int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
-        buffer = new byte[firstDataBlockLength];
-        // TODO: read might not fill the whole buffer
-        if (in.read(buffer) != buffer.length)
-        {
-            throw new IOException();
-        }
-        block.getDataBlock(firstDataBlockIndex).setContent(buffer, firstDataBlockOffset);
-
-        // Write all block between the first and the last block
-        for (int currentBlockIndex = firstDataBlockIndex + 1; currentBlockIndex < lastDataBlockIndex; currentBlockIndex++)
-        {
-            buffer = new byte[VUtil.BLOCK_SIZE];
-            // TODO: read might not fill the whole buffer
-            if (in.read(buffer) != buffer.length)
+            try
             {
-                throw new IOException();
+                equal = equal && this.getPath().equals(((VFile) obj).getPath());
+                equal = equal && this.block.size() == ((VFile) obj).block.size();
+                equal = equal && this.getName().equals(((VFile) obj).getName());
             }
-            block.getDataBlock(currentBlockIndex).setContent(buffer);
-        }
-
-        // If necessary write the last block
-        if (firstDataBlockIndex != lastDataBlockIndex)
-        {
-            int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
-            buffer = new byte[lastDataBlockLength];
-            // TODO: read might not fill the whole buffer
-            if (in.read(buffer) != buffer.length)
+            catch (IOException e)
             {
-                throw new IOException();
+                equal = false;
             }
-            block.getDataBlock(lastDataBlockIndex).setContent(buffer);
-        }
-    }
-
-    public byte[] read(long startPosition, int length) throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
-    {
-        if (startPosition + length > block.size())
-        {
-            throw new FileTooSmallException();
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
-
-        //(VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE) is equivalent to Math.ceil()
-        int lastDataBlockIndex = (int) ((startPosition + length) / VUtil.BLOCK_SIZE);
-
-        // Read first block
-        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
-        int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
-        out.write(block.getDataBlock(firstDataBlockIndex).getContent(firstDataBlockOffset, firstDataBlockLength));
-
-        // Read all block between the first and the last block
-        for (int currentBlock = firstDataBlockIndex + 1; currentBlock < lastDataBlockIndex; currentBlock++)
-        {
-            out.write(block.getDataBlock(currentBlock).getContent());
-        }
-
-        // If necessary read the last block
-        if (firstDataBlockIndex != lastDataBlockIndex)
-        {
-            int lastDataBlockLength = (int) ((startPosition + length) % VUtil.BLOCK_SIZE);
-            out.write(block.getDataBlock(lastDataBlockIndex).getContent(0, lastDataBlockLength));
-        }
-
-        return out.toByteArray();
+        return equal;
     }
 
     /**
@@ -172,7 +116,8 @@ public class VFile extends VObject<FileBlock>
      *
      * @return the input stream
      */
-    public VFileImputStream inputStream(VUtil vUtil) throws IOException
+    public VFileImputStream inputStream(VUtil vUtil)
+            throws IOException
     {
         return new VFileImputStream(vUtil, this);
     }
@@ -192,22 +137,24 @@ public class VFile extends VObject<FileBlock>
          *
          * @param vUtil used to allocate Blocks
          */
-        private VFileImputStream(VUtil vUtil, VFile vFile) throws IOException
+        private VFileImputStream(VUtil vUtil, VFile vFile)
+                throws IOException
         {
             this.vUtil = vUtil;
             this.vFile = vFile;
 
-            for(DataBlock b: block.getDataBlockList( ))
+            for (DataBlock b : block.getDataBlockList())
             {
                 this.vUtil.free(b);
             }
         }
 
-        public void put(byte[] bytes) throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
+        public void put(byte[] bytes)
+                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
         {
             DataBlock dataBlock = vUtil.allocateDataBlock();
             dataBlock.setContent(bytes);
-            vFile.block.addDataBlock(dataBlock, bytes.length);
+            vFile.block.addDataBlock(dataBlock);
         }
     }
 
@@ -243,8 +190,6 @@ public class VFile extends VObject<FileBlock>
         }
 
         /**
-         *
-         *
          * @return true if there is a next element, false otherwise
          */
         @Override
@@ -286,9 +231,111 @@ public class VFile extends VObject<FileBlock>
          * exception.
          */
         @Override
-        public void remove( )
+        public void remove()
         {
             throw new UnsupportedOperationException();
         }
     }
 }
+
+/*
+
+    // TODO: bruched mer worschindli nid
+    // TODO fix exceptions
+    // TODO: Check whole method for off by 1 errors!
+    // TODO: fix usedBytes
+    public void write(byte[] bytes, long startPosition)
+            throws IOException, InvalidDataBlockOffsetException, BlockFullException, InvalidBlockSizeException
+    {
+        // Add new blocks to the end of the file if needed
+        for (long remainingBytes = startPosition + bytes.length - block.size();
+             remainingBytes > 0;
+             remainingBytes = startPosition + bytes.length - block.size())
+        {
+            int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
+
+            // TODO: Create new DataBlock
+            block.addDataBlock(null);
+        }
+
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
+        int lastDataBlockIndex = (int) ((startPosition + bytes.length) / VUtil.BLOCK_SIZE);
+        byte[] buffer;
+
+        // Write first block
+        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
+        int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
+        buffer = new byte[firstDataBlockLength];
+        // TODO: read might not fill the whole buffer
+        if (in.read(buffer) != buffer.length)
+        {
+            throw new IOException();
+        }
+        block.getDataBlock(firstDataBlockIndex).setContent(buffer, firstDataBlockOffset);
+
+        // Write all block between the first and the last block
+        for (int currentBlockIndex = firstDataBlockIndex + 1;
+             currentBlockIndex < lastDataBlockIndex;
+             currentBlockIndex++)
+        {
+            buffer = new byte[VUtil.BLOCK_SIZE];
+            // TODO: read might not fill the whole buffer
+            if (in.read(buffer) != buffer.length)
+            {
+                throw new IOException();
+            }
+            block.getDataBlock(currentBlockIndex).setContent(buffer);
+        }
+
+        // If necessary write the last block
+        if (firstDataBlockIndex != lastDataBlockIndex)
+        {
+            int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
+            buffer = new byte[lastDataBlockLength];
+            // TODO: read might not fill the whole buffer
+            if (in.read(buffer) != buffer.length)
+            {
+                throw new IOException();
+            }
+            block.getDataBlock(lastDataBlockIndex).setContent(buffer);
+        }
+    }
+
+    public byte[] read(long startPosition, int length)
+            throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
+    {
+        if (startPosition + length > block.size())
+        {
+            throw new FileTooSmallException();
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
+
+        //(VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE) is equivalent to Math.ceil()
+        int lastDataBlockIndex = (int) ((startPosition + length) / VUtil.BLOCK_SIZE);
+
+        // Read first block
+        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
+        int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
+        out.write(block.getDataBlock(firstDataBlockIndex).getContent(firstDataBlockOffset, firstDataBlockLength));
+
+        // Read all block between the first and the last block
+        for (int currentBlock = firstDataBlockIndex + 1;
+             currentBlock < lastDataBlockIndex;
+             currentBlock++)
+        {
+            out.write(block.getDataBlock(currentBlock).getContent());
+        }
+
+        // If necessary read the last block
+        if (firstDataBlockIndex != lastDataBlockIndex)
+        {
+            int lastDataBlockLength = (int) ((startPosition + length) % VUtil.BLOCK_SIZE);
+            out.write(block.getDataBlock(lastDataBlockIndex).getContent(0, lastDataBlockLength));
+        }
+
+        return out.toByteArray();
+    }
+ */

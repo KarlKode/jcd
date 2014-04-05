@@ -50,11 +50,14 @@ public abstract class ObjectBlock extends Block
     }
 
     /**
+     * The visibility is set to protected to avoid abuse by setting the object's
+     * type from file to directory or vis versa.
+     *
      * @param type new type
      * @throws IOException
      * @throws IllegalArgumentException if the new type is not in [TYPE_DIRECTORY, TYPE_FILE]
      */
-    public void setType(byte type) throws IOException, IllegalArgumentException
+    protected void setType(byte type) throws IOException, IllegalArgumentException
     {
         // Check type for validity
         if (type != TYPE_DIRECTORY && type != TYPE_FILE)

@@ -22,9 +22,10 @@ public class DirectoryBlock extends ObjectBlock
     public static final int OFFSET_ENTRY_COUNT = OFFSET_CONTENT;
     public static final int OFFSET_FIRST_ENTRY = OFFSET_ENTRY_COUNT + SIZE_ENTRY_COUNT;
 
-    public DirectoryBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
+    public DirectoryBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException, IOException
     {
         super(fileManager, blockAddress);
+        this.setType(ObjectBlock.TYPE_DIRECTORY);
     }
 
     /**

@@ -19,9 +19,10 @@ public class FileBlock extends ObjectBlock
     public static final int OFFSET_FILE_SIZE = OFFSET_CONTENT;
     public static final int OFFSET_FIRST_ENTRY = OFFSET_FILE_SIZE + SIZE_FILE_SIZE;
 
-    public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
+    public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException, IOException
     {
         super(fileManager, blockAddress);
+        this.setType(ObjectBlock.TYPE_FILE);
     }
 
     /**
@@ -31,34 +32,31 @@ public class FileBlock extends ObjectBlock
      * TODO füegt jo en ganze Block hinzue und tuet nid uffülle falls de letschti no halbe leer isch
      *
      * @param dataBlock to add
-     * @param usedBytes of the DataBlock to add
      * @throws BlockFullException
      * @throws IOException
      */
-    public void addDataBlock(DataBlock dataBlock, int usedBytes) throws BlockFullException, IOException
+    public void addDataBlock(DataBlock dataBlock) throws BlockFullException, IOException
     {
-        if (usedBytes < 0)
+        int dataBlockSize = dataBlock.size();
+        long oldFileSize = size();
+        long newFileSize = oldFileSize;
+        int usedDataBlocks = getUsedDataBlocks(oldFileSize);
+
+        if (dataBlockSize < 0)
         {
             throw new IllegalArgumentException();
         }
 
-        long newSize = size();
-        // Round to next block border if necessary
-        if (newSize % VUtil.BLOCK_SIZE != 0)
-        {
-            newSize += VUtil.BLOCK_SIZE - (newSize % VUtil.BLOCK_SIZE);
-        }
-        newSize += usedBytes;
-
-        if (getUsedDataBlocks(newSize) > getMaxDataBlocks())
+        if ( usedDataBlocks > getMaxDataBlocks())
         {
             throw new BlockFullException();
         }
-
+        // Round to next block border if necessary
+        newFileSize += (newFileSize % VUtil.BLOCK_SIZE != 0) ? VUtil.BLOCK_SIZE - (newFileSize % VUtil.BLOCK_SIZE) : dataBlockSize;
         // Write the block address of the added data block
-        fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (getUsedDataBlocks(newSize) * SIZE_ENTRY), dataBlock.getBlockAddress());
+        fileManager.writeInt(getBlockOffset(), OFFSET_FIRST_ENTRY + usedDataBlocks * SIZE_ENTRY, dataBlock.getBlockAddress());
         // Write the new file size
-        fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
+        this.setSize(newFileSize);
     }
 
     /**
@@ -88,7 +86,7 @@ public class FileBlock extends ObjectBlock
         // clear the block address of the unlinked DataBlock
         fileManager.writeInt(getBlockOffset(), offset, 0);
         // update the file size
-        fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, newSize);
+        this.setSize(newSize);
 
         return new DataBlock(fileManager, blockAddress);
     }
@@ -130,6 +128,17 @@ public class FileBlock extends ObjectBlock
     public long size() throws IOException
     {
         return fileManager.readLong(getBlockOffset(), OFFSET_FILE_SIZE);
+    }
+
+    /**
+     * Writes the size of the file into its metadata. The visibility is set to
+     * protected to guarantee the file size is only affected by adding or
+     * removing DataBlocks.
+     */
+    protected void setSize(long size)
+            throws IOException
+    {
+        fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, size);
     }
 
     /**

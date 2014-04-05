@@ -19,7 +19,8 @@ public class DataBlock extends Block
     public static int DATA_BLOCK_CONTENT_OFFSET = Integer.SIZE / 8;
     public static int MAX_DATA_BLOCK_SIZE = VUtil.BLOCK_SIZE - DATA_BLOCK_CONTENT_OFFSET;
 
-    public DataBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
+    public DataBlock(FileManager fileManager, int blockAddress)
+            throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
     }
@@ -30,10 +31,13 @@ public class DataBlock extends Block
      *
      * @param contentOffset offset of first byte
      * @param length        number of bytes in total
+     *
      * @return new byte array that contains the read content
+     *
      * @throws IOException
      */
-    public byte[] getContent(int contentOffset, int length) throws IOException
+    public byte[] getContent(int contentOffset, int length)
+            throws IOException
     {
         return fileManager.readBytes(getBlockOffset(), contentOffset, length);
     }
@@ -42,9 +46,11 @@ public class DataBlock extends Block
      * Reads the whole content.
      *
      * @return new byte array that contains the read content
+     *
      * @throws IOException
      */
-    public byte[] getContent() throws IOException
+    public byte[] getContent()
+            throws IOException
     {
         return getContent(DATA_BLOCK_CONTENT_OFFSET, size());
     }
@@ -53,10 +59,12 @@ public class DataBlock extends Block
      * Writes the whole content.
      *
      * @param content new content
+     *
      * @throws IOException
      * @throws InvalidBlockSizeException
      */
-    public void setContent(byte[] content) throws IOException, InvalidBlockSizeException
+    public void setContent(byte[] content)
+            throws IOException, InvalidBlockSizeException
     {
         setContent(content, 0);
     }
@@ -66,12 +74,14 @@ public class DataBlock extends Block
      *
      * @param content new content
      * @param offset  offset of first byte
+     *
      * @throws IOException
      * @throws InvalidBlockSizeException
      */
-    public void setContent(byte[] content, int offset) throws IOException, InvalidBlockSizeException
+    public void setContent(byte[] content, int offset)
+            throws IOException, InvalidBlockSizeException
     {
-        if(content.length > MAX_DATA_BLOCK_SIZE - offset)
+        if (content.length > MAX_DATA_BLOCK_SIZE - offset)
         {
             throw new InvalidBlockSizeException();
         }
@@ -80,18 +90,19 @@ public class DataBlock extends Block
     }
 
     /**
-     *
      * @return the block size in bytes
      */
-    public int size() throws IOException
+    public int size()
+            throws IOException
     {
-       return fileManager.readInt(getBlockOffset(), 0);
+        return fileManager.readInt(getBlockOffset(), 0) + DataBlock.DATA_BLOCK_CONTENT_OFFSET;
     }
 
     /**
      * Sets the number of used bytes and writes it into the DataBlock's metadata.
      */
-    protected void setSize(int usedBytes) throws IOException
+    protected void setSize(int usedBytes)
+            throws IOException
     {
         fileManager.writeInt(getBlockOffset(), 0, usedBytes);
     }

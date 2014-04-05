@@ -103,10 +103,10 @@ public class VFSConsole
         try
         {
             VDisk disk = new VDisk(diskFile);
-            System.out.println(disk.getDirectory(path).getEntries());
-            disk.createDirectory(disk.getDirectory(path), "test");
-            System.out.println(disk.getDirectory(path).getEntries());
-            for (VObject b : disk.getDirectory(path).getEntries())
+            System.out.println(disk.resolve(path).getEntries());
+            disk.mkdir(disk.resolve(path), "test");
+            System.out.println(disk.resolve(path).getEntries());
+            for (VObject b : disk.resolve(path).getEntries())
             {
                 System.out.println(b.getName());
             }
@@ -114,18 +114,6 @@ public class VFSConsole
         {
             e.printStackTrace();
         } catch (IOException e)
-        {
-            e.printStackTrace();
-        } catch (InvalidBlockAddressException e)
-        {
-            e.printStackTrace();
-        } catch (DiskFullException e)
-        {
-            e.printStackTrace();
-        } catch (BlockFullException e)
-        {
-            e.printStackTrace();
-        } catch (InvalidNameException e)
         {
             e.printStackTrace();
         }

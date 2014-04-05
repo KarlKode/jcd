@@ -27,25 +27,25 @@ public class ObjectBlockTest
         fileManager.writeByte(0, ObjectBlock.OFFSET_TYPE, TYPE);
         // Name
         fileManager.writeString(0, ObjectBlock.OFFSET_NAME, NAME);
-        block = new ObjectBlock(fileManager, BLOCK_ADDRESS);
+        //block = new ObjectBlock(fileManager, BLOCK_ADDRESS);
     }
 
     @Test
     public void testConstructor() throws Exception
     {
-        new ObjectBlock(fileManager, 0);
-        new ObjectBlock(fileManager, BLOCK_ADDRESS);
-        new ObjectBlock(fileManager, Integer.MAX_VALUE);
+        //new ObjectBlock(fileManager, 0);
+        //new ObjectBlock(fileManager, BLOCK_ADDRESS);
+        //new ObjectBlock(fileManager, Integer.MAX_VALUE);
         try
         {
-            new ObjectBlock(null, 0);
+          //  new ObjectBlock(null, 0);
             fail("Exception was expected for invalid file manager");
         } catch (IllegalArgumentException e)
         {
         }
         try
         {
-            new ObjectBlock(fileManager, -1);
+            //new ObjectBlock(fileManager, -1);
             fail("Exception was expected for invalid block address");
         } catch (IllegalArgumentException e)
         {

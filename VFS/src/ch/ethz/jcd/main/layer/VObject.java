@@ -59,7 +59,7 @@ public abstract class VObject<T extends ObjectBlock>
      * @throws DiskFullException
      * @throws InvalidBlockSizeException
      */
-    public abstract VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException;
+    public abstract VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException;
 
     /**
      * This Method recursively deletes the VObject

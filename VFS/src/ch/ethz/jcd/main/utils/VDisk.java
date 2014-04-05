@@ -27,7 +27,8 @@ public class VDisk
      *
      * @param diskFile path to the VDisk file
      */
-    public VDisk(File diskFile) throws FileNotFoundException
+    public VDisk(File diskFile)
+            throws FileNotFoundException
     {
         this.diskFile = diskFile;
         vUtil = new VUtil(diskFile);
@@ -42,7 +43,8 @@ public class VDisk
      *                 of blockSize and have space for at least 16 blocks
      *                 (size >= blockSize * 16)
      */
-    public static void format(File diskFile, long size) throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
+    public static void format(File diskFile, long size)
+            throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         VUtil.format(diskFile, size);
     }
@@ -72,6 +74,7 @@ public class VDisk
      * This method lists the content of the given folder.
      *
      * @param destination given
+     *
      * @return list of the content as a HashMap using the object's name as key
      */
     public HashMap<String, VObject> list(VDirectory destination)
@@ -94,22 +97,47 @@ public class VDisk
     }
 
     /**
+     * This method is used to go to the root of the virtual file system tree.
+     */
+    public void chdir()
+    {
+        current = vUtil.getRootDirectory();
+    }
+
+    /**
      * This method is used to navigate in the file system tree. Used to provide
      * the common operations like mkdir, touch, copy and move without specifying
      * the destination.
      *
      * @param path where to go
-     * @throws FileNotFoundException
      */
-    public void chdir(String path) throws FileNotFoundException
+    public void chdir(String path)
     {
-        current = this.getDirectory(path);
+        VDirectory current = this.resolve(path);
+
+        if (current != null)
+        {
+            this.current = current;
+        }
+        else
+        {
+            chdir();
+        }
+    }
+
+    /**
+     * @return the current working directory
+     */
+    public VDirectory pwdir()
+    {
+        return current;
     }
 
     /**
      * This method creates a new directory at the current location.
      *
      * @param name to set
+     *
      * @return the created directory
      */
     public VDirectory mkdir(String name)
@@ -122,6 +150,7 @@ public class VDisk
      *
      * @param destination where to create a new directory
      * @param name        to set
+     *
      * @return the created directory
      */
     public VDirectory mkdir(VDirectory destination, String name)
@@ -161,6 +190,7 @@ public class VDisk
      * This method creates a new file at the current location.
      *
      * @param name to set
+     *
      * @return the created file
      */
     public VFile touch(String name)
@@ -173,6 +203,7 @@ public class VDisk
      *
      * @param destination where to create a new file
      * @param name        to set
+     *
      * @return the created file
      */
     public VFile touch(VDirectory destination, String name)
@@ -288,7 +319,7 @@ public class VDisk
      * @param object to copy
      * @param name   to set
      */
-    public VObject copy(VObject object, String name)
+    public <T extends VObject> T copy(T object, String name)
     {
         return this.copy(object, current, name);
     }
@@ -300,11 +331,11 @@ public class VDisk
      * @param object      to copy
      * @param destination where to copy
      */
-    public VObject copy(VObject object, VDirectory destination)
+    public <T extends VObject> T copy(T object, VDirectory destination)
     {
         try
         {
-            return object.copy(vUtil, destination);
+            return (T) object.copy(vUtil, destination);
         }
         catch (BlockFullException e)
         {
@@ -326,6 +357,10 @@ public class VDisk
         {
             //TODO do sth
         }
+        catch (InvalidNameException e)
+        {
+            //TODO do sth
+        }
 
         return null;
     }
@@ -338,11 +373,11 @@ public class VDisk
      * @param destination where to copy
      * @param name        of copied VObject
      */
-    public VObject copy(VObject object, VDirectory destination, String name)
+    public <T extends VObject> T copy(T object, VDirectory destination, String name)
     {
         VObject copy = this.copy(object, destination);
         this.rename(copy, name);
-        return copy;
+        return (T) copy;
     }
 
     /**
@@ -361,6 +396,17 @@ public class VDisk
         {
             //TODO do sth
         }
+    }
+
+    /**
+     * This method imports the given source file from the host file system into
+     * this virtual file system using the current working directory as destination.
+     *
+     * @param source file to import
+     */
+    public VFile importFromHost(File source)
+    {
+        return importFromHost(source, current);
     }
 
     /**
@@ -426,8 +472,6 @@ public class VDisk
         {
             FileOutputStream stream = new FileOutputStream(destination);
 
-            byte[] bytes = new byte[DataBlock.MAX_DATA_BLOCK_SIZE];
-
             VFileOutputStream iterator = source.iterator();
 
             while (iterator.hasNext())
@@ -458,15 +502,15 @@ public class VDisk
      * This methods resolves a given path and returns the VDirectory.
      *
      * @param path given
+     *
      * @return VDirectory to the given path
-     * @throws FileNotFoundException if the given path could not be resolved
      */
-    public VDirectory getDirectory(String path) throws FileNotFoundException
+    public VDirectory resolve(String path)
     {
         if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR))
         {
             // TODO: Throw correct exception
-            throw new FileNotFoundException();
+            return null;
         }
 
         VDirectory destination = vUtil.getRootDirectory();
@@ -480,14 +524,14 @@ public class VDisk
             try
             {
                 VObject object = destination.getEntry(directories[i]);
-                if (!(object instanceof VDirectory))
+                if (object instanceof VDirectory)
                 {
-                    throw new FileNotFoundException();
+                    destination = (VDirectory) object;
                 }
             }
             catch (IOException e)
             {
-                //TODO do sth
+                return null;
             }
         }
 
