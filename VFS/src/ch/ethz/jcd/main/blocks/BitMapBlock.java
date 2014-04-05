@@ -26,9 +26,27 @@ public class BitMapBlock extends Block
 
     private static final byte USED_MASK = (byte) 0b00000001;
 
+    private Object sync = new Object();
+    private int usedBlocks;
+
+    private int lastSmallestFreeBlockPosition;
+
+
     public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
     {
         super(fileManager, blockAddress);
+
+        //init usedBlocks and lastSmallestFreeBlockPosition
+        try {
+            final byte[] content = fileManager.readBytes(VUtil.getBlockOffset(this.blockAddress), 0, VUtil.BLOCK_SIZE);
+            final BitSet set = BitSet.valueOf(content);
+
+            this.usedBlocks = set.cardinality();
+            this.lastSmallestFreeBlockPosition = set.nextClearBit(0);
+        } catch (IOException e) {
+            //shouldn't be thrown
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -38,7 +56,8 @@ public class BitMapBlock extends Block
      */
     public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException
     {
-        int pos = -1;
+        // -1 because we have a pos++ at first argument in the do-while-loop
+        int pos = (this.lastSmallestFreeBlockPosition / 8)-1;
 
         byte[] val = new byte[1];
         do
@@ -57,8 +76,11 @@ public class BitMapBlock extends Block
         int freeBitInByte = freeBlocks.nextClearBit(0);
         int freeBlockAddress = pos * 8 + freeBitInByte;
 
+        this.lastSmallestFreeBlockPosition = freeBlockAddress;
+
         freeBlocks.set(freeBitInByte);
         fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, freeBlocks.toByteArray()[0]);
+        this.usedBlocks++;
 
         //awesome solution (but not sure if correct)
         //byte newByte = (byte) (val[0] | (freeBitInByte << USED_MASK));
@@ -83,6 +105,8 @@ public class BitMapBlock extends Block
         freeVDisk[0] = firstBlock;
 
         fileManager.writeBytes(VUtil.getBlockOffset(this.blockAddress), 0, freeVDisk);
+        usedBlocks = 3;
+        lastSmallestFreeBlockPosition = 3;
     }
 
     /**
@@ -112,7 +136,12 @@ public class BitMapBlock extends Block
             newValue = set.toByteArray()[0];
         }
 
+        if(blockAddress < lastSmallestFreeBlockPosition){
+            this.lastSmallestFreeBlockPosition = blockAddress;
+        }
+
         fileManager.writeByte(VUtil.getBlockOffset(this.blockAddress), pos, newValue);
+        this.usedBlocks--;
     }
 
     /**
@@ -142,5 +171,13 @@ public class BitMapBlock extends Block
         byte value = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
 
         return !BitSet.valueOf(new byte[]{value}).get(bit);
+    }
+
+    public int getFreeBlocks(){
+        return (VUtil.BLOCK_SIZE*8)-usedBlocks;
+    }
+
+    public int getUsedBlocks(){
+        return this.usedBlocks;
     }
 }
