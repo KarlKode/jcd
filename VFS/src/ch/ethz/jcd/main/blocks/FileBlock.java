@@ -35,9 +35,8 @@ public class FileBlock extends ObjectBlock
      * @throws BlockFullException
      * @throws IOException
      */
-    public void addDataBlock(DataBlock dataBlock) throws BlockFullException, IOException
+    public void addDataBlock(DataBlock dataBlock, int dataBlockSize) throws BlockFullException, IOException
     {
-        int dataBlockSize = dataBlock.size();
         long oldFileSize = size();
         long newFileSize = oldFileSize;
         int usedDataBlocks = getUsedDataBlocks(oldFileSize);

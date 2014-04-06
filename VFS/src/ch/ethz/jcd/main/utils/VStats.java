@@ -1,55 +1,69 @@
 package ch.ethz.jcd.main.utils;
 
+import ch.ethz.jcd.main.blocks.BitMapBlock;
 import ch.ethz.jcd.main.blocks.SuperBlock;
-import ch.ethz.jcd.main.layer.VDirectory;
 
+import java.io.IOException;
+
+/**
+ * Ths class provides some methods to query statistical information about the
+ * virtual file system.
+ */
 public class VStats
 {
-    private VDisk vDisk;
-    private VDirectory root;
     private SuperBlock superBlock;
+    private BitMapBlock bitMapBlock;
 
-    private int totalBlocks;
-
-    public VStats(VDisk vDisk, VDirectory root, SuperBlock superBlock)
+    public VStats(VUtil vUtil)
     {
-        this.vDisk = vDisk;
-        this.root = root;
-        this.superBlock = superBlock;
+        this.superBlock = vUtil.getSuperBlock();
+        this.bitMapBlock = vUtil.getBitMapBlock();
     }
 
+    /**
+     *
+     * @return the disk size
+     * @throws IOException
+     */
     public int diskSize( )
+            throws IOException
     {
-        return 0;
+        return VUtil.BLOCK_SIZE * superBlock.getBlockCount();
     }
 
-    public int freeSpace( )
+    /**
+     *
+     * @return the amount of free space available on disk
+     */
+    public long freeSpace( )
     {
-        return 0;
+        return bitMapBlock.getFreeBlocks() * VUtil.BLOCK_SIZE;
     }
 
-    public int usedSpace( )
+    /**
+     *
+     * @return the amount of used space on disk
+     */
+    public long usedSpace( )
     {
-        return 0;
+        return bitMapBlock.getUsedBlocks() * VUtil.BLOCK_SIZE;
     }
 
+    /**
+     *
+     * @return the number of free blocks available on disk
+     */
     public int freeBlocks( )
     {
-        return 0;
+        return bitMapBlock.getFreeBlocks();
     }
 
+    /**
+     *
+     * @return the number of used blocks on disk
+     */
     public int usedBlocks()
     {
-        return 0;
-    }
-
-    public int fileCount( )
-    {
-        return 0;
-    }
-
-    public int directoryCount( )
-    {
-        return 0;
+        return bitMapBlock.getUsedBlocks();
     }
 }

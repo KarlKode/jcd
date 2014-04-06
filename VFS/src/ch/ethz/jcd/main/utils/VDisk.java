@@ -495,7 +495,7 @@ public class VDisk
      */
     public VStats stats()
     {
-        return new VStats(this, vUtil.getRootDirectory(), vUtil.getSuperBlock());
+        return new VStats(vUtil);
     }
 
     /**
