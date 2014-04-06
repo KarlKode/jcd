@@ -19,7 +19,6 @@ public class VDisk
 
     private final File diskFile;
     private final VUtil vUtil;
-    private VDirectory current;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -31,7 +30,6 @@ public class VDisk
     {
         this.diskFile = diskFile;
         vUtil = new VUtil(diskFile);
-        current = vUtil.getRootDirectory();
     }
 
     /**
@@ -60,16 +58,6 @@ public class VDisk
     }
 
     /**
-     * This method lists the content of the current folder.
-     *
-     * @return list of the content as a HashMap using the object's name as key
-     */
-    public HashMap<String, VObject> list()
-    {
-        return list(current);
-    }
-
-    /**
      * This method lists the content of the given folder.
      *
      * @param destination given
@@ -93,55 +81,6 @@ public class VDisk
         }
 
         return list;
-    }
-
-    /**
-     * This method is used to go to the root of the virtual file system tree.
-     */
-    public void chdir()
-    {
-        current = vUtil.getRootDirectory();
-    }
-
-    /**
-     * This method is used to navigate in the file system tree. Used to provide
-     * the common operations like mkdir, touch, copy and move without specifying
-     * the destination.
-     *
-     * @param path where to go
-     */
-    public void chdir(String path)
-    {
-        VDirectory current = this.resolve(path);
-
-        if (current != null)
-        {
-            this.current = current;
-        }
-        else
-        {
-            chdir();
-        }
-    }
-
-    /**
-     * @return the current working directory
-     */
-    public VDirectory pwdir()
-    {
-        return current;
-    }
-
-    /**
-     * This method creates a new directory at the current location.
-     *
-     * @param name to set
-     *
-     * @return the created directory
-     */
-    public VDirectory mkdir(String name)
-    {
-        return this.mkdir(current, name);
     }
 
     /**
@@ -183,18 +122,6 @@ public class VDisk
             //TODO do sth
         }
         return null;
-    }
-
-    /**
-     * This method creates a new file at the current location.
-     *
-     * @param name to set
-     *
-     * @return the created file
-     */
-    public VFile touch(String name)
-    {
-        return this.touch(current, name);
     }
 
     /**
@@ -241,7 +168,6 @@ public class VDisk
     /**
      * This method renames the given VObject
      * <p/>
-     * //TODO think about only using move
      *
      * @param object to rename
      * @param name   to set
@@ -263,29 +189,22 @@ public class VDisk
     }
 
     /**
-     * This method first renames and the moves the given object and its
-     * underlying structure to the current destination.
-     *
-     * @param object to move
-     * @param name   to set
-     */
-    public void move(VObject object, String name)
-    {
-        this.move(object, current, name);
-    }
-
-    /**
-     * This method moves the given object and its underlying structure to the
-     * specified destination.
+     * This method first renames and then moves the given object and its
+     * underlying structure to the specified destination.
      *
      * @param object      to move
      * @param destination where to move
+     * @param name        to set
      */
-    public void move(VObject object, VDirectory destination)
+    public void move(VObject object, VDirectory destination, String name)
     {
         try
         {
             object.move(destination);
+            if(name != null)
+            {
+                this.rename(object, name);
+            }
         }
         catch (BlockFullException e)
         {
@@ -298,43 +217,25 @@ public class VDisk
     }
 
     /**
-     * This method first renames and then moves the given object and its
-     * underlying structure to the specified destination.
-     *
-     * @param object      to move
-     * @param destination where to move
-     * @param name        to set
-     */
-    public void move(VObject object, VDirectory destination, String name)
-    {
-        this.rename(object, name);
-        this.move(object, destination);
-    }
-
-    /**
-     * This method copies the given VObject to the given destination without renaming
-     * the VObject.
-     *
-     * @param object to copy
-     * @param name   to set
-     */
-    public <T extends VObject> T copy(T object, String name)
-    {
-        return this.copy(object, current, name);
-    }
-
-    /**
-     * This method copies the given VObject to the given destination without renaming
-     * the VObject.
+     * This method copies the given VObject to the given destination with renaming
+     * the VObject
      *
      * @param object      to copy
      * @param destination where to copy
+     * @param name        of copied VObject
      */
-    public <T extends VObject> T copy(T object, VDirectory destination)
+    public <T extends VObject> T copy(T object, VDirectory destination, String name)
     {
         try
         {
-            return (T) object.copy(vUtil, destination);
+            T copy = (T) object.copy(vUtil, destination);
+
+            if(name != null)
+            {
+                this.rename(object, name);
+            }
+
+            return copy;
         }
         catch (BlockFullException e)
         {
@@ -360,23 +261,7 @@ public class VDisk
         {
             //TODO do sth
         }
-
         return null;
-    }
-
-    /**
-     * This method copies the given VObject to the given destination with renaming
-     * the VObject
-     *
-     * @param object      to copy
-     * @param destination where to copy
-     * @param name        of copied VObject
-     */
-    public <T extends VObject> T copy(T object, VDirectory destination, String name)
-    {
-        VObject copy = this.copy(object, destination);
-        this.rename(copy, name);
-        return (T) copy;
     }
 
     /**
@@ -395,17 +280,6 @@ public class VDisk
         {
             //TODO do sth
         }
-    }
-
-    /**
-     * This method imports the given source file from the host file system into
-     * this virtual file system using the current working directory as destination.
-     *
-     * @param source file to import
-     */
-    public VFile importFromHost(File source)
-    {
-        return importFromHost(source, current);
     }
 
     /**

@@ -41,10 +41,11 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
+        VDirectory root = vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY), vStats.freeSpace());
 
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory user = vDisk.mkdir(home, "user");
         VFile pdf = vDisk.touch(user, "test.pdf");
         assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3), vStats.freeSpace());
@@ -58,10 +59,11 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
+        VDirectory root = vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VUtil.BLOCK_SIZE * USED_BLOCKS_WHEN_EMPTY, vStats.usedSpace());
 
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory user = vDisk.mkdir(home, "user");
         VFile pdf = vDisk.touch(user, "test.pdf");
         assertEquals(VUtil.BLOCK_SIZE * (USED_BLOCKS_WHEN_EMPTY + 3), vStats.usedSpace());
@@ -75,10 +77,11 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
+        VDirectory root = vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY, vStats.freeBlocks());
 
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory user = vDisk.mkdir(home, "user");
         VFile pdf = vDisk.touch(user, "test.pdf");
         assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3, vStats.freeBlocks());
@@ -92,10 +95,11 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
+        VDirectory root = vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(USED_BLOCKS_WHEN_EMPTY, vStats.usedBlocks());
 
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory user = vDisk.mkdir(home, "user");
         VFile pdf = vDisk.touch(user, "test.pdf");
         assertEquals(USED_BLOCKS_WHEN_EMPTY + 3, vStats.usedBlocks());

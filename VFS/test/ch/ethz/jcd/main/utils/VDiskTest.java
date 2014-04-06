@@ -44,17 +44,18 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        HashMap<String, VObject> list = vDisk.list();
+        VDirectory root = vDisk.resolve("/");
+        HashMap<String, VObject> list = vDisk.list(root);
 
         assertEquals(0, list.size());
 
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VFile cache = vDisk.touch(phgamper, ".cache");
-        VDirectory etc = vDisk.mkdir("etc");
-        VFile foo = vDisk.touch("foo.c");
+        VDirectory etc = vDisk.mkdir(root, "etc");
+        VFile foo = vDisk.touch(root, "foo.c");
 
-        list = vDisk.list();
+        list = vDisk.list(root);
 
         assertEquals(3, list.size());
         assertEquals(home, list.get("home"));
@@ -67,38 +68,16 @@ public class VDiskTest
     }
 
     @Test
-    public void testChdir()
-            throws FileNotFoundException
-    {
-        VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory home = vDisk.mkdir("home");
-        VDirectory phgamper = vDisk.mkdir(home, "phgamper");
-
-        vDisk.chdir("/home/phgamper/");
-        assertEquals(phgamper, vDisk.pwdir());
-
-        vDisk.chdir();
-        assertEquals(root, vDisk.pwdir());
-
-        vDisk.chdir("/");
-        assertEquals(root, vDisk.pwdir());
-
-        vDisk.chdir("/not/existing/path/");
-        assertEquals(root, vDisk.pwdir());
-    }
-
-    @Test
     public void testMkdir()
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
-        VDirectory etc = vDisk.mkdir("etc");
+        VDirectory etc = vDisk.mkdir(root, "etc");
 
-        HashMap<String, VObject> list = vDisk.list();
+        HashMap<String, VObject> list = vDisk.list(root);
         assertEquals(2, list.size());
         assertEquals(home, list.get("home"));
         assertEquals(etc, list.get("etc"));
@@ -116,15 +95,15 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VFile cache = vDisk.touch(phgamper, ".cache");
         VFile xorg = vDisk.touch(phgamper, "xorg.conf");
         VFile bar = vDisk.touch(phgamper, "bar.db");
-        VFile foo = vDisk.touch("foo.c");
+        VFile foo = vDisk.touch(root, "foo.c");
 
-        HashMap<String, VObject> list = vDisk.list();
+        HashMap<String, VObject> list = vDisk.list(root);
         assertEquals(2, list.size());
         assertEquals(foo, list.get("foo.c"));
         assertEquals(root, foo.getParent());
@@ -144,8 +123,8 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VFile cache = vDisk.touch(phgamper, ".cache");
         VFile xorg = vDisk.touch(phgamper, "xorg.conf");
@@ -160,7 +139,7 @@ public class VDiskTest
         assertEquals(phgamper, bar.getParent());
 
         vDisk.rename(home, "home.bak");
-        list = vDisk.list();
+        list = vDisk.list(root);
         assertEquals(1, list.size());
         assertFalse(list.containsKey("home"));
         assertTrue(list.containsKey("home.bak"));
@@ -182,10 +161,10 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory home = vDisk.mkdir("home");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
-        VDirectory bak = vDisk.mkdir("bak");
+        VDirectory bak = vDisk.mkdir(root, "bak");
         VFile cache = vDisk.touch(phgamper, ".cache");
         VFile xorg = vDisk.touch(phgamper, "xorg.conf");
         VFile bar = vDisk.touch(phgamper, "bar.db");
@@ -193,7 +172,7 @@ public class VDiskTest
         HashMap<String, VObject> list = vDisk.list(bak);
         assertEquals(0, list.size());
 
-        vDisk.move(home, bak);
+        vDisk.move(home, bak, null);
         list = vDisk.list(bak);
         assertEquals(1, list.size());
         assertEquals(home, list.get("home"));
@@ -201,11 +180,11 @@ public class VDiskTest
         list = vDisk.list(phgamper);
         assertEquals(3, list.size());
 
-        vDisk.move(phgamper, "usr");
+        vDisk.move(phgamper, root, "usr");
         list = vDisk.list(home);
         assertEquals(0, list.size());
         assertEquals(root, phgamper.getParent());
-        list = vDisk.list();
+        list = vDisk.list(root);
         assertFalse(list.containsKey("phgamper"));
         assertTrue(list.containsKey("usr"));
 
@@ -217,8 +196,8 @@ public class VDiskTest
         assertTrue(list.containsKey("phgamper"));
 
 
-        vDisk.move(bar, "bar.txt");
-        list = vDisk.list();
+        vDisk.move(bar, root, "bar.txt");
+        list = vDisk.list(root);
         assertEquals(2, list.size());
         assertTrue(list.containsKey("bar.txt"));
         assertFalse(list.containsKey("bar.db"));
@@ -230,11 +209,11 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.pwdir();
-        VDirectory etc = vDisk.mkdir("etc");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory confd = vDisk.mkdir(etc, "conf.d");
         VDirectory initd = vDisk.mkdir(etc, "init.d");
-        VFile foo = vDisk.touch("foo.c");
+        VFile foo = vDisk.touch(root, "foo.c");
         VFile barsh = vDisk.touch(initd, "bar.sh");
         VFile net = vDisk.touch(initd, "net");
 
@@ -245,15 +224,15 @@ public class VDiskTest
         list = vDisk.list(initd);
         assertEquals(oldsize + 1, list.size());
         assertEquals(foocpp, list.get("foo.cpp"));
-        list = vDisk.list();
+        list = vDisk.list(root);
         assertEquals(foo, list.get("foo.c"));
 
 
-        list = vDisk.list();
+        list = vDisk.list(root);
         oldsize = list.size();
         assertFalse(list.containsKey("bar"));
-        VFile bar = vDisk.copy(barsh, "bar");
-        list = vDisk.list();
+        VFile bar = vDisk.copy(barsh, root, "bar");
+        list = vDisk.list(root);
         assertEquals(oldsize + 1, list.size());
         assertEquals(bar, list.get("bar"));
         list = vDisk.list(initd);
@@ -263,16 +242,16 @@ public class VDiskTest
         list = vDisk.list(confd);
         oldsize = list.size();
         assertFalse(list.containsKey("net"));
-        VFile netcopy = vDisk.copy(net, confd);
+        VFile netcopy = vDisk.copy(net, confd, null);
         list = vDisk.list(confd);
         assertEquals(oldsize + 1, list.size());
         assertEquals(netcopy, list.get("net"));
 
-        list = vDisk.list();
+        list = vDisk.list(root);
         oldsize = list.size();
         assertFalse(list.containsKey("home"));
-        VDirectory home = vDisk.copy(initd, "home");
-        list = vDisk.list();
+        VDirectory home = vDisk.copy(initd, root, "home");
+        list = vDisk.list(root);
         assertEquals(oldsize + 1, list.size());
         assertEquals(home, list.get("home"));
 
@@ -288,7 +267,7 @@ public class VDiskTest
         list = vDisk.list(initd);
         oldsize = list.size();
         assertFalse(list.containsKey("usr"));
-        VDirectory usrcopy = vDisk.copy(home, initd);
+        VDirectory usrcopy = vDisk.copy(home, initd, null);
         list = vDisk.list(initd);
         assertEquals(oldsize + 1, list.size());
         assertEquals(usrcopy, list.get("usr"));
@@ -299,15 +278,16 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory bin = vDisk.mkdir("bin");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory bin = vDisk.mkdir(root, "bin");
 
-        HashMap<String, VObject> list = vDisk.list();
+        HashMap<String, VObject> list = vDisk.list(root);
         assertTrue(list.containsKey("bin"));
         vDisk.delete(bin);
-        list = vDisk.list();
+        list = vDisk.list(root);
         assertFalse(list.containsKey("bin"));
 
-        VDirectory usr = vDisk.mkdir("usr");
+        VDirectory usr = vDisk.mkdir(root, "usr");
         VDirectory src = vDisk.mkdir(usr, "src");
         VDirectory linux = vDisk.mkdir(src, "linux");
         VFile config = vDisk.touch(linux, ".config");
@@ -331,13 +311,14 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory bin = vDisk.mkdir("bin");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory bin = vDisk.mkdir(root, "bin");
 
-        HashMap<String, VObject> list = vDisk.list();
+        HashMap<String, VObject> list = vDisk.list(root);
         int oldsize = list.size();
         assertFalse(list.containsKey("simons_cat.jpg"));
-        VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"));
-        list = vDisk.list();
+        VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"), root);
+        list = vDisk.list(root);
         assertEquals(oldsize + 1, list.size());
         assertTrue(list.containsKey("simons_cat.jpg"));
 
@@ -355,7 +336,8 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory bin = vDisk.mkdir("bin");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory bin = vDisk.mkdir(root, "bin");
         VFile foo = vDisk.touch(bin, "foo.c");
 
         File out = new File("data/foo.c");
@@ -369,14 +351,15 @@ public class VDiskTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"));
+        VDirectory root = vDisk.resolve("/");
+        VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"), root);
         File out = new File("data/cat.jpg");
         out.delete();
         out.createNewFile();
         vDisk.exportToHost(cat, out);
         assertTrue(out.exists());
 
-        VFile helloworld = vDisk.importFromHost(new File("data/helloworld.c"));
+        VFile helloworld = vDisk.importFromHost(new File("data/helloworld.c"), root);
         File hello = new File("data/hello.c");
         hello.delete();
         hello.createNewFile();
@@ -388,7 +371,7 @@ public class VDiskTest
         inFile.delete();
         RandomAccessFile raf = new RandomAccessFile(inFile, "rw");
         raf.writeInt(Integer.MAX_VALUE);
-        VFile vFile = vDisk.importFromHost(inFile);
+        VFile vFile = vDisk.importFromHost(inFile, root);
         File outFile = new File("data/import_export.test");
         outFile.delete();
         vDisk.exportToHost(vFile, outFile);
@@ -403,7 +386,8 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory etc = vDisk.mkdir("etc");
+        VDirectory root = vDisk.resolve("/");
+        VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory initd = vDisk.mkdir(etc, "init.d");
         assertEquals(initd, vDisk.resolve("/etc/init.d/"));
     }
