@@ -47,9 +47,10 @@ public class VFile extends VObject<FileBlock>
         {
             DataBlock dest = vUtil.allocateDataBlock();
             dest.setContent(src.getContent());
-            fileBlock.addDataBlock(dest);
+            fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
         }
 
+        fileBlock.setSize(block.size());
         VFile copy = new VFile(fileBlock, destination);
         copy.setName(this.getName());
         destination.addEntry(copy);
@@ -154,7 +155,7 @@ public class VFile extends VObject<FileBlock>
         {
             DataBlock dataBlock = vUtil.allocateDataBlock();
             dataBlock.setContent(bytes);
-            vFile.block.addDataBlock(dataBlock);
+            vFile.block.addDataBlock(dataBlock, bytes.length);
         }
     }
 
@@ -216,7 +217,15 @@ public class VFile extends VObject<FileBlock>
         {
             try
             {
-                ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent());
+                int len = VUtil.BLOCK_SIZE;
+
+                if(vFile.block.isLastDataBlock(next))
+                {
+                    int remainder = (int) vFile.block.size() % VUtil.BLOCK_SIZE;
+                    len = remainder > 0 ? remainder : len;
+                }
+
+                ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent(0, len));
                 next++;
                 return buf;
             }

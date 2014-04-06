@@ -11,14 +11,6 @@ import java.io.IOException;
  */
 public class DataBlock extends Block
 {
-    /**
-     * The max size of a DataBlock is the size of an Integer shorter then the
-     * VUtil.BLOCK_SIZE since the first 4 bytes are holding the number of used
-     * bytes
-     */
-    public static int DATA_BLOCK_CONTENT_OFFSET = Integer.SIZE / 8;
-    public static int MAX_DATA_BLOCK_SIZE = VUtil.BLOCK_SIZE - DATA_BLOCK_CONTENT_OFFSET;
-
     public DataBlock(FileManager fileManager, int blockAddress)
             throws IllegalArgumentException
     {
@@ -52,7 +44,7 @@ public class DataBlock extends Block
     public byte[] getContent()
             throws IOException
     {
-        return getContent(DATA_BLOCK_CONTENT_OFFSET, size());
+        return getContent(0, VUtil.BLOCK_SIZE);
     }
 
     /**
@@ -81,29 +73,10 @@ public class DataBlock extends Block
     public void setContent(byte[] content, int offset)
             throws IOException, InvalidBlockSizeException
     {
-        if (content.length > MAX_DATA_BLOCK_SIZE - offset)
+        if (content.length > VUtil.BLOCK_SIZE - offset)
         {
             throw new InvalidBlockSizeException();
         }
-        setSize(content.length);
-        fileManager.writeBytes(getBlockOffset(), DATA_BLOCK_CONTENT_OFFSET + offset, content);
-    }
-
-    /**
-     * @return the block size in bytes
-     */
-    public int size()
-            throws IOException
-    {
-        return fileManager.readInt(getBlockOffset(), 0) + DataBlock.DATA_BLOCK_CONTENT_OFFSET;
-    }
-
-    /**
-     * Sets the number of used bytes and writes it into the DataBlock's metadata.
-     */
-    protected void setSize(int usedBytes)
-            throws IOException
-    {
-        fileManager.writeInt(getBlockOffset(), 0, usedBytes);
+        fileManager.writeBytes(getBlockOffset(), offset, content);
     }
 }

@@ -1,6 +1,5 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
@@ -425,10 +424,13 @@ public class VDisk
             FileInputStream stream = new FileInputStream(source);
             VFileImputStream vfile = file.inputStream(vUtil);
 
-            byte[] bytes = new byte[DataBlock.MAX_DATA_BLOCK_SIZE];
+            long remaining = stream.available();
 
-            while (stream.read(bytes) > 0)
+            while (0 < remaining)
             {
+                int len = remaining < VUtil.BLOCK_SIZE ? (int) remaining : VUtil.BLOCK_SIZE;
+                byte[] bytes = new byte[len];
+                remaining -= stream.read(bytes);
                 vfile.put(bytes);
             }
 

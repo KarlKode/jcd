@@ -36,8 +36,9 @@ public class VStats
      * @return the amount of free space available on disk
      */
     public long freeSpace( )
+            throws IOException
     {
-        return bitMapBlock.getFreeBlocks() * VUtil.BLOCK_SIZE;
+        return freeBlocks() * VUtil.BLOCK_SIZE;
     }
 
     /**
@@ -46,7 +47,7 @@ public class VStats
      */
     public long usedSpace( )
     {
-        return bitMapBlock.getUsedBlocks() * VUtil.BLOCK_SIZE;
+        return usedBlocks() * VUtil.BLOCK_SIZE;
     }
 
     /**
@@ -54,8 +55,9 @@ public class VStats
      * @return the number of free blocks available on disk
      */
     public int freeBlocks( )
+            throws IOException
     {
-        return bitMapBlock.getFreeBlocks();
+        return diskSize() / VUtil.BLOCK_SIZE - usedBlocks();
     }
 
     /**
