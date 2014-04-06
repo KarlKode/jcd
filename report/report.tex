@@ -51,15 +51,17 @@ The main API classes are
 \item[VDirectory] \hfill\\ Represents a directory in the \emph{VFS}. Provides an interface to get the entries of the directory, add and remove entries and copy or delete the whole directory including it's entries.
 
 \item[VFile] \hfill\\ Represents a file in the \emph{VFS}. Provides an interface to write and read from the file and to copy or delete the file.
+
+\item[VStats] \hfill\\ Provides information about the \emph{VFS}. This includes the size of the \emph{VFS}, used and free space and blocks and the number of directories and files.
 \end{description}
 
 \subsection{Requirements}
 In this section all requirements, that were implemented in the first part, are listed. For each requirement there is a short description of the requirement and how it is implemented in the project.
 
 \subparagraph{The virtual disk must be stored in a single file in the working directory in the host file system} \hfill\\
-The idea behind the virtual disk is to store a whole file system in a single file in an existing file system. This requirement was implemented was implemented in \texttt{VDisk}.
+The idea behind the virtual disk is to store a virtual file system in a single file in an existing file system (which is called the host file system from now on). This requirement is implemented in \texttt{VDisk}.
 
-\subparagraph{\emph{VFS} must support the creation of a new disk with the specified maximum size at the specified location in the host file system}
+\subparagraph{\emph{VFS} must support the creation of a new disk with the specified maximum size at the specified location in the host file system} \hfill\\
 A new \emph{VFS} can be created using the \texttt{VDisk} class. To create a new \emph{VFS} it is necessary to format the \emph{VFS file} using the \texttt{format} method of \texttt{VDisk} before it is used for the first time.
 
 
@@ -70,22 +72,22 @@ Once a \emph{VFS} file has been created and formatted, it can be opened by using
 A previously created \emph{VFS file} can be deleted with the \texttt{discard} method of \texttt{VDisk}. It simply removes the \emph{VFS file} from the host's filesystem.
 
 \subparagraph{\emph{VFS} must support creating/deleting/renaming directories and files} \hfill\\
-All necessary interfaces that handle file/directory creation, deletion and renaming are implemented as methods of \texttt{VDisk}, namely \texttt{touch}/\texttt{mkdir}, \texttt{delete} and \texttt{move}.
+All necessary interfaces that handle file/directory creation, deletion and renaming are implemented as methods of \texttt{VDisk}, namely \texttt{touch}/\texttt{mkdir}, \texttt{delete} and \texttt{rename}.
 
 \subparagraph{\emph{VFS} must support navigation: listing of files and folders, and going to a location expressed by a concrete path} \hfill\\
-
+To keep the \texttt{VDisk} class stateless in regard to the current file or directory, the \texttt{VDisk} class provides a \texttt{resolve} method that expects a path in the \emph{VFS} and returns a \texttt{VDirectory} instance if the path is valid. To list the files and sub-directory, that a directory contains, the \texttt{list} method of \texttt{VDisk} can be used in combination in a previously resolved \texttt{VDirectory}.
 
 \subparagraph{\emph{VFS} must support moving/copying directories and files, including hierarchy} \hfill\\
-
+To move or copy a \texttt{VDirectory} or \texttt{VFile} in the \emph{VFS} there exist the \texttt{move} and \texttt{copy} methods in the \texttt{VDisk} class. Both methods support both copying/moving a \texttt{VDirectory}/\texttt{VFile} without renaming it (thus keeping it's original name) or renaming it in the same step. Copying a directory results in a recursive copy of the directory and all it's content.
 
 \subparagraph{\emph{VFS} must support importing files and directories from the host file system} \hfill\\
-
+To import a file or directory from the host file system into the \emph{VFS}, the \texttt{importFromHost} method of \texttt{VDisk} can be used.
 
 \subparagraph{\emph{VFS} must support exporting files and directories to the host file system} \hfill\\
-
+To export a \texttt{VDirectory} or \texttt{VFile} from the \emph{VFS} into the host file system, the \texttt{exportToHost} method of \texttt{VDisk} can be used.
 
 \subparagraph{\emph{VFS} must support querying of free/occupied space in the virtual disk} \hfill\\
-
+To receive information about the \emph{VFS} the \texttt{stats} method of \texttt{VDisk} can be used. It returns a \texttt{VStats} instance that contains all information about the queries \emph{VFS}
 
 \subsection{Design}
 
