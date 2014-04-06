@@ -68,6 +68,8 @@ public class VDirectory extends VObject<DirectoryBlock>
     public void delete(VUtil vUtil)
             throws IOException
     {
+        parent.removeEntry(this);
+
         for (VObject<ObjectBlock> obj : this.getEntries())
         {
             obj.delete(vUtil);

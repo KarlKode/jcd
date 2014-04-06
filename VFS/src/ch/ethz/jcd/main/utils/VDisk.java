@@ -507,32 +507,29 @@ public class VDisk
      */
     public VDirectory resolve(String path)
     {
+        VDirectory destination = vUtil.getRootDirectory();
+
         if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR))
         {
             // TODO: Throw correct exception
-            return null;
+            destination = null;
         }
 
-        VDirectory destination = vUtil.getRootDirectory();
-
         String[] directories = path.split(PATH_SEPARATOR);
+        int i = 1;
 
-        for (int i = 1;
-             i < directories.length;
-             i++)
+        while (i < directories.length && destination != null)
         {
             try
             {
                 VObject object = destination.getEntry(directories[i]);
-                if (object instanceof VDirectory)
-                {
-                    destination = (VDirectory) object;
-                }
+                destination = object instanceof VDirectory ? (VDirectory) object : null;
             }
             catch (IOException e)
             {
-                return null;
+                destination = null;
             }
+            i++;
         }
 
         return destination;

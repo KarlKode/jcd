@@ -295,6 +295,38 @@ public class VDiskTest
     }
 
     @Test
+    public void testDelete( )
+            throws FileNotFoundException
+    {
+        VDisk vDisk = new VDisk(vdiskFile);
+        VDirectory bin = vDisk.mkdir("bin");
+
+        HashMap<String, VObject> list = vDisk.list();
+        assertTrue(list.containsKey("bin"));
+        vDisk.delete(bin);
+        list = vDisk.list();
+        assertFalse(list.containsKey("bin"));
+
+        VDirectory usr = vDisk.mkdir("usr");
+        VDirectory src = vDisk.mkdir(usr, "src");
+        VDirectory linux = vDisk.mkdir(src, "linux");
+        VFile config = vDisk.touch(linux, ".config");
+        VFile configgz = vDisk.touch(linux, "config.tar.gz");
+        VDirectory arch = vDisk.mkdir(linux, "arch");
+        VDirectory x86_64 = vDisk.mkdir(arch, "x86_64");
+        VDirectory boot = vDisk.mkdir(x86_64, "boot");
+        VFile bzimage = vDisk.touch(boot, "bzimage");
+
+        list = vDisk.list(linux);
+        assertEquals(3, list.size());
+        vDisk.delete(src);
+        list = vDisk.list(usr);
+        assertTrue(list.isEmpty());
+        assertNull(vDisk.resolve("/usr/src/linux/arch/x86_64/boot/"));
+        assertNull(vDisk.resolve("/usr/src/"));
+    }
+
+    @Test
     public void testImportFromHost()
             throws FileNotFoundException
     {
