@@ -1,6 +1,9 @@
 package ch.ethz.jcd.console;
 
-import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
+import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
+import ch.ethz.jcd.main.exceptions.InvalidSizeException;
+import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -8,64 +11,17 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
-public class VFSConsole
+public class VFSCommands
 {
     private VDisk vDisk;
 
-    public VFSConsole(VDisk vDisk)
+    public VFSCommands(VDisk vDisk)
     {
         this.vDisk = vDisk;
-
-                            
     }
 
-    public static void main(String[] args)
-    {
-        quitWithUsageIfLessThan(args, 2);
-
-        String command = args[0];
-        String[] arguments = Arrays.copyOfRange(args, 1, args.length);
-        switch (command)
-        {
-            case "help":
-                help(arguments);
-                break;
-            case "create":
-                vfsCreate(arguments);
-                break;
-            case "destroy":
-                vfsDestroy(arguments);
-                break;
-            case "ls":
-                vfsLs(arguments);
-                break;
-            case "get":
-                vfsGet(arguments);
-                break;
-            case "put":
-                vfsPut(arguments);
-                break;
-            case "rm":
-                vfsRm(arguments);
-                break;
-            case "cp":
-                vfsCp(arguments);
-                break;
-            case "import":
-                vfsImport(arguments);
-                break;
-            case "export":
-                vfsExport(arguments);
-                break;
-            default:
-                usage();
-                System.exit(1);
-        }
-    }
-
-    private static void vfsCreate(String[] arguments)
+    public void vfsCreate(String[] arguments)
     {
         quitWithUsageIfLessThan(arguments, 2);
 
@@ -81,7 +37,7 @@ public class VFSConsole
         }
     }
 
-    private static void vfsDestroy(String[] arguments)
+    public void vfsDestroy(String[] arguments)
     {
         quitWithUsageIfLessThan(arguments, 1);
 
@@ -102,7 +58,7 @@ public class VFSConsole
         System.out.println(String.format("Destroyed VDisk file at \"%s\".", vDiskFilePath));
     }
 
-    private static void vfsLs(String[] arguments)
+    public void vfsLs(String[] arguments)
     {
         quitWithUsageIfLessThan(arguments, 2);
 
@@ -128,37 +84,37 @@ public class VFSConsole
         }
     }
 
-    private static void vfsGet(String[] arguments)
+    public void vfsGet(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void vfsPut(String[] arguments)
+    public void vfsPut(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void vfsRm(String[] arguments)
+    public void vfsRm(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void vfsCp(String[] arguments)
+    public void vfsCp(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void vfsImport(String[] arguments)
+    public void vfsImport(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void vfsExport(String[] arguments)
+    public void vfsExport(String[] arguments)
     {
         throw new NotImplementedException();
     }
 
-    private static void usage()
+    public void usage()
     {
         System.out.println("Usage: vdisk <command>[ arguments]");
         System.out.println();
@@ -175,7 +131,7 @@ public class VFSConsole
         System.out.println("  export <VDisk file> <VPath src> <VPath dst> - Export the VFile VDirectory from <src> to file or directory at <dst>");
     }
 
-    private static void help(String[] arguments)
+    public void help(String[] arguments)
     {
         quitWithUsageIfLessThan(arguments);
 
@@ -212,12 +168,12 @@ public class VFSConsole
         }
     }
 
-    private static void quitWithUsageIfLessThan(String[] arguments)
+    public void quitWithUsageIfLessThan(String[] arguments)
     {
         quitWithUsageIfLessThan(arguments, 1);
     }
 
-    private static void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)
+    public void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)
     {
         if (arguments.length < minArgumentLength)
         {
