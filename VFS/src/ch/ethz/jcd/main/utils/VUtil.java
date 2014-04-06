@@ -11,7 +11,7 @@ import java.io.RandomAccessFile;
 
 public class VUtil
 {
-    public static final int BLOCK_SIZE = 1024000;
+    public static final int BLOCK_SIZE = 4096;
 
     private final FileManager fileManager;
     private final SuperBlock superBlock;

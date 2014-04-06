@@ -26,6 +26,9 @@ public class SuperBlock extends Block
     }
 
     /**
+     * This method loads the maximum number of Blocks that could be stored in
+     * the virtual file system.
+     *
      * @return block count
      * @throws IOException
      */

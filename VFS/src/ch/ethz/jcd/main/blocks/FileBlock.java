@@ -29,15 +29,12 @@ public class FileBlock extends ObjectBlock
      * This method adds the given DataBlock to the FileBlock and links it in
      * the FileBlocks metadata
      *
-     * TODO füegt jo en ganze Block hinzue und tuet nid uffülle falls de letschti no halbe leer isch
-     *
      * @param dataBlock to add
      * @throws BlockFullException
      * @throws IOException
      */
-    public void addDataBlock(DataBlock dataBlock) throws BlockFullException, IOException
+    public void addDataBlock(DataBlock dataBlock, int dataBlockSize) throws BlockFullException, IOException
     {
-        int dataBlockSize = dataBlock.size();
         long oldFileSize = size();
         long newFileSize = oldFileSize;
         int usedDataBlocks = getUsedDataBlocks(oldFileSize);
@@ -47,7 +44,7 @@ public class FileBlock extends ObjectBlock
             throw new IllegalArgumentException();
         }
 
-        if ( usedDataBlocks > getMaxDataBlocks())
+        if (usedDataBlocks > getMaxDataBlocks())
         {
             throw new BlockFullException();
         }
@@ -110,15 +107,6 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
-     *
-     * @return whether the file is empty or not
-     */
-    public boolean isEmpty( ) throws IOException
-    {
-        return !(size() > 0);
-    }
-
-    /**
      * This method computes the size of the by reading the files
      * metadata
      *
@@ -131,11 +119,9 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
-     * Writes the size of the file into its metadata. The visibility is set to
-     * protected to guarantee the file size is only affected by adding or
-     * removing DataBlocks.
+     * Writes the size of the file into its metadata.
      */
-    protected void setSize(long size)
+    public void setSize(long size)
             throws IOException
     {
         fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, size);
@@ -152,7 +138,6 @@ public class FileBlock extends ObjectBlock
         return getUsedDataBlocks(size());
     }
 
-
     /**
      * This method reads the DataBlock to a given DataBlock index linked in the FileBlock.
      *
@@ -163,29 +148,50 @@ public class FileBlock extends ObjectBlock
      */
     public DataBlock getDataBlock(int dataBlockIndex) throws IOException, IllegalArgumentException
     {
-        if (dataBlockIndex < 0 || dataBlockIndex >= getMaxDataBlocks())
+        if (!isValidDataBlockIndex(dataBlockIndex))
         {
             throw new IllegalArgumentException();
         }
-
-        if (dataBlockIndex > count())
-        {
-            throw new IllegalArgumentException();
-        }
-
         // Create a new DataBlock instance that wraps the part of the file that corresponds to dataBlockIndex
         int dataBlockAddress = fileManager.readInt(getBlockOffset(), OFFSET_FIRST_ENTRY + (dataBlockIndex * SIZE_ENTRY));
         return new DataBlock(fileManager, dataBlockAddress);
     }
 
+    /**
+     * This method determines whether the DataBlock at given index is the last
+     * linked DataBlock.
+     *
+     * @param dataBlockIndex to check
+     * @return true if the DataBlock at given index is the last one, false otherwise
+     */
+    public boolean isLastDataBlock(int dataBlockIndex)
+            throws IOException
+    {
+        if (!isValidDataBlockIndex(dataBlockIndex))
+        {
+            throw new IllegalArgumentException();
+        }
+        return dataBlockIndex == count() - 1;
+    }
 
     /**
      *
-     * @return the maximum number of DataBlocks fitting into a FileBlock
+     * @param dataBlockIndex to check
+     * @return true if the given dataBlockIndex is valid
      */
-    private int getMaxDataBlocks()
+    public boolean isValidDataBlockIndex(int dataBlockIndex)
+            throws IOException
     {
-        return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY - 1;
+        return !(dataBlockIndex < 0 || dataBlockIndex >= getMaxDataBlocks() || dataBlockIndex > count());
+    }
+
+    /**
+     *
+     * @return whether the file is empty or not
+     */
+    public boolean isEmpty( ) throws IOException
+    {
+        return !(size() > 0);
     }
 
     /**
@@ -201,6 +207,15 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
+     *
+     * @return the maximum number of DataBlocks fitting into a FileBlock
+     */
+    private int getMaxDataBlocks()
+    {
+        return (VUtil.BLOCK_SIZE - OFFSET_FIRST_ENTRY) / SIZE_ENTRY - 1;
+    }
+
+    /**
      * This method computes the theoretically number of used blocks according
      * to a given file size.
      *
@@ -209,7 +224,6 @@ public class FileBlock extends ObjectBlock
      */
     private int getUsedDataBlocks(long size)
     {
-        // Math.ceil((float) size / (float) VUtil.BLOCK_SIZE)
         return (int) ((size + VUtil.BLOCK_SIZE - 1) / VUtil.BLOCK_SIZE);
     }
 }

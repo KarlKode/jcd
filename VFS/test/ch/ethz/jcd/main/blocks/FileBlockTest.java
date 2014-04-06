@@ -32,8 +32,8 @@ public class FileBlockTest
 
         block = new FileBlock(fileManager, BLOCK_ADDRESS);
         fileManager.writeLong(0, FileBlock.OFFSET_FILE_SIZE, 0L);
-        block.addDataBlock(dataBlock1);
-        block.addDataBlock(dataBlock2);
+        block.addDataBlock(dataBlock1, DATA_BLOCK_1_SIZE);
+        block.addDataBlock(dataBlock2, DATA_BLOCK_2_SIZE);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class FileBlockTest
     public void testAddDataBlock() throws Exception
     {
         DataBlock block0 = new DataBlock(fileManager, BLOCK_ADDRESS + 3);
-        block.addDataBlock(block0);
+        block.addDataBlock(block0, VUtil.BLOCK_SIZE);
         assertEquals(2 * VUtil.BLOCK_SIZE, block.size());
     }
 
