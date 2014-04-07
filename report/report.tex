@@ -226,8 +226,20 @@ A formatted \emph{VFS file} has a fixed-size header, which consists of a super b
 
 \section{Quick Start Guide}
 
-% TODO: Remove this line
-\textbf{[optional: This part has to be completed by April 8th.]}
+To easily see the VFS in action, it comes with a simple console application. The usage of this command line tool is simple:
+
+\begin{enumerate}
+\item open a terminal
+\item navigate to the VFS root directory
+\item launch the console by typing the following command into your prompt
+\[> java -jar VFS.jar data/console.vdisk \]
+\end{enumerate}
+
+The command above make the console loading an existing VDisk. If you want to create a new one, you have to pass the number of blocks to trigger the console to create a new VDisk. The command therefore is
+
+\[> java -jar VFS.jar data/console.vdisk <number of block to allocate>\]
+
+
 
 % TODO: Remove this text and replace it with actual content
 \emph{If you have a command line interface for your VFS, describe here the commands available (e.g. ls, copy, import).} \\ \\ \\
@@ -237,6 +249,7 @@ A formatted \emph{VFS file} has a fixed-size header, which consists of a super b
 
 % TODO: Remove this line
 \noindent\textbf{[This part has to be completed by May 13th.]}
+
 
 % TODO: Remove this text and replace it with actual content
 \emph{Describe how to realize the following use case with your system. Describe the steps involved and how to perform each action (e.g. command line executions and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:

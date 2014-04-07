@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2014.4.6)  7 APR 2014 17:05
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.4.6)  7 APR 2014 17:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **report.tex
 (./report.tex
 LaTeX2e <2011/06/27>
-Babel <3.9h> and hyphenation patterns for 78 languages loaded.
+Babel <3.9f> and hyphenation patterns for 2 languages loaded.
 (/usr/share/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
 (/usr/share/texmf-dist/tex/latex/base/size12.clo
@@ -141,9 +141,6 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
-
-LaTeX Warning: Reference `abstactVdisk' on page 4 undefined on input line 97.
-
 <images/AVDisk.pdf, id=18, 731.73375pt x 488.82625pt>
 File: images/AVDisk.pdf Graphic file (type pdf)
  <use images/AVDisk.pdf>
@@ -152,9 +149,6 @@ Package pdftex.def Info: images/AVDisk.pdf used on input line 111.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: Reference `vdiskheader' on page 4 undefined on input line 118.
 
 <images/VDiskHeader.pdf, id=19, 707.64375pt x 144.54pt>
 File: images/VDiskHeader.pdf Graphic file (type pdf)
@@ -199,22 +193,29 @@ Package pdftex.def Info: images/Blocks.pdf used on input line 148.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[4]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 235.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 235.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 235.
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
-
- []
-
-[4] [5 <./images/AVDisk.pdf> <./images/VDiskHeader.pdf
+[5 <./images/AVDisk.pdf> <./images/VDiskHeader.pdf
 
 pdfTeX warning: pdflatex (file ./images/VDiskHeader.pdf): PDF inclusion: multip
 le pdfs with page group included in a single page
@@ -222,31 +223,27 @@ le pdfs with page group included in a single page
 
 pdfTeX warning: pdflatex (file ./images/BitMapBlock.pdf): PDF inclusion: multip
 le pdfs with page group included in a single page
->] [7 <./images/Blocks.pdf>] (./report.aux)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+>] [7 <./images/Blocks.pdf>] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 1540 strings out of 493308
- 21928 string characters out of 6143617
- 81945 words of memory out of 5000000
- 5004 multiletter control sequences out of 15000+600000
- 7245 words of font info for 26 fonts, out of 8000000 for 9000
- 957 hyphenation exceptions out of 8191
+ 1557 strings out of 495033
+ 22100 string characters out of 6182222
+ 77446 words of memory out of 5000000
+ 4763 multiletter control sequences out of 15000+600000
+ 9683 words of font info for 34 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
  37i,7n,23p,531b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/share/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on report.pdf (7 pages, 231446 bytes).
+</usr/share/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmbxti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12
+.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/shar
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmtt12.pfb>
+Output written on report.pdf (7 pages, 251298 bytes).
 PDF statistics:
- 128 PDF objects out of 1000 (max. 8388607)
- 91 compressed objects within 1 object stream
+ 136 PDF objects out of 1000 (max. 8388607)
+ 97 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 
