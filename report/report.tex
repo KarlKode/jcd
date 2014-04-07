@@ -100,7 +100,7 @@ All previously mentioned interfaces (such as create, rename, move, \dots) are im
 In addition to this there exists a fourth user facing class \texttt{VStats} which provide the user with different kinds of information about the \emph{VFS}.
 Internally the \emph{VFS} uses a helper class \texttt{VUtil}, that offers a mid level API for different operations on the \emph{VFS} (like allocating and freeing blocks).
 
-One layer below the file system uses different block classes that serve as the last abstraction above the physical disk level. Most importantly there exist implementations of \texttt{DirectoryBlock}, \texttt{FileBlock}, \texttt{SuperBlock}, and \texttt{BitMapBlock}.
+One layer below the file system uses different block classes that serve as the last abstraction above the physical disk level. Most importantly there exist implementations of \texttt{DirectoryBlock}, \texttt{FileBlock}, \texttt{SuperBlock} (see figure \ref{superblock}), and \texttt{BitMapBlock} (see figure \ref{bitmapblock}).
 
 The last two blocks exist once for each \emph{VFS} and store specific metadata such as the block count, information about free/used blocks or the block address of the root directory block.
 
@@ -109,7 +109,7 @@ The final level that offers multiple methods to read and write specific types (l
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.4]{images/AVDisk.pdf}
-\caption{Illustration of VDisk}
+\caption{Illustration of \texttt{VDisk}}
 \label{abstactVdisk}
 \end{center}
 \end{figure}
@@ -117,33 +117,33 @@ The final level that offers multiple methods to read and write specific types (l
 \subsubsection{VFS File Format}
 A formatted \emph{VFS file} has a fixed-size header, which consists of a super block (represented by the previously mentioned \texttt{SuperBlock} class, a bitmap block (\texttt{BitMapBlock} and a single directory block (\texttt{DirectoryBlock}) called \texttt{rootDirectoryBlock}. The layout is visible in figure (\ref{vdiskheader}).
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.6]{images/VDiskHeader.pdf}
-\caption{first three Blocks of a VDisk file}
+\caption{first three Blocks of a \texttt{VDisk} file}
 \label{vdiskheader}
 \end{center}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.5]{images/SuperBlock.pdf}
-\caption{representation of our SuperBlock, which contains all necessary properties of the VFS}
+\caption{Representation of the \texttt{SuperBlock}, which contains all necessary properties of the \emph{VFS}}
 \label{superblock}
 \end{center}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.5]{images/BitMapBlock.pdf}
-\caption{representation of our BitMapBlock which keeps track of the used and free block of the VFS}
+\caption{Representation of the \texttt{BitMapBlock} which keeps track of the used and free block of the \emph{VFS}}
 \label{bitmapblock}
 
 \end{center}
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.3]{images/Blocks.pdf}
 \label{blocks}
@@ -153,6 +153,21 @@ A formatted \emph{VFS file} has a fixed-size header, which consists of a super b
 
 
 \subsubsection{Design Patterns}
+\subparagraph{Factory method} \hfill\\
+Used to create new instances of \texttt{DirectoryBlock}, \texttt{FileBlock} and \texttt{DataBlock}.
+
+\subparagraph{Composite} \hfill\\
+The general structure of the whole \texttt{Block} hierarchy (see figure \ref{blocks}).
+
+\subparagraph{Facade} \hfill\\
+Used to make operations on \texttt{VFiles} and \texttt{VDirectory} possible that immediately work on the disk level.
+
+\subparagraph{Iterator} \hfill\\
+Different usages, for example in \texttt{VFile} to read a file with an \texttt{InputStream}.
+
+\subparagraph{Strategy} \hfill\\
+Used in the console application (\texttt{VConsole}).
+
 
 % START multiline comment
 \ifx true false
@@ -229,15 +244,15 @@ A formatted \emph{VFS file} has a fixed-size header, which consists of a super b
 To easily see the VFS in action, it comes with a simple console application. The usage of this command line tool is simple:
 
 \begin{enumerate}
-\item open a terminal
-\item navigate to the VFS root directory
-\item launch the console by typing the following command into your prompt
-\[> java -jar VFS.jar data/console.vdisk \]
+\item Open a terminal
+\item Navigate to the VFS root directory
+\item Launch the console by typing the following command into your prompt
+\[\texttt{> java -jar VFS.jar data/console.vdisk} \]
 \end{enumerate}
 
 The command above make the console loading an existing VDisk. If you want to create a new one, you have to pass the number of blocks to trigger the console to create a new VDisk. The command therefore is
 
-\[> java -jar VFS.jar data/console.vdisk <number of block to allocate>\]
+\[\texttt{> java -jar VFS.jar data/console.vdisk <number of block to allocate>}\]
 
 
 
