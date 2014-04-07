@@ -3,7 +3,7 @@
 
 % add more packages if necessary
 \usepackage{xspace}
-%\usepackage{graphicx}
+\usepackage{graphicx}
 %\usepackage{xcolor}
 %\usepackage{hyperref}
 
@@ -91,17 +91,58 @@ To receive information about the \emph{VFS} the \texttt{stats} method of \texttt
 
 \subsection{Design}
 
-% TODO: Remove this text and replace it with actual content
-\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
-
 In this section we are describing the general design of the application. Additionally we supply an abstract illustration how the VFS is implemented and what the different layers are as well as a detailed view on the used design patterns and how the file system works.
 
 \subsubsection{General Design}
 
-Our VFS has three different Layers, illustrated in figure (...). All in the document specified interfaces such as create, rename, move, etc. are implemented in the VDisk class, thus this is the only Object the user should see/use. Additionally to the VUtil and VStats helper classes (see section 2), there are VFile and VDirectory. Objects of those two classes representing a file resp. a directory in the virtual file system. One layer below we use Blocks to save the data on the hard disk. We differentiate between Directory-, File-, Super-, and BitMapBlock whereas the last two are just once on the VirtualDisk and are necessary to store the information about free/used blocks and properties of the file syste like the blocksize or the address of the first root directory.
+Our VFS has three different Layers, illustrated in figure (\ref{abstactVdisk}). All in the document specified interfaces such as create, rename, move, etc. are implemented in the VDisk class, thus this is the only Object the user should see/use. Additionally to the VUtil and VStats helper classes (see section 2), there are VFile and VDirectory. Objects of those two classes representing a file resp. a directory in the virtual file system. One layer below we use Blocks to save the data on the hard disk. We differentiate between Directory-, File-, Super-, and BitMapBlock whereas the last two are just once on the VirtualDisk and are necessary to store the information about free/used blocks and properties of the file syste like the blocksize or the address of the first root directory.\\
+In the lowest layer there is just one class, called FileManager. Only this class has direct access to the VDisk file, and thus provides all important methods like readInt, readBytes as well as writeInt, writeBytes, writeString, etc. 
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{images/AVDisk.pdf}
+\label{abstactVdisk}
+\caption{Illustration of VDisk}
+\end{center}
+\end{figure}
 
 \subsubsection{VFS File Format}
 
+A well formated VDisk-file has a fixed header, which consists of a SuperBlock, a BitmapBlock and a DirectoryBlock called RootDirectoryBlock as you can see in figure (\ref{vdiskheader}). As soon as one creates and formats a new VDisk, this 3 Blocks will be created.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{images/VDiskHeader.pdf}
+\label{vdiskheader}
+\caption{first three Blocks of a VDisk file}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/SuperBlock.pdf}
+\label{superblock}
+\caption{representation of our SuperBlock, which contains all necessary properties of the VFS}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/BitMapBlock.pdf}
+\label{bitmapblock}
+\caption{representation of our BitMapBlock which keeps track of the used and free block of the VFS}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.3]{images/Blocks.pdf}
+\label{blocks}
+\caption{Schematically illustration how the blocks are arranged}
+\end{center}
+\end{figure}
 
 
 \subsubsection{Design Patterns}
