@@ -16,16 +16,17 @@ public class VFScp extends AbstractVFSCommand
         {
             case 3:
             {
+                String name = args[1];
                 VFile file = (VFile) vDisk.resolve(args[1]);
                 VDirectory destination = console.getCurrent();
                 if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
-                    args[1] = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                    name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
                     destination = resolveDirectory(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
                 if(destination != null && file != null)
                 {
-                    vDisk.copy(file, destination, args[1]);
+                    vDisk.copy(file, destination, name);
                     break;
                 }
             }

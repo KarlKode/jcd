@@ -16,7 +16,6 @@ public class VFSrm extends AbstractVFSCommand
             case 2:
             {
                 VDirectory destination = resolveDirectory(console, args[1]);
-
                 if(destination != null)
                 {
                     vDisk.delete(destination);

@@ -24,12 +24,7 @@ public class VFStouch extends AbstractVFSCommand
                     destination = resolveDirectory(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
 
-                if(destination != null)
-                {
-                    vDisk.touch(destination, name);
-                    break;
-                }
-            }
+           }
             default:
             {
                 usage();
