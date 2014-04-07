@@ -19,15 +19,13 @@ public class VFScd extends AbstractVFSCommand
             }
             case 2:
             {
-                args[1] = normPath(console, args[1]);
-                VDirectory destination = (VDirectory) vDisk.resolve(args[1]);
-                if (destination == null)
+
+                VDirectory destination = resolveDirectory(console, args[1]);
+                if (destination != null)
                 {
-                    usage();
+                    console.setCurrent(destination);
                     break;
                 }
-                console.setCurrent(destination);
-                break;
             }
             default:
             {

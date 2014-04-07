@@ -23,16 +23,13 @@ public class VFSls extends AbstractVFSCommand
             }
             case 2:
             {
-                args[1] = normPath(console, args[1]);
-                VDirectory dir = (VDirectory) vDisk.resolve(args[1]);
-                //TODO path und soo ...
-                if(dir == null)
+                VDirectory destination = resolveDirectory(console, args[1]);
+
+                if(destination != null)
                 {
-                    usage();
+                    out(vDisk.list(destination));
                     break;
                 }
-                out(vDisk.list(dir));
-                break;
             }
             default:
             {

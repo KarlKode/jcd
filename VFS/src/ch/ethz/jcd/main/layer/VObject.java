@@ -64,7 +64,7 @@ public abstract class VObject<T extends ObjectBlock>
     /**
      * This method recursively resolves the given path.
      *
-     * @param path to resolve
+     * @param path to resolveDirectory
      * @return the resolved object, null if no object found
      * @throws IOException
      */

@@ -18,18 +18,13 @@ public class VFSexport extends AbstractVFSCommand
             case 3:
             {
                 File file = new File(args[1]);
-                args[2] = normPath(console, args[2]);
+                VFile source = resolveFile(console, args[2]);
 
-                VFile source = (VFile) vDisk.resolve(args[2]);
-
-                if(source == null)
+                if(source != null)
                 {
-                    usage();
+                    vDisk.exportToHost(source, file);
                     break;
                 }
-
-                vDisk.exportToHost(source, file);
-                break;
             }
             default:
             {

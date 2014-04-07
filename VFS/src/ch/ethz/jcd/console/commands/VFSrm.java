@@ -15,15 +15,13 @@ public class VFSrm extends AbstractVFSCommand
         {
             case 2:
             {
-                args[1] = normPath(console, args[1]);
-                VDirectory destination = (VDirectory) vDisk.resolve(args[1]);
-                if(destination == null)
+                VDirectory destination = resolveDirectory(console, args[1]);
+
+                if(destination != null)
                 {
-                    usage();
+                    vDisk.delete(destination);
                     break;
                 }
-                vDisk.delete(destination);
-                break;
             }
             default:
             {

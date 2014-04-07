@@ -18,17 +18,13 @@ public class VFSimport extends AbstractVFSCommand
             case 3:
             {
                 File file = new File(args[1]);
-                args[2] = normPath(console, args[2]);
-                VDirectory destination = (VDirectory) vDisk.resolve(args[2]);
+                VDirectory destination = resolveDirectory(console, args[2]);
 
-                if(destination == null || !file.exists())
+                if(destination != null || !file.exists())
                 {
-                    usage();
+                    vDisk.importFromHost(file, destination);
                     break;
                 }
-
-                vDisk.importFromHost(file, destination);
-                break;
             }
             default:
             {
