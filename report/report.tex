@@ -3,7 +3,7 @@
 
 % add more packages if necessary
 \usepackage{xspace}
-%\usepackage{graphicx}
+\usepackage{graphicx}
 %\usepackage{xcolor}
 %\usepackage{hyperref}
 
@@ -91,12 +91,66 @@ To receive information about the \emph{VFS} the \texttt{stats} method of \texttt
 
 \subsection{Design}
 
-% TODO: Remove this text and replace it with actual content
-\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+This section describes the general design of the first part of the project. In addition to this it supplies a detailed overview of the \emph{VFS} implementation including the different abstraction layers it uses, an explenation how the \emph{VFS} is stored on the lowest leven and a list of the design pattern it utilizes.
 
 \subsubsection{General Design}
+Our \emph{VFS} has three different layers, illustrated in figure (\ref{abstactVdisk}).
+All previously mentioned interfaces (such as create, rename, move, \dots) are implemented in the \texttt{VDisk} class which serves as the only interface a user should call directly. Files and directories in the \emph{VFS} are represented with the \texttt{VFile} and \texttt{VDirectory} classes respectively.
+
+In addition to this there exists a fourth user facing class \texttt{VStats} which provide the user with different kinds of information about the \emph{VFS}.
+Internally the \emph{VFS} uses a helper class \texttt{VUtil}, that offers a mid level API for different operations on the \emph{VFS} (like allocating and freeing blocks).
+
+One layer below the file system uses different block classes that serve as the last abstraction above the physical disk level. Most importantly there exist implementations of \texttt{DirectoryBlock}, \texttt{FileBlock}, \texttt{SuperBlock}, and \texttt{BitMapBlock}.
+
+The last two blocks exist once for each \emph{VFS} and store specific metadata such as the block count, information about free/used blocks or the block address of the root directory block.
+
+The final level that offers multiple methods to read and write specific types (like integers, byte arrays or UTF-8 strings) from/to the \emph{VFS file} is called \texttt{FileManager}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{images/AVDisk.pdf}
+\caption{Illustration of VDisk}
+\label{abstactVdisk}
+\end{center}
+\end{figure}
 
 \subsubsection{VFS File Format}
+A formatted \emph{VFS file} has a fixed-size header, which consists of a super block (represented by the previously mentioned \texttt{SuperBlock} class, a bitmap block (\texttt{BitMapBlock} and a single directory block (\texttt{DirectoryBlock}) called \texttt{rootDirectoryBlock}. The layout is visible in figure (\ref{vdiskheader}).
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{images/VDiskHeader.pdf}
+\caption{first three Blocks of a VDisk file}
+\label{vdiskheader}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/SuperBlock.pdf}
+\caption{representation of our SuperBlock, which contains all necessary properties of the VFS}
+\label{superblock}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/BitMapBlock.pdf}
+\caption{representation of our BitMapBlock which keeps track of the used and free block of the VFS}
+\label{bitmapblock}
+
+\end{center}
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.3]{images/Blocks.pdf}
+\label{blocks}
+\caption{Schematically illustration how the blocks are arranged}
+\end{center}
+\end{figure}
+
 
 \subsubsection{Design Patterns}
 
