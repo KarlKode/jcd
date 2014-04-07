@@ -27,7 +27,7 @@ public abstract class VObject<T extends ObjectBlock>
     public VObject(T block, VDirectory parent)
     {
         this.block = block;
-        this.parent = parent; // TODO why we don't use the setter here?
+        this.parent = parent;
     }
 
     /**
@@ -60,6 +60,16 @@ public abstract class VObject<T extends ObjectBlock>
      * @throws InvalidBlockSizeException
      */
     public abstract VObject copy(VUtil vUtil, VDirectory destination) throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException;
+
+    /**
+     * This method recursively resolves the given path.
+     *
+     * @param path to resolve
+     * @return the resolved object, null if no object found
+     * @throws IOException
+     */
+    public abstract VObject resolve(String path)
+            throws IOException;
 
     /**
      * This Method recursively deletes the VObject
@@ -122,7 +132,7 @@ public abstract class VObject<T extends ObjectBlock>
             return parent.getPath() + VDisk.PATH_SEPARATOR + getName();
         }
 
-        return VDisk.PATH_SEPARATOR + getName();
+        return getName();
     }
 
     /**

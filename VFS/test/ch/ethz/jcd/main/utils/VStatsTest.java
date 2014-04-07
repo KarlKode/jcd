@@ -41,7 +41,7 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY), vStats.freeSpace());
 
@@ -59,7 +59,7 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VUtil.BLOCK_SIZE * USED_BLOCKS_WHEN_EMPTY, vStats.usedSpace());
 
@@ -77,7 +77,7 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY, vStats.freeBlocks());
 
@@ -95,7 +95,7 @@ public class VStatsTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
         assertEquals(USED_BLOCKS_WHEN_EMPTY, vStats.usedBlocks());
 

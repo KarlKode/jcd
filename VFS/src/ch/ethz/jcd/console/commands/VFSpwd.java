@@ -32,8 +32,8 @@ public class VFSpwd extends AbstractVFSCommand
     }
 
     @Override
-    public void usage()
+    public void help()
     {
-        System.out.println("Error");
+        System.out.println("\tpwd");
     }
 }

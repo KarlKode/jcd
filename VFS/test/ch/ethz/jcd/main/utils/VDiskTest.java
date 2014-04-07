@@ -44,7 +44,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         HashMap<String, VObject> list = vDisk.list(root);
 
         assertEquals(0, list.size());
@@ -72,7 +72,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VDirectory etc = vDisk.mkdir(root, "etc");
@@ -95,7 +95,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VFile cache = vDisk.touch(phgamper, ".cache");
@@ -123,7 +123,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VFile cache = vDisk.touch(phgamper, ".cache");
@@ -161,7 +161,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
         VDirectory bak = vDisk.mkdir(root, "bak");
@@ -209,7 +209,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory confd = vDisk.mkdir(etc, "conf.d");
         VDirectory initd = vDisk.mkdir(etc, "init.d");
@@ -278,7 +278,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
 
         HashMap<String, VObject> list = vDisk.list(root);
@@ -311,7 +311,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
 
         HashMap<String, VObject> list = vDisk.list(root);
@@ -336,7 +336,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
         VFile foo = vDisk.touch(bin, "foo.c");
 
@@ -351,7 +351,7 @@ public class VDiskTest
             throws IOException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"), root);
         File out = new File("data/cat.jpg");
         out.delete();
@@ -386,7 +386,7 @@ public class VDiskTest
             throws FileNotFoundException
     {
         VDisk vDisk = new VDisk(vdiskFile);
-        VDirectory root = vDisk.resolve("/");
+        VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory initd = vDisk.mkdir(etc, "init.d");
         assertEquals(initd, vDisk.resolve("/etc/init.d/"));

@@ -18,15 +18,18 @@ public class VFSls extends AbstractVFSCommand
         {
             case 1:
             {
-                vDisk.list(console.getCurrent());
+                out(vDisk.list(console.getCurrent()));
                 break;
             }
             case 2:
             {
-                VDirectory dir = vDisk.resolve(args[1]);
+                args[1] = normPath(console, args[1]);
+                VDirectory dir = (VDirectory) vDisk.resolve(args[1]);
+                //TODO path und soo ...
                 if(dir == null)
                 {
                     usage();
+                    break;
                 }
                 out(vDisk.list(dir));
                 break;
@@ -40,9 +43,9 @@ public class VFSls extends AbstractVFSCommand
     }
 
     @Override
-    public void usage()
+    public void help()
     {
-        System.out.println("Error");
+        System.out.println("\tls [DEST]");
     }
 
     private void out(HashMap<String, VObject> list)

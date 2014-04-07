@@ -201,7 +201,7 @@ public class VDisk
         try
         {
             object.move(destination);
-            if(name != null)
+            if (name != null)
             {
                 this.rename(object, name);
             }
@@ -230,7 +230,7 @@ public class VDisk
         {
             T copy = (T) object.copy(vUtil, destination);
 
-            if(name != null)
+            if (name != null)
             {
                 this.rename(object, name);
             }
@@ -377,37 +377,33 @@ public class VDisk
     /**
      * This methods resolves a given path and returns the VDirectory.
      *
+     * TODO Direcotry
+     *
      * @param path given
      *
      * @return VDirectory to the given path
      */
-    public VDirectory resolve(String path)
+    public VObject resolve(String path)
     {
-        VDirectory destination = vUtil.getRootDirectory();
-
-        if (path.length() <= 0 || !path.startsWith(PATH_SEPARATOR) || !path.endsWith(PATH_SEPARATOR))
+        if (path == null || path.length() <= 0 || !path.startsWith(PATH_SEPARATOR))
         {
             // TODO: Throw correct exception
-            destination = null;
+            return null;
         }
 
-        String[] directories = path.split(PATH_SEPARATOR);
-        int i = 1;
-
-        while (i < directories.length && destination != null)
+        if (path.endsWith(PATH_SEPARATOR))
         {
-            try
-            {
-                VObject object = destination.getEntry(directories[i]);
-                destination = object instanceof VDirectory ? (VDirectory) object : null;
-            }
-            catch (IOException e)
-            {
-                destination = null;
-            }
-            i++;
+            path = path.substring(0, path.length()-1);
         }
 
-        return destination;
+        try
+        {
+            path = path.substring(path.indexOf(VDisk.PATH_SEPARATOR) + 1);
+            return vUtil.getRootDirectory().resolve(path);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
     }
 }

@@ -21,7 +21,7 @@ public class VFStouch extends AbstractVFSCommand
                 if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
                     name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = vDisk.resolve(args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                    destination = (VDirectory) vDisk.resolve(args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
 
                 vDisk.touch(destination, name);
@@ -36,8 +36,8 @@ public class VFStouch extends AbstractVFSCommand
     }
 
     @Override
-    public void usage()
+    public void help()
     {
-        System.out.println("Error");
+        System.out.println("\ttouch DEST");
     }
 }

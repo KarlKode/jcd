@@ -7,11 +7,16 @@ public class VFShelp extends AbstractVFSCommand
     @Override
     public void execute(VFSConsole console, String[] args)
     {
+        System.out.println("Commands:");
+        for(AbstractVFSCommand cmd : VFSConsole.VFS_COMMANDS.values())
+        {
+            cmd.help();
+        }
     }
 
     @Override
-    public void usage()
+    public void help()
     {
-        System.out.println("Error");
+        System.out.println("\thelp");
     }
 }

@@ -13,18 +13,20 @@ public class VFScd extends AbstractVFSCommand
 
         switch (args.length)
         {
+            case 1:
+            {
+                console.setCurrent((VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR));
+            }
             case 2:
             {
-                VDirectory destination = vDisk.resolve(args[0]);
-
-                if(destination != null)
-                {
-                    console.setCurrent(destination);
-                }
-                else
+                args[1] = normPath(console, args[1]);
+                VDirectory destination = (VDirectory) vDisk.resolve(args[1]);
+                if (destination == null)
                 {
                     usage();
+                    break;
                 }
+                console.setCurrent(destination);
                 break;
             }
             default:
@@ -36,8 +38,8 @@ public class VFScd extends AbstractVFSCommand
     }
 
     @Override
-    public void usage()
+    public void help()
     {
-        System.out.println("Error");
+        System.out.println("\tcd [DEST]");
     }
 }

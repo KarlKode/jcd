@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.layer;
 import ch.ethz.jcd.main.blocks.DirectoryBlock;
 import ch.ethz.jcd.main.blocks.ObjectBlock;
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class VDirectory extends VObject<DirectoryBlock>
         VDirectory copy = new VDirectory(directoryBlock, destination);
         copy.setName(this.getName());
 
-        for (VObject<ObjectBlock> obj : this.getEntries())
+        for (VObject obj : this.getEntries())
         {
             obj.copy(vUtil, copy);
         }
@@ -57,11 +58,49 @@ public class VDirectory extends VObject<DirectoryBlock>
     }
 
     /**
+     * This method recursively resolves the given path.
+     *
+     * @param path to resolve
+     * @return the resolved object, null if no object found
+     * @throws IOException
+     */
+    @Override
+    public VObject resolve(String path)
+            throws IOException
+    {
+        if (path == null || path.startsWith(VDisk.PATH_SEPARATOR))
+        {
+            // TODO: Throw correct exception
+            return null;
+        }
+
+        String[] split = path.split(VDisk.PATH_SEPARATOR);
+
+        if(path.length() == 0)
+        {
+            return this;
+        }
+
+        if(split.length == 1)
+        {
+            return this.getEntry(split[0]);
+        }
+
+        VObject object = this.getEntry(split[0]);
+
+        if(object == null)
+        {
+            return null;
+        }
+
+        return object.resolve(path.substring(path.indexOf(VDisk.PATH_SEPARATOR) + 1));
+    }
+
+    /**
      * This Method recursively deletes the VDirectory
      *
      * @param vUtil used to free the corresponding Blocks
      *
-     * @throws BlockFullException
      * @throws IOException
      */
     @Override
@@ -70,7 +109,7 @@ public class VDirectory extends VObject<DirectoryBlock>
     {
         parent.removeEntry(this);
 
-        for (VObject<ObjectBlock> obj : this.getEntries())
+        for (VObject obj : this.getEntries())
         {
             obj.delete(vUtil);
         }
@@ -177,7 +216,7 @@ public class VDirectory extends VObject<DirectoryBlock>
             throws IOException
     {
         List<ObjectBlock> entryBlocks = block.getEntries();
-        List<VObject> entryObjects = new ArrayList<VObject>(entryBlocks.size());
+        List<VObject> entryObjects = new ArrayList<>(entryBlocks.size());
 
         for (ObjectBlock entryBlock : entryBlocks)
         {
@@ -209,7 +248,7 @@ public class VDirectory extends VObject<DirectoryBlock>
         {
             try
             {
-                equal = equal && this.getPath().equals(((VDirectory) obj).getPath());
+                equal = this.getPath().equals(((VDirectory) obj).getPath());
                 equal = equal && this.getEntries().size() == ((VDirectory) obj).getEntries().size();
                 equal = equal && this.getName().equals(((VDirectory) obj).getName());
             }

@@ -1,7 +1,6 @@
 package ch.ethz.jcd.console;
 
-import ch.ethz.jcd.console.commands.AbstractVFSCommand;
-import ch.ethz.jcd.console.commands.VFSls;
+import ch.ethz.jcd.console.commands.*;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
@@ -23,7 +22,16 @@ public class VFSConsole
     static
     {
         VFS_COMMANDS = new HashMap<>();
+        VFS_COMMANDS.put("cd", new VFScd());
+        VFS_COMMANDS.put("cp", new VFScp());
+        VFS_COMMANDS.put("export", new VFSexport());
+        VFS_COMMANDS.put("import", new VFSimport());
         VFS_COMMANDS.put("ls", new VFSls());
+        VFS_COMMANDS.put("mkdir", new VFSmkdir());
+        VFS_COMMANDS.put("mv", new VFSmv());
+        VFS_COMMANDS.put("pwd", new VFSpwd());
+        VFS_COMMANDS.put("rm", new VFSrm());
+        VFS_COMMANDS.put("touch", new VFStouch());
     }
 
     private VDirectory current;
@@ -33,10 +41,12 @@ public class VFSConsole
     {
         try
         {
-            quitWithUsageIfLessThan(args, 2);
+            quitWithUsageIfLessThan(args, 1);
             File vdiskFile = new File(args[0]);
-            int blockCount = Integer.parseInt(args[1]);
-            VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * blockCount);
+            if(args.length > 1)
+            {
+                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * Integer.parseInt(args[1]));
+            }
             new VFSConsole(new VDisk(vdiskFile));
         }
         catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
@@ -48,7 +58,7 @@ public class VFSConsole
     public VFSConsole(VDisk vDisk)
     {
         this.vDisk = vDisk;
-        current = vDisk.resolve("/");
+        current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
 
         while(true)
         {
@@ -113,16 +123,10 @@ public class VFSConsole
         System.out.println("Usage: vdisk <command>[ arguments]");
         System.out.println();
         System.out.println("Commands:");
-        System.out.println("  help <command> - Get help for a certain command");
-        System.out.println("  create <VDisk file> - Create a new VDisk at <file>");
-        System.out.println("  destroy <VDisk file> - Destroy the existing VDisk at <file>");
-        System.out.println("  ls <VDisk file> <VPath dir> - List contents of VDirectory at <dir>");
-        System.out.println("  get <VDisk file> <VPath file> - Read contents of VFile at <file> and print it to stdout");
-        System.out.println("  put <VDisk file> <VPath file> - Read from stdin into VFile <file>");
-        System.out.println("  rm <VDisk file> <VPath file/dir> - Remove VFile or VDirectory at <file/dir>");
-        System.out.println("  cp <VDisk file> <VPath src> <VPath dst> - Copy VFile or VDirectory from <src> to <dst>");
-        System.out.println("  import <VDisk file> <Path src> <VPath dst> - Import file or directory from <src> to the VFile or VDirectory at <dst>");
-        System.out.println("  export <VDisk file> <VPath src> <VPath dst> - Export the VFile VDirectory from <src> to file or directory at <dst>");
+        for(AbstractVFSCommand cmd : VFS_COMMANDS.values())
+        {
+            cmd.help();
+        }
     }
 
     private static void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)

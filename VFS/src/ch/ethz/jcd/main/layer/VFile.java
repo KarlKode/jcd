@@ -3,6 +3,7 @@ package ch.ethz.jcd.main.layer;
 import ch.ethz.jcd.main.blocks.DataBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
@@ -78,6 +79,28 @@ public class VFile extends VObject<FileBlock>
     }
 
     /**
+     * This method recursively resolves the given path.
+     *
+     * @param path to resolve
+     * @return the resolved object, null if no object found
+     * @throws IOException
+     */
+    @Override
+    public VObject resolve(String path)
+            throws IOException
+    {
+        if (path == null || path.length() <= 0 || path.startsWith(VDisk.PATH_SEPARATOR) || path.endsWith(VDisk.PATH_SEPARATOR))
+        {
+            // TODO: Throw correct exception
+            return null;
+        }
+
+        String[] split = path.split(VDisk.PATH_SEPARATOR);
+
+        return (split.length == 1) ? this : null;
+    }
+
+    /**
      * This method compare the given object to this VFile and checks if they
      * are equal or not. For the equality of two VFile the following
      * properties must be equal.
@@ -99,7 +122,7 @@ public class VFile extends VObject<FileBlock>
         {
             try
             {
-                equal = equal && this.getPath().equals(((VFile) obj).getPath());
+                equal = this.getPath().equals(((VFile) obj).getPath());
                 equal = equal && this.block.size() == ((VFile) obj).block.size();
                 equal = equal && this.getName().equals(((VFile) obj).getName());
             }
@@ -183,7 +206,7 @@ public class VFile extends VObject<FileBlock>
          * Visibility is set to private to ensure the iterator is instantiated
          * correctly
          *
-         * @param vFile
+         * @param vFile to apply the output stream
          */
         private VFileOutputStream(VFile vFile)
         {
