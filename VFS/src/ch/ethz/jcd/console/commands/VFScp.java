@@ -5,8 +5,25 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.utils.VDisk;
 
+/**
+ * This command provides functionality to the VFS similar to the unix command cp.
+ */
 public class VFScp extends AbstractVFSCommand
 {
+    /**
+     * NAME
+     *      cp - copy files and directories
+     * SYNOPSIS
+     *      cp [OPTION]... SOURCE... DEST
+     * DESCRIPTION
+     *      Copy SOURCE to DEST.
+     *
+     *      -h, --help
+     *          prints information about usage
+     *
+     * @param console that executes the command
+     * @param args passed with the command
+     */
     @Override
     public void execute(VFSConsole console, String[] args)
     {
@@ -14,6 +31,14 @@ public class VFScp extends AbstractVFSCommand
 
         switch (args.length)
         {
+            case 2:
+            {
+                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                {
+                    help();
+                    break;
+                }
+            }
             case 3:
             {
                 String name = args[1];
@@ -38,6 +63,9 @@ public class VFScp extends AbstractVFSCommand
         }
     }
 
+    /**
+     * Prints the help of the concrete command.
+     */
     @Override
     public void help()
     {

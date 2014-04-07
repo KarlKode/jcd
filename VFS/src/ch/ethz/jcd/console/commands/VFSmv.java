@@ -5,8 +5,25 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.utils.VDisk;
 
+/**
+ * This command provides functionality to the VFS similar to the unix command mv.
+ */
 public class VFSmv extends AbstractVFSCommand
 {
+    /**
+     * NAME
+     *      mv - move (rename) files or directory
+     * SYNOPSIS
+     *      ls [OPTION]... SOURCE... DEST
+     * DESCRIPTION
+     *      Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
+     *
+     *      -h, --help
+     *          prints information about usage
+     *
+     * @param console that executes the command
+     * @param args passed with the command
+     */
     @Override
     public void execute(VFSConsole console, String[] args)
     {
@@ -14,6 +31,14 @@ public class VFSmv extends AbstractVFSCommand
 
         switch (args.length)
         {
+            case 2:
+            {
+                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                {
+                    help();
+                    break;
+                }
+            }
             case 3:
             {
                 String name = args[1];
@@ -39,6 +64,9 @@ public class VFSmv extends AbstractVFSCommand
         }
     }
 
+    /**
+     * Prints the help of the concrete command.
+     */
     @Override
     public void help()
     {
