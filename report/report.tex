@@ -109,7 +109,9 @@ In the lowest layer there is just one class, called FileManager. Only this class
 
 \subsubsection{VFS File Format}
 
-A well formated VDisk-file has a fixed header, which consists of a SuperBlock, a BitmapBlock and a DirectoryBlock called RootDirectoryBlock as you can see in figure (\ref{vdiskheader}). As soon as one creates and formats a new VDisk, this 3 Blocks will be created.
+A well formated VDisk-file has a fixed header, which consists of a SuperBlock, a BitmapBlock and a DirectoryBlock called RootDirectoryBlock as you can see in figure (\ref{vdiskheader}). As soon as one creates and formats a new VDisk, this 3 Blocks will be created.\\
+
+
 
 \begin{figure}[h]
 \begin{center}
@@ -132,16 +134,18 @@ A well formated VDisk-file has a fixed header, which consists of a SuperBlock, a
 \includegraphics[scale=0.5]{images/BitMapBlock.pdf}
 \caption{representation of our BitMapBlock which keeps track of the used and free block of the VFS}
 \label{bitmapblock}
-
 \end{center}
 \end{figure}
 
+Figure (\ref{bitmapblock}) illustrates the BitMapBlock. As in the first part of this section described the first three bits are always used by Super-, BitMap- and RootDirectory Block. To avoid huge buffered data in memory we read the data byte after byte. Important to mention is which bit is for which address.\\
+Since we read just one byte at the time, we have 8 bits in memory. But, whereas we use \emph{BitSet} to set and unset the bits, we changed the order of the bits. Thats the reason why in figure (\ref{bitmapblock}) the arrangement of the bits is in reverse order.
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.3]{images/Blocks.pdf}
-\label{blocks}
+\includegraphics[scale=0.4]{images/Blocks.pdf}
 \caption{Schematically illustration how the blocks are arranged}
+\label{blocks}
+
 \end{center}
 \end{figure}
 
