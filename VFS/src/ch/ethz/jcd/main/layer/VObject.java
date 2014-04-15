@@ -143,4 +143,18 @@ public abstract class VObject<T extends ObjectBlock>
     {
         return block;
     }
+
+    /**
+     * We have to override it, otherwise we couldnt override the Object.toString function
+     * @return
+     */
+    @Override
+    public String toString(){
+        try {
+            return this.getName();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

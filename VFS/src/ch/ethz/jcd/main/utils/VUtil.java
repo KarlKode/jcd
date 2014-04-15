@@ -31,6 +31,9 @@ public class VUtil
         {
             bitMapBlock = new BitMapBlock(fileManager, superBlock.getFirstBitMapBlock());
             rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
+
+            //hope thats ok..
+            rootBlock.setName("/");
             rootDirectory = new VDirectory(rootBlock, null);
         }
         catch (InvalidBlockAddressException e)

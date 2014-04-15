@@ -83,6 +83,11 @@ public class VDisk
         return list;
     }
 
+    public HashMap<String, VObject> list(){
+        return list(vUtil.getRootDirectory());
+    }
+
+
     /**
      * This method creates a new directory at the given destination.
      *

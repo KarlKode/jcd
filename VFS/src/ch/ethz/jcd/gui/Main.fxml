@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
+<children><MenuBar>
+  <menus>
+    <Menu mnemonicParsing="false" text="File">
+      <items><MenuItem fx:id="menuItemCreateVFS" mnemonicParsing="false" onAction="#onActionMenuItemCreateVFS" text="Create VFS ..." /><MenuItem fx:id="menuItemLoadVFS" mnemonicParsing="false" onAction="#onActionMenuItemLoadVFS" text="Load VFS ..." />
+        <MenuItem fx:id="menuItemClose" mnemonicParsing="false" onAction="#onActionMenuItemClose" text="Close" />
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="Edit">
+      <items><MenuItem fx:id="menuItemAdd" mnemonicParsing="false" onAction="#onActionMenuItemAdd" text="Add" /><MenuItem fx:id="menuItemCopy" mnemonicParsing="false" onAction="#onActionMenuItemCopy" text="Copy" />
+        <MenuItem fx:id="menuItemDelete" mnemonicParsing="false" onAction="#onActionMenuItemDelete" text="Delete" />
+      </items>
+    </Menu>
+  </menus>
+</MenuBar><SplitPane dividerPositions="0.29797979797979796" focusTraversable="true">
+<items><TreeView id="treeViewNavigation" fx:id="treeViewNavigation" /><VBox id="paneBrowser" fx:id="paneBrowser" prefHeight="200.0" prefWidth="100.0">
+<children><BorderPane id="panePath" fx:id="panePath" prefHeight="26.0" prefWidth="368.0">
+<left><Label id="labelPath" fx:id="labelPath" contentDisplay="CENTER" text="Path:" textAlignment="RIGHT" BorderPane.alignment="CENTER">
+<BorderPane.margin>
+<Insets />
+</BorderPane.margin>
+<padding>
+<Insets bottom="4.0" left="4.0" right="8.0" top="4.0" />
+</padding></Label>
+</left>
+<center><TextField id="textFieldPath" fx:id="textFieldPath" alignment="CENTER_RIGHT" onInputMethodTextChanged="#onTextChangedTextFieldPath" prefHeight="26.0" prefWidth="337.0" BorderPane.alignment="CENTER" />
+</center>
+<VBox.margin>
+<Insets />
+</VBox.margin>
+<right><Button fx:id="buttonGotoLocation" mnemonicParsing="false" onAction="#onActionButtonGotoLocation" text="Goto" BorderPane.alignment="CENTER" />
+</right></BorderPane><TilePane id="tilePaneFiles" fx:id="paneContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="518.0" prefTileHeight="2.0" prefTileWidth="2.0" prefWidth="414.0" />
+</children></VBox>
+</items>
+</SplitPane>
+</children></VBox>
