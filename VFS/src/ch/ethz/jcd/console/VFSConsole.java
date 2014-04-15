@@ -15,6 +15,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
+/**
+ * Console application to operate on the VFS.
+ *
+ * To easily see the VFS in action, it comes with a simple console application.
+ * The usage of this command line tool is simple:
+ *
+ *      1) open a terminal
+ *      2) navigate to the VFS root directory
+ *      3) launch the console by typing the following command into your prompt
+ *
+ *          > java -jar VFS.jar data/console.vdisk
+ *
+ * The command above make the console loading an existing VDisk. If you want to
+ * create a new one, you have to pass the number of blocks to trigger the
+ * console to create a new VDisk. The command therefore is
+ *
+ *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
+ *
+ */
 public class VFSConsole
 {
     public static final String QUIT_CMD = "quit";
@@ -37,6 +56,17 @@ public class VFSConsole
     private VDirectory current;
     private VDisk vDisk;
 
+    /**
+     * Start the console and open an existing VDisk
+     *
+     *  > java -jar VFS.jar data/console.vdisk
+     *
+     *  Start the console and create a new VDisk
+     *
+     *  > java -jar VFS.jar data/console.vdisk <number of block to allocate>
+     *
+     * @param args passed to the console to behave in different ways
+     */
     public static void main(String[] args)
     {
         try
@@ -55,6 +85,12 @@ public class VFSConsole
         }
     }
 
+    /**
+     * Instantiate a new console application to operate on the loaded VDisk
+     * passed through the arguments described above
+     *
+     * @param vDisk to operate on
+     */
     public VFSConsole(VDisk vDisk)
     {
         this.vDisk = vDisk;
@@ -75,7 +111,16 @@ public class VFSConsole
         }
     }
 
-    private String[] prompt( String prompt )
+    /**
+     * Prints the prompt of the console application and reads the command
+     * entered by the user.
+     *
+     * TODO make fancy
+     *
+     * @param prompt to output
+     * @return read aguments
+     */
+    private String[] prompt(String prompt)
     {
         try
         {
@@ -89,6 +134,11 @@ public class VFSConsole
         }
     }
 
+    /**
+     * Executes the entered command.
+     *
+     * @param args to pass
+     */
     private void execute(String[] args)
     {
         AbstractVFSCommand cmd = VFS_COMMANDS.get(args[0]);
@@ -103,21 +153,37 @@ public class VFSConsole
         }
     }
 
+    /**
+     *
+     * @return the vDisk
+     */
     public VDisk getVDisk( )
     {
         return vDisk;
     }
 
+    /**
+     *
+     * @return the current/working directory
+     */
     public VDirectory getCurrent( )
     {
         return current;
     }
 
+    /**
+     * Sets the current/working directory
+     *
+     * @param dir to set
+     */
     public void setCurrent(VDirectory dir)
     {
         this.current = dir;
     }
 
+    /**
+     * Prints the usage of the console application
+     */
     private static void usage()
     {
         System.out.println("Usage: vdisk <command>[ arguments]");
@@ -129,6 +195,12 @@ public class VFSConsole
         }
     }
 
+    /**
+     * Checks if the minimum required arguments are passed, quit otherwise.
+     *
+     * @param arguments to check
+     * @param minArgumentLength required
+     */
     private static void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)
     {
         if (arguments.length < minArgumentLength)

@@ -5,8 +5,25 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.utils.VDisk;
 
+/**
+ * This command provides functionality to the VFS similar to the unix command mv.
+ */
 public class VFSmv extends AbstractVFSCommand
 {
+    /**
+     * NAME
+     *      mv - move (rename) files or directory
+     * SYNOPSIS
+     *      ls [OPTION]... SOURCE... DEST
+     * DESCRIPTION
+     *      Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
+     *
+     *      -h, --help
+     *          prints information about usage
+     *
+     * @param console that executes the command
+     * @param args passed with the command
+     */
     @Override
     public void execute(VFSConsole console, String[] args)
     {
@@ -14,27 +31,30 @@ public class VFSmv extends AbstractVFSCommand
 
         switch (args.length)
         {
-            case 3:
+            case 2:
             {
-                VFile file = (VFile) vDisk.resolve(args[1]);
-
-                if(file == null)
+                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
                 {
-                    usage();
+                    help();
                     break;
                 }
-
+            }
+            case 3:
+            {
                 String name = args[1];
+                VFile file = resolveFile(console, args[1]);
                 VDirectory destination = console.getCurrent();
-
                 if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
                     name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = (VDirectory) vDisk.resolve(args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                    destination = resolveDirectory(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
 
-                vDisk.move(file, destination, name);
-                break;
+                if(destination != null && file != null)
+                {
+                    vDisk.move(file, destination, name);
+                    break;
+                }
             }
             default:
             {
@@ -44,6 +64,9 @@ public class VFSmv extends AbstractVFSCommand
         }
     }
 
+    /**
+     * Prints the help of the concrete command.
+     */
     @Override
     public void help()
     {

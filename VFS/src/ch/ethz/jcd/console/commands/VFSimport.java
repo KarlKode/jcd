@@ -6,8 +6,27 @@ import ch.ethz.jcd.main.utils.VDisk;
 
 import java.io.File;
 
+/**
+ * This command provides functionality to the VFS to import from the host file
+ * system to the VFS.
+ */
 public class VFSimport extends AbstractVFSCommand
 {
+    /**
+     * NAME
+     *      import - imports a file into VFS
+     * SYNOPSIS
+     *      import [OPTION]... PATH_TO_HOST_FILE... DEST
+     * DESCRIPTION
+     *      Imports the given file form the host file system into the given
+     *      location at the virtual file system.
+     *
+     *      -h, --help
+     *          prints information about usage
+     *
+     * @param console that executes the command
+     * @param args passed with the command
+     */
     @Override
     public void execute(VFSConsole console, String[] args)
     {
@@ -15,20 +34,24 @@ public class VFSimport extends AbstractVFSCommand
 
         switch (args.length)
         {
+            case 2:
+            {
+                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                {
+                    help();
+                    break;
+                }
+            }
             case 3:
             {
                 File file = new File(args[1]);
-                args[2] = normPath(console, args[2]);
-                VDirectory destination = (VDirectory) vDisk.resolve(args[2]);
+                VDirectory destination = resolveDirectory(console, args[2]);
 
-                if(destination == null || !file.exists())
+                if(destination != null || !file.exists())
                 {
-                    usage();
+                    vDisk.importFromHost(file, destination);
                     break;
                 }
-
-                vDisk.importFromHost(file, destination);
-                break;
             }
             default:
             {
@@ -38,6 +61,9 @@ public class VFSimport extends AbstractVFSCommand
         }
     }
 
+    /**
+     * Prints the help of the concrete command.
+     */
     @Override
     public void help()
     {

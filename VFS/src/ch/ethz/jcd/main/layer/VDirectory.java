@@ -60,7 +60,7 @@ public class VDirectory extends VObject<DirectoryBlock>
     /**
      * This method recursively resolves the given path.
      *
-     * @param path to resolve
+     * @param path to resolveDirectory
      * @return the resolved object, null if no object found
      * @throws IOException
      */

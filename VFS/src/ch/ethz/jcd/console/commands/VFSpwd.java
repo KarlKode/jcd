@@ -4,8 +4,25 @@ import ch.ethz.jcd.console.VFSConsole;
 
 import java.io.IOException;
 
+/**
+ * This command provides functionality to the VFS similar to the unix command pwd.
+ */
 public class VFSpwd extends AbstractVFSCommand
 {
+    /**
+     * NAME
+     *      pwd - print the name of current/working directory
+     * SYNOPSIS
+     *      pwd [OPTION]...
+     * DESCRIPTION
+     *      Print the full filename of the current working directory.
+     *
+     *      -h, --help
+     *          prints information about usage
+     *
+     * @param console that executes the command
+     * @param args passed with the command
+     */
     @Override
     public void execute(VFSConsole console, String[] args)
     {
@@ -16,12 +33,19 @@ public class VFSpwd extends AbstractVFSCommand
                 try
                 {
                     System.out.println(console.getCurrent().getPath());
+                    break;
                 }
-                catch (IOException e)
+                catch (IOException ignored)
                 {
-                    e.printStackTrace();
                 }
-                break;
+            }
+            case 2:
+            {
+                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                {
+                    help();
+                    break;
+                }
             }
             default:
             {
@@ -31,6 +55,9 @@ public class VFSpwd extends AbstractVFSCommand
         }
     }
 
+    /**
+     * Prints the help of the concrete command.
+     */
     @Override
     public void help()
     {

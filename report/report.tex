@@ -91,66 +91,83 @@ To receive information about the \emph{VFS} the \texttt{stats} method of \texttt
 
 \subsection{Design}
 
-In this section we are describing the general design of the application. Additionally we supply an abstract illustration how the VFS is implemented and what the different layers are as well as a detailed view on the used design patterns and how the file system works.
+This section describes the general design of the first part of the project. In addition to this it supplies a detailed overview of the \emph{VFS} implementation including the different abstraction layers it uses, an explenation how the \emph{VFS} is stored on the lowest leven and a list of the design pattern it utilizes.
 
 \subsubsection{General Design}
+Our \emph{VFS} has three different layers, illustrated in figure (\ref{abstactVdisk}).
+All previously mentioned interfaces (such as create, rename, move, \dots) are implemented in the \texttt{VDisk} class which serves as the only interface a user should call directly. Files and directories in the \emph{VFS} are represented with the \texttt{VFile} and \texttt{VDirectory} classes respectively.
 
-Our VFS has three different Layers, illustrated in figure (\ref{abstactVdisk}). All in the document specified interfaces such as create, rename, move, etc. are implemented in the VDisk class, thus this is the only Object the user should see/use. Additionally to the VUtil and VStats helper classes (see section 2), there are VFile and VDirectory. Objects of those two classes representing a file resp. a directory in the virtual file system. One layer below we use Blocks to save the data on the hard disk. We differentiate between Directory-, File-, Super-, and BitMapBlock whereas the last two are just once on the VirtualDisk and are necessary to store the information about free/used blocks and properties of the file syste like the blocksize or the address of the first root directory.\\
-In the lowest layer there is just one class, called FileManager. Only this class has direct access to the VDisk file, and thus provides all important methods like readInt, readBytes as well as writeInt, writeBytes, writeString, etc. 
+In addition to this there exists a fourth user facing class \texttt{VStats} which provide the user with different kinds of information about the \emph{VFS}.
+Internally the \emph{VFS} uses a helper class \texttt{VUtil}, that offers a mid level API for different operations on the \emph{VFS} (like allocating and freeing blocks).
 
+One layer below the file system uses different block classes that serve as the last abstraction above the physical disk level. Most importantly there exist implementations of \texttt{DirectoryBlock}, \texttt{FileBlock}, \texttt{SuperBlock} (see figure \ref{superblock}), and \texttt{BitMapBlock} (see figure \ref{bitmapblock}).
+
+The last two blocks exist once for each \emph{VFS} and store specific metadata such as the block count, information about free/used blocks or the block address of the root directory block.
+
+The final level that offers multiple methods to read and write specific types (like integers, byte arrays or UTF-8 strings) from/to the \emph{VFS file} is called \texttt{FileManager}.
 
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.4]{images/AVDisk.pdf}
-\caption{Illustration of VDisk}
+\caption{Illustration of \texttt{VDisk}}
 \label{abstactVdisk}
 \end{center}
 \end{figure}
 
 \subsubsection{VFS File Format}
+A formatted \emph{VFS file} has a fixed-size header, which consists of a super block (represented by the previously mentioned \texttt{SuperBlock} class, a bitmap block (\texttt{BitMapBlock} and a single directory block (\texttt{DirectoryBlock}) called \texttt{rootDirectoryBlock}. The layout is visible in figure (\ref{vdiskheader}).
 
-A well formated VDisk-file has a fixed header, which consists of a SuperBlock, a BitmapBlock and a DirectoryBlock called RootDirectoryBlock as you can see in figure (\ref{vdiskheader}). As soon as one creates and formats a new VDisk, this 3 Blocks will be created.\\
-
-
-
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.6]{images/VDiskHeader.pdf}
-\caption{first three Blocks of a VDisk file}
+\caption{first three Blocks of a \texttt{VDisk} file}
 \label{vdiskheader}
 \end{center}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.5]{images/SuperBlock.pdf}
-\caption{representation of our SuperBlock, which contains all necessary properties of the VFS}
+\caption{Representation of the \texttt{SuperBlock}, which contains all necessary properties of the \emph{VFS}}
 \label{superblock}
 \end{center}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
 \includegraphics[scale=0.5]{images/BitMapBlock.pdf}
-\caption{representation of our BitMapBlock which keeps track of the used and free block of the VFS}
+\caption{Representation of the \texttt{BitMapBlock} which keeps track of the used and free block of the \emph{VFS}}
 \label{bitmapblock}
+
 \end{center}
 \end{figure}
 
-Figure (\ref{bitmapblock}) illustrates the BitMapBlock. As in the first part of this section described the first three bits are always used by Super-, BitMap- and RootDirectory Block. To avoid huge buffered data in memory we read the data byte after byte. Important to mention is which bit is for which address.\\
-Since we read just one byte at the time, we have 8 bits in memory. But, whereas we use \emph{BitSet} to set and unset the bits, we changed the order of the bits. Thats the reason why in figure (\ref{bitmapblock}) the arrangement of the bits is in reverse order.
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{center}
-\includegraphics[scale=0.4]{images/Blocks.pdf}
-\caption{Schematically illustration how the blocks are arranged}
+\includegraphics[scale=0.3]{images/Blocks.pdf}
 \label{blocks}
-
+\caption{Schematically illustration how the blocks are arranged}
 \end{center}
 \end{figure}
 
 
 \subsubsection{Design Patterns}
+\subparagraph{Factory method} \hfill\\
+Used to create new instances of \texttt{DirectoryBlock}, \texttt{FileBlock} and \texttt{DataBlock}.
+
+\subparagraph{Composite} \hfill\\
+The general structure of the whole \texttt{Block} hierarchy (see figure \ref{blocks}).
+
+\subparagraph{Facade} \hfill\\
+Used to make operations on \texttt{VFiles} and \texttt{VDirectory} possible that immediately work on the disk level.
+
+\subparagraph{Iterator} \hfill\\
+Different usages, for example in \texttt{VFile} to read a file with an \texttt{InputStream}.
+
+\subparagraph{Strategy} \hfill\\
+Used in the console application (\texttt{VConsole}).
+
 
 % START multiline comment
 \ifx true false
@@ -224,8 +241,20 @@ Since we read just one byte at the time, we have 8 bits in memory. But, whereas 
 
 \section{Quick Start Guide}
 
-% TODO: Remove this line
-\textbf{[optional: This part has to be completed by April 8th.]}
+To easily see the VFS in action, it comes with a simple console application. The usage of this command line tool is simple:
+
+\begin{enumerate}
+\item Open a terminal
+\item Navigate to the VFS root directory
+\item Launch the console by typing the following command into your prompt
+\[\texttt{> java -jar VFS.jar data/console.vdisk} \]
+\end{enumerate}
+
+The command above make the console loading an existing VDisk. If you want to create a new one, you have to pass the number of blocks to trigger the console to create a new VDisk. The command therefore is
+
+\[\texttt{> java -jar VFS.jar data/console.vdisk <number of block to allocate>}\]
+
+
 
 % TODO: Remove this text and replace it with actual content
 \emph{If you have a command line interface for your VFS, describe here the commands available (e.g. ls, copy, import).} \\ \\ \\
@@ -235,6 +264,7 @@ Since we read just one byte at the time, we have 8 bits in memory. But, whereas 
 
 % TODO: Remove this line
 \noindent\textbf{[This part has to be completed by May 13th.]}
+
 
 % TODO: Remove this text and replace it with actual content
 \emph{Describe how to realize the following use case with your system. Describe the steps involved and how to perform each action (e.g. command line executions and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:
