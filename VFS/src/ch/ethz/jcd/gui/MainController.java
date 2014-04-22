@@ -16,12 +16,17 @@ import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import javax.swing.plaf.FileChooserUI;
@@ -36,7 +41,7 @@ public class MainController {
     private URL location;
 
     @FXML
-    private TilePane paneContent;
+    private ListView<VObject> listViewFiles;
 
     @FXML
     private MenuItem menuItemDelete;
@@ -91,10 +96,10 @@ public class MainController {
                 final TreeItem<VDirectory> currNode = dirs.pop();
 
                 currNode.getValue().getEntries().forEach(a -> {
-                   if(a instanceof VDirectory){
-                       TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory)a);
-                       dirs.add(tmp);
-                       currNode.getChildren().add(tmp);
+                    if (a instanceof VDirectory) {
+                        final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
+                        dirs.add(tmp);
+                        currNode.getChildren().add(tmp);
                     }
                 });
             }
@@ -104,8 +109,6 @@ public class MainController {
             e.printStackTrace();
             //TODO: dialog
         }
-
-
     }
 
     @FXML
@@ -200,7 +203,7 @@ public class MainController {
 
     @FXML
     void initialize() {
-        assert paneContent != null : "fx:id=\"paneContent\" was not injected: check your FXML file 'Main.fxml'.";
+        assert listViewFiles != null : "fx:id=\"paneContent\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemDelete != null : "fx:id=\"menuItemDelete\" was not injected: check your FXML file 'Main.fxml'.";
         assert panePath != null : "fx:id=\"panePath\" was not injected: check your FXML file 'Main.fxml'.";
         assert buttonGotoLocation != null : "fx:id=\"buttonGotoLocation\" was not injected: check your FXML file 'Main.fxml'.";
@@ -214,6 +217,46 @@ public class MainController {
         assert menuItemClose != null : "fx:id=\"menuItemClose\" was not injected: check your FXML file 'Main.fxml'.";
         assert labelPath != null : "fx:id=\"labelPath\" was not injected: check your FXML file 'Main.fxml'.";
 
+        treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
+                try {
+                    textFieldPath.setText(newValue.getValue().getPath());
+
+                    listViewFiles.getItems().clear();
+                    List<VObject> items = newValue.getValue().getEntries();
+                    listViewFiles.getItems().addAll(items);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //TODO: handle
+                }
+            }
+        });
+
+//        listViewFiles.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<VObject>() {
+//            @Override
+//            public void changed(ObservableValue<? extends VObject> observableValue, VObject oldValue, VObject newValue) {
+                //this approach doesn't work. If I just have this handler, i don't get events when i switch from a
+                //  VDirectory-item to a VFile item and vis a vis
+//            }
+//        });
+
+        listViewFiles.getSelectionModel().selectedItemProperty().addListener((a) ->{
+            try {
+                textFieldPath.setText(((ObservableValue<VObject>)a).getValue().getPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                //TODO: handle
+            }
+        });
+    }
+
+    public Node createFileIcon(VObject item){
+        VBox box = new VBox();
+        //Image icon = new Image();
+        Label name = new Label();
+        name.setWrapText(true);
+        return box;
     }
 }
 

@@ -30,13 +30,15 @@
 <Insets bottom="4.0" left="4.0" right="8.0" top="4.0" />
 </padding></Label>
 </left>
-<center><TextField id="textFieldPath" fx:id="textFieldPath" alignment="CENTER_RIGHT" onInputMethodTextChanged="#onTextChangedTextFieldPath" prefHeight="26.0" prefWidth="337.0" BorderPane.alignment="CENTER" />
+<center><TextField id="textFieldPath" fx:id="textFieldPath" editable="false" onInputMethodTextChanged="#onTextChangedTextFieldPath" prefHeight="26.0" prefWidth="337.0" promptText="Path" BorderPane.alignment="CENTER" />
 </center>
 <VBox.margin>
 <Insets />
 </VBox.margin>
 <right><Button fx:id="buttonGotoLocation" mnemonicParsing="false" onAction="#onActionButtonGotoLocation" text="Goto" BorderPane.alignment="CENTER" />
-</right></BorderPane><TilePane id="tilePaneFiles" fx:id="paneContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="518.0" prefTileHeight="2.0" prefTileWidth="2.0" prefWidth="414.0" />
+</right></BorderPane><ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="360.0" prefWidth="416.0">
+<content><ListView fx:id="listViewFiles" prefHeight="200.0" prefWidth="200.0" />
+</content></ScrollPane>
 </children></VBox>
 </items>
 </SplitPane>

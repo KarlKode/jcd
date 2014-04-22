@@ -33,7 +33,7 @@ public class VUtil
             rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
 
             //hope thats ok..
-            rootBlock.setName("/");
+            rootBlock.setName(VDisk.PATH_SEPARATOR);
             rootDirectory = new VDirectory(rootBlock, null);
         }
         catch (InvalidBlockAddressException e)

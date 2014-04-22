@@ -128,11 +128,19 @@ public abstract class VObject<T extends ObjectBlock>
      */
     public String getPath() throws IOException
     {
+        String path;
+
         if (parent != null) {
-            return parent.getPath() + VDisk.PATH_SEPARATOR + getName();
+            path = parent.getPath() + getName();
+            
+            if (this instanceof VDirectory){
+                path += VDisk.PATH_SEPARATOR;
+            }
+        }else{
+            path = getName();
         }
 
-        return getName();
+        return path;
     }
 
     /**
