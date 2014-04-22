@@ -37,7 +37,7 @@
 </VBox.margin>
 <right><Button fx:id="buttonGotoLocation" mnemonicParsing="false" onAction="#onActionButtonGotoLocation" text="Goto" BorderPane.alignment="CENTER" />
 </right></BorderPane><ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="360.0" prefWidth="416.0">
-<content><ListView fx:id="listViewFiles" prefHeight="200.0" prefWidth="200.0" />
+<content><ListView fx:id="listViewFiles" onDragDetected="#onDragDetectedListViewFiles" onDragDone="#onDragDoneListViewFiles" onDragDropped="#onDragDroppedListViewFiles" onDragOver="#onDragOverListViewFiles" prefHeight="200.0" prefWidth="200.0" />
 </content></ScrollPane>
 </children></VBox>
 </items>

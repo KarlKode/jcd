@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
@@ -18,11 +21,15 @@ import ch.ethz.jcd.main.utils.VUtil;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -33,6 +40,8 @@ import javax.swing.plaf.FileChooserUI;
 
 
 public class MainController {
+    private Executor exec;
+
 
     @FXML
     private ResourceBundle resources;
@@ -80,6 +89,8 @@ public class MainController {
     private Label labelPath;
 
     private VDisk vdisk;
+
+    private VDirectory selectedDirectory;
 
     public MainController() {
     }
@@ -202,6 +213,61 @@ public class MainController {
     }
 
     @FXML
+    void onDragDetectedListViewFiles(DragEvent event) {
+        System.out.println("MainController.onDragDetectedListViewFiles");
+    }
+
+    @FXML
+    void onDragDoneListViewFiles(DragEvent event) {
+        System.out.println("MainController.onDragDoneListViewFiles");
+    }
+
+    @FXML
+    void onDragDroppedListViewFiles(DragEvent event) {
+        Dragboard db = event.getDragboard();
+
+        boolean success = false;
+        if (db.hasFiles()) {
+            success = true;
+
+            try {
+                new Task<Void>(){
+
+                    @Override
+                    protected Void call() throws Exception {
+                        for (File file:db.getFiles()) {
+                            vdisk.importFromHost(file, selectedDirectory);
+                        }
+
+                        Platform.runLater(()->{
+                            refreshTreeView();
+                            refreshListView(selectedDirectory);
+                        });
+
+                        return null;
+                    }
+                }.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    @FXML
+    void onDragOverListViewFiles(DragEvent event) {
+        Dragboard db = event.getDragboard();
+
+        if (db.hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY);
+        } else {
+            event.consume();
+        }
+    }
+
+    @FXML
     void initialize() {
         assert listViewFiles != null : "fx:id=\"paneContent\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemDelete != null : "fx:id=\"menuItemDelete\" was not injected: check your FXML file 'Main.fxml'.";
@@ -220,16 +286,8 @@ public class MainController {
         treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
             @Override
             public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
-                try {
-                    textFieldPath.setText(newValue.getValue().getPath());
-
-                    listViewFiles.getItems().clear();
-                    List<VObject> items = newValue.getValue().getEntries();
-                    listViewFiles.getItems().addAll(items);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //TODO: handle
-                }
+                selectedDirectory = newValue.getValue();
+                refreshListView(newValue.getValue());
             }
         });
 
@@ -249,6 +307,22 @@ public class MainController {
                 //TODO: handle
             }
         });
+
+        exec = Executors.newCachedThreadPool();
+
+    }
+
+    private void refreshListView(VDirectory dir) {
+        try {
+            textFieldPath.setText(dir.getPath());
+
+            listViewFiles.getItems().clear();
+            List<VObject> items = dir.getEntries();
+            listViewFiles.getItems().addAll(items);
+        } catch (IOException e) {
+            e.printStackTrace();
+            //TODO: handle
+        }
     }
 
     public Node createFileIcon(VObject item){
