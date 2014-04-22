@@ -29,12 +29,14 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 
 import javax.swing.plaf.FileChooserUI;
 
@@ -92,6 +94,8 @@ public class MainController {
 
     private VDirectory selectedDirectory;
 
+    private boolean ignoreSelectionChanged = false;
+
     public MainController() {
     }
 
@@ -109,6 +113,7 @@ public class MainController {
                 currNode.getValue().getEntries().forEach(a -> {
                     if (a instanceof VDirectory) {
                         final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
+                        tmp.setExpanded(true);
                         dirs.add(tmp);
                         currNode.getChildren().add(tmp);
                     }
@@ -116,6 +121,7 @@ public class MainController {
             }
 
             this.treeViewNavigation.setRoot(rootNode);
+            this.treeViewNavigation.getRoot().setExpanded(true);
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: dialog
@@ -150,6 +156,7 @@ public class MainController {
             VFile foo = this.vdisk.touch(root, "foo.c");
 
             refreshTreeView();
+            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
         } catch (FileNotFoundException e) {
             //TODO: create dialog
             e.printStackTrace();
@@ -176,6 +183,7 @@ public class MainController {
         try {
             this.vdisk = new VDisk(fileVdisk);
             refreshTreeView();
+            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             //TODO: show dialog
@@ -213,7 +221,7 @@ public class MainController {
     }
 
     @FXML
-    void onDragDetectedListViewFiles(DragEvent event) {
+    void onDragDetectedListViewFiles(MouseEvent event) {
         System.out.println("MainController.onDragDetectedListViewFiles");
     }
 
@@ -227,22 +235,51 @@ public class MainController {
         Dragboard db = event.getDragboard();
 
         boolean success = false;
+
         if (db.hasFiles()) {
             success = true;
 
             try {
                 new Task<Void>(){
-
                     @Override
                     protected Void call() throws Exception {
-                        for (File file:db.getFiles()) {
-                            vdisk.importFromHost(file, selectedDirectory);
+                        Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
+
+                        for(File file : db.getFiles()){
+                            items.add(new Pair<File, VDirectory>(file, selectedDirectory));
                         }
 
-                        Platform.runLater(()->{
-                            refreshTreeView();
-                            refreshListView(selectedDirectory);
-                        });
+                        while(!items.isEmpty()){
+                            Pair<File, VDirectory> tmpItem = items.pop();
+                            File tmpFile = tmpItem.getKey();
+                            VDirectory tmpVDir = tmpItem.getValue();
+
+                            if(tmpFile.isDirectory()){
+                                VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
+
+                                for(File file : tmpFile.listFiles()){
+                                    items.add(new Pair<File, VDirectory>(file, newVDir));
+                                }
+                            }else{
+                                vdisk.importFromHost(tmpFile, tmpVDir);
+
+                                //show progress
+                                if(tmpVDir.equals(selectedDirectory)){
+                                    refreshListView(selectedDirectory);
+                                }
+                            }
+                        }
+
+                        ignoreSelectionChanged = true;
+                        refreshTreeView();
+                        ignoreSelectionChanged = false;
+
+                        selectVDirectory(selectedDirectory);
+                        refreshListView(selectedDirectory);
+
+//                        treeViewNavigation.getSelectionModel().select(new TreeItem<VDirectory>(selectedDirectory));
+//
+
 
                         return null;
                     }
@@ -255,6 +292,34 @@ public class MainController {
         event.setDropCompleted(success);
         event.consume();
     }
+
+    private void selectVDirectory(VDirectory selected){
+        Stack<VDirectory> path = new Stack<VDirectory>();
+        VDirectory tmp = selected;
+
+        path.add(tmp);
+        while(tmp.getParent() != null){
+            path.add(tmp.getParent());
+            tmp = tmp.getParent();
+        }
+
+        TreeItem<VDirectory> dir = treeViewNavigation.getRoot();
+
+        while(!path.isEmpty()){
+            VDirectory t = path.pop();
+
+            for(TreeItem<VDirectory> item : dir.getChildren()){
+                if(item.getValue().equals(t)){
+                    dir = item;
+                    break;
+                }
+            }
+        }
+
+        System.out.println("MainController.selectVDirectory");
+        //treeViewNavigation.getSelectionModel().select(dir);
+    }
+
 
     @FXML
     void onDragOverListViewFiles(DragEvent event) {
@@ -286,8 +351,11 @@ public class MainController {
         treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
             @Override
             public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
-                selectedDirectory = newValue.getValue();
-                refreshListView(newValue.getValue());
+                if(!ignoreSelectionChanged){
+                    selectedDirectory = newValue.getValue();
+                    refreshListView(newValue.getValue());
+                    selectVDirectory(selectedDirectory);
+                }
             }
         });
 
@@ -301,7 +369,9 @@ public class MainController {
 
         listViewFiles.getSelectionModel().selectedItemProperty().addListener((a) ->{
             try {
-                textFieldPath.setText(((ObservableValue<VObject>)a).getValue().getPath());
+                if(!ignoreSelectionChanged) {
+                    textFieldPath.setText(((ObservableValue<VObject>) a).getValue().getPath());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 //TODO: handle
