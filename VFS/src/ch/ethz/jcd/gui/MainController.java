@@ -18,24 +18,28 @@ import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
+import com.sun.javafx.scene.input.DragboardHelper;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 import javax.swing.plaf.FileChooserUI;
@@ -222,7 +226,26 @@ public class MainController {
 
     @FXML
     void onDragDetectedListViewFiles(MouseEvent event) {
-        System.out.println("MainController.onDragDetectedListViewFiles");
+        ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
+        Map<DataFormat, Object> files = new HashMap<>();
+        List<File> aa = new ArrayList<File>();
+
+        for(VObject d : items){
+            try {
+                if(d instanceof VFile){
+                    File f = new File(System.getProperty("java.io.tmpdir") + "/" + d.getName());
+                    vdisk.exportToHost((VFile)d, f);
+                    aa.add(f);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        files.put(DataFormat.FILES, aa);
+
+        Dragboard d = listViewFiles.startDragAndDrop(TransferMode.COPY);
+        d.setContent(files);
     }
 
     @FXML
@@ -249,6 +272,7 @@ public class MainController {
                             items.add(new Pair<File, VDirectory>(file, selectedDirectory));
                         }
 
+                        //TODO: maybe better if we update the List/TreeView on the fly, and not after the complete operation is finished
                         while(!items.isEmpty()){
                             Pair<File, VDirectory> tmpItem = items.pop();
                             File tmpFile = tmpItem.getKey();
@@ -270,16 +294,12 @@ public class MainController {
                             }
                         }
 
+
                         ignoreSelectionChanged = true;
                         refreshTreeView();
                         ignoreSelectionChanged = false;
 
                         selectVDirectory(selectedDirectory);
-                        refreshListView(selectedDirectory);
-
-//                        treeViewNavigation.getSelectionModel().select(new TreeItem<VDirectory>(selectedDirectory));
-//
-
 
                         return null;
                     }
@@ -316,8 +336,7 @@ public class MainController {
             }
         }
 
-        System.out.println("MainController.selectVDirectory");
-        //treeViewNavigation.getSelectionModel().select(dir);
+        treeViewNavigation.getSelectionModel().select(dir);
     }
 
 
@@ -359,6 +378,17 @@ public class MainController {
             }
         });
 
+
+        listViewFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        listViewFiles.setCellFactory(new Callback<ListView<VObject>, ListCell<VObject>>() {
+            @Override
+            public ListCell<VObject> call(ListView<VObject> list) {
+                return new DirectoryListCell();
+            }
+        });
+
+
 //        listViewFiles.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<VObject>() {
 //            @Override
 //            public void changed(ObservableValue<? extends VObject> observableValue, VObject oldValue, VObject newValue) {
@@ -369,12 +399,26 @@ public class MainController {
 
         listViewFiles.getSelectionModel().selectedItemProperty().addListener((a) ->{
             try {
-                if(!ignoreSelectionChanged) {
+                if(!ignoreSelectionChanged && ((ObservableValue<VObject>) a).getValue() != null) {
                     textFieldPath.setText(((ObservableValue<VObject>) a).getValue().getPath());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 //TODO: handle
+            }
+        });
+
+        listViewFiles.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory){
+                    if(mouseEvent.getClickCount() == 2){
+                        selectedDirectory = (VDirectory)listViewFiles.getSelectionModel().getSelectedItem();
+
+                        selectVDirectory(selectedDirectory);
+                    }
+                }
+
             }
         });
 
@@ -401,6 +445,35 @@ public class MainController {
         Label name = new Label();
         name.setWrapText(true);
         return box;
+    }
+
+
+    public class DirectoryListCell extends ListCell<VObject> {
+        public DirectoryListCell() {
+            super();
+        }
+
+        @Override
+        protected void updateItem(VObject item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if(!empty){
+                try {
+                    setText(item.getName());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Font f = getFont();
+                if(item instanceof VDirectory){
+                    setFont(Font.font(f.getName(), FontWeight.BOLD, f.getSize()));
+                }else{
+                    setFont(Font.font(f.getName(), FontWeight.NORMAL, f.getSize()));
+                }
+            }else{
+                setText("");
+            }
+        }
     }
 }
 
