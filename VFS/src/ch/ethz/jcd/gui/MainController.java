@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
@@ -285,12 +286,14 @@ public class MainController {
                                     items.add(new Pair<File, VDirectory>(file, newVDir));
                                 }
                             }else{
-                                vdisk.importFromHost(tmpFile, tmpVDir);
+                                VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
+
+                                System.out.println("copied file size: " + ((FileBlock)file.getBlock()).size());
 
                                 //show progress
-                                if(tmpVDir.equals(selectedDirectory)){
-                                    refreshListView(selectedDirectory);
-                                }
+//                                if(tmpVDir.equals(selectedDirectory)){
+//                                    refreshListView(selectedDirectory);
+//                                }
                             }
                         }
 
@@ -446,6 +449,7 @@ public class MainController {
         name.setWrapText(true);
         return box;
     }
+
 
 
     public class DirectoryListCell extends ListCell<VObject> {

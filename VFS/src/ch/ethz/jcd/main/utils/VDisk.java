@@ -319,22 +319,27 @@ public class VDisk
         }
         catch (IOException e)
         {
+            e.printStackTrace();
             //TODO do sth
         }
         catch (InvalidBlockSizeException e)
         {
+            e.printStackTrace();
             //TODO do sth
         }
         catch (InvalidBlockAddressException e)
         {
+            e.printStackTrace();
             //TODO do sth
         }
         catch (DiskFullException e)
         {
+            e.printStackTrace();
             //TODO do sth
         }
         catch (BlockFullException e)
         {
+            e.printStackTrace();
             //TODO do sth
         }
         return null;
