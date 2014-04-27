@@ -216,9 +216,8 @@ public class MainController {
             }else if(event.getCode() == KeyCode.E) {
                 exportFiles();
             }else if(event.getCode() == KeyCode.ENTER) {
-                System.out.println("MainController.onKeyPressedMainPane / enter");
                 enterDirectory();
-            }else if(event.getCode() == KeyCode.ENTER) {
+            }else if(event.getCode() == KeyCode.O) {
                 openVDisk();
             }else if(event.getCode() == KeyCode.N) {
                 newVDisk();
@@ -228,7 +227,6 @@ public class MainController {
         }else if(event.getCode() == KeyCode.BACK_SPACE) {
             gotoParent();
         }else if(event.getCode() == KeyCode.ENTER) {
-            System.out.println("MainController.onKeyPressedMainPane / enter");
             enterDirectory();
         }
     }
@@ -254,11 +252,6 @@ public class MainController {
                 this.vdisk.mkdir(phgamper, "Videos");
                 this.vdisk.mkdir(phgamper, "Documents");
                 this.vdisk.mkdir(phgamper, "Dropbox");
-
-                VFile cache = this.vdisk.touch(phgamper, ".cache");
-                VFile xorg = this.vdisk.touch(phgamper, "xorg.conf");
-                VFile bar = this.vdisk.touch(phgamper, "bar.db");
-                VFile foo = this.vdisk.touch(root, "foo.c");
 
                 refreshTreeView();
                 this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
