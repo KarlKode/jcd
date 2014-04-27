@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ch.ethz.jcd.main.blocks.FileBlock;
+import ch.ethz.jcd.dialog.SearchDialogController;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
 import ch.ethz.jcd.main.exceptions.InvalidSizeException;
@@ -19,7 +18,6 @@ import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
-import com.sun.javafx.scene.input.DragboardHelper;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,22 +26,22 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Pair;
-
-import javax.swing.plaf.FileChooserUI;
 
 
 public class MainController {
@@ -200,6 +198,7 @@ public class MainController {
         Platform.exit();
     }
 
+
     @FXML
     void onActionMenuItemAdd(ActionEvent event) {
 
@@ -216,12 +215,55 @@ public class MainController {
     }
 
     @FXML
+    void onActionMenuItemFind(ActionEvent event) {
+
+    }
+
+    @FXML
     void onTextChangedTextFieldPath(ActionEvent event) {
 
     }
 
     @FXML
     void onActionButtonGotoLocation(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonImport(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonExport(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonDelete(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonFind(ActionEvent event) {
+        try{
+            Stage dialogStage = new Stage();
+
+            FXMLLoader loader = new FXMLLoader();
+            Parent root = (Parent)loader.load(SearchDialogController.class.getResource("SearchDialog.fxml").openStream());
+            loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+            final SearchDialogController searchDialogController = loader.getController();
+
+            searchDialogController.init(this.vdisk, this.selectedDirectory);
+
+            dialogStage.setTitle("Search ... ");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
 
     }
 
@@ -287,8 +329,6 @@ public class MainController {
                                 }
                             }else{
                                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-
-                                System.out.println("copied file size: " + ((FileBlock)file.getBlock()).size());
 
                                 //show progress
 //                                if(tmpVDir.equals(selectedDirectory)){

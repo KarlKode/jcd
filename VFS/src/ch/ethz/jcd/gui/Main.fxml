@@ -3,26 +3,65 @@
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="574.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
 <children><MenuBar>
   <menus>
-    <Menu mnemonicParsing="false" text="File">
+    <Menu mnemonicParsing="true" text="_File">
       <items><MenuItem fx:id="menuItemCreateVFS" mnemonicParsing="false" onAction="#onActionMenuItemCreateVFS" text="Create VFS ..." /><MenuItem fx:id="menuItemLoadVFS" mnemonicParsing="false" onAction="#onActionMenuItemLoadVFS" text="Load VFS ..." />
         <MenuItem fx:id="menuItemClose" mnemonicParsing="false" onAction="#onActionMenuItemClose" text="Close" />
       </items>
     </Menu>
-    <Menu mnemonicParsing="false" text="Edit">
-      <items><MenuItem fx:id="menuItemAdd" mnemonicParsing="false" onAction="#onActionMenuItemAdd" text="Add" /><MenuItem fx:id="menuItemCopy" mnemonicParsing="false" onAction="#onActionMenuItemCopy" text="Copy" />
-        <MenuItem fx:id="menuItemDelete" mnemonicParsing="false" onAction="#onActionMenuItemDelete" text="Delete" />
+    <Menu mnemonicParsing="true" text="_Edit">
+      <items><MenuItem fx:id="menuItemImport" mnemonicParsing="true" onAction="#onActionMenuItemAdd" text="_Add" />
+          <MenuItem fx:id="menuItemExport" mnemonicParsing="true" onAction="#onActionMenuItemCopy" text="_Copy" />
+        <MenuItem fx:id="menuItemDelete" mnemonicParsing="true" onAction="#onActionMenuItemDelete" text="_Delete" />
+          <MenuItem fx:id="menuItemFind" mnemonicParsing="true" onAction="#onActionMenuItemFind" text="_Find" />
+          <SeparatorMenuItem mnemonicParsing="false" />
+          <MenuItem fx:id="menuItemRename" mnemonicParsing="false" text="Rename" />
+          <MenuItem fx:id="menuItemCopy" mnemonicParsing="false" text="Copy" />
       </items>
     </Menu>
   </menus>
-</MenuBar><SplitPane dividerPositions="0.29797979797979796" focusTraversable="true">
-<items><TreeView id="treeViewNavigation" fx:id="treeViewNavigation" /><VBox id="paneBrowser" fx:id="paneBrowser" prefHeight="200.0" prefWidth="100.0">
-<children><BorderPane id="panePath" fx:id="panePath" prefHeight="26.0" prefWidth="368.0">
-<left><Label id="labelPath" fx:id="labelPath" contentDisplay="CENTER" text="Path:" textAlignment="RIGHT" BorderPane.alignment="CENTER">
+</MenuBar><ToolBar fx:id="toolBarInterface" prefWidth="200.0">
+<items><Button fx:id="buttonImport" mnemonicParsing="false" onAction="#onActionButtonImport">
+<graphic><ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/import.png" />
+</image></ImageView>
+</graphic></Button><Button fx:id="buttonExport" mnemonicParsing="false" onAction="#onActionButtonExport">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/export.png" />
+</image>
+</ImageView>
+</graphic>
+</Button><Button fx:id="buttonDelete" mnemonicParsing="false" onAction="#onActionButtonDelete">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/delete.png" />
+</image>
+</ImageView>
+</graphic>
+</Button><Button fx:id="buttonFind" mnemonicParsing="false" onAction="#onActionButtonFind">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/search.png" />
+</image>
+</ImageView>
+</graphic>
+</Button>
+</items>
+</ToolBar>
+    <SplitPane dividerPositions="0.2" focusTraversable="false" VBox.vgrow="ALWAYS">
+<items><TreeView id="treeViewNavigation" fx:id="treeViewNavigation" maxHeight="1.7976931348623157E308" maxWidth="300" minHeight="-Infinity" minWidth="-Infinity" /><BorderPane prefHeight="1023.0" prefWidth="585.0">
+<top><BorderPane id="panePath" fx:id="panePath" BorderPane.alignment="CENTER">
+<left><Label id="labelPath" fx:id="labelPath" contentDisplay="CENTER" focusTraversable="false" text="Path:" textAlignment="RIGHT" BorderPane.alignment="CENTER">
 <BorderPane.margin>
 <Insets />
 </BorderPane.margin>
@@ -35,11 +74,13 @@
 <VBox.margin>
 <Insets />
 </VBox.margin>
-<right><Button fx:id="buttonGotoLocation" mnemonicParsing="false" onAction="#onActionButtonGotoLocation" text="Goto" BorderPane.alignment="CENTER" />
-</right></BorderPane><ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="360.0" prefWidth="416.0">
-<content><ListView fx:id="listViewFiles" onDragDetected="#onDragDetectedListViewFiles" onDragDone="#onDragDoneListViewFiles" onDragDropped="#onDragDroppedListViewFiles" onDragOver="#onDragOverListViewFiles" prefHeight="200.0" prefWidth="200.0" />
+<right><Button fx:id="buttonGotoLocation" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonGotoLocation" text="Goto" visible="false" BorderPane.alignment="CENTER" />
+</right></BorderPane>
+</top>
+<center><ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+<content><ListView fx:id="listViewFiles" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onDragDetected="#onDragDetectedListViewFiles" onDragDone="#onDragDoneListViewFiles" onDragDropped="#onDragDroppedListViewFiles" onDragOver="#onDragOverListViewFiles" prefHeight="304.0" prefWidth="581.0" BorderPane.alignment="CENTER" />
 </content></ScrollPane>
-</children></VBox>
+</center></BorderPane>
 </items>
 </SplitPane>
 </children></VBox>
