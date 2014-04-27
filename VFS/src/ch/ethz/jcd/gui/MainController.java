@@ -135,6 +135,105 @@ public class MainController {
 
     @FXML
     void onActionMenuItemCreateVFS(ActionEvent event) {
+        newVDisk();
+    }
+
+    @FXML
+    void onActionMenuItemLoadVFS(ActionEvent event) {
+        openVDisk();
+    }
+
+    @FXML
+    void onActionMenuItemClose(ActionEvent event) {
+        Platform.exit();
+    }
+
+    @FXML
+    void onActionMenuItemAdd(ActionEvent event) {
+        importFiles();
+    }
+
+    @FXML
+    void onActionMenuItemDelete(ActionEvent event) {
+        deleteSelectedFiles();
+    }
+
+    @FXML
+    void onActionMenuItemFind(ActionEvent event) {
+        openFindDialog();
+    }
+
+    @FXML
+    void onTextChangedTextFieldPath(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonGotoLocation(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionMenuItemCopy(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onActionButtonImport(ActionEvent event) {
+        importFiles();
+    }
+
+    @FXML
+    void onActionButtonExport(ActionEvent event) {
+        exportFiles();
+    }
+
+    @FXML
+    void onActionButtonDelete(ActionEvent event) {
+        deleteSelectedFiles();
+    }
+
+    @FXML
+    void onActionButtonFind(ActionEvent event) {
+       openFindDialog();
+    }
+
+    @FXML
+    void onKeyPressedMainPane(KeyEvent event) {
+        if(event.isControlDown()){
+            if(event.getCode() == KeyCode.C){
+                copySelectedFiles();
+            }else if(event.getCode() == KeyCode.V){
+                pasteSelectedFiles();
+            }else if(event.getCode() == KeyCode.D) {
+                deleteSelectedFiles();
+            }else if(event.getCode() == KeyCode.R) {
+                renameSelectedFile();
+            }else if(event.getCode() == KeyCode.F) {
+                openFindDialog();
+            }else if(event.getCode() == KeyCode.I) {
+                importFiles();
+            }else if(event.getCode() == KeyCode.E) {
+                exportFiles();
+            }else if(event.getCode() == KeyCode.ENTER) {
+                System.out.println("MainController.onKeyPressedMainPane / enter");
+                enterDirectory();
+            }else if(event.getCode() == KeyCode.ENTER) {
+                openVDisk();
+            }else if(event.getCode() == KeyCode.N) {
+                newVDisk();
+            }
+        }else if(event.getCode() == KeyCode.DELETE) {
+            deleteSelectedFiles();
+        }else if(event.getCode() == KeyCode.BACK_SPACE) {
+            gotoParent();
+        }else if(event.getCode() == KeyCode.ENTER) {
+            System.out.println("MainController.onKeyPressedMainPane / enter");
+            enterDirectory();
+        }
+    }
+
+    private void newVDisk() {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Create new VDisk.. ");
 
@@ -182,8 +281,7 @@ public class MainController {
         }
     }
 
-    @FXML
-    void onActionMenuItemLoadVFS(ActionEvent event) {
+    private void openVDisk() {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Load VDisk.. ");
 
@@ -202,84 +300,24 @@ public class MainController {
         }
     }
 
-    @FXML
-    void onActionMenuItemClose(ActionEvent event) {
-        Platform.exit();
-    }
-
-
-    @FXML
-    void onActionMenuItemAdd(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionMenuItemCopy(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionMenuItemDelete(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionMenuItemFind(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onTextChangedTextFieldPath(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionButtonGotoLocation(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionButtonImport(ActionEvent event) {
-        importFiles();
-    }
-
-    @FXML
-    void onActionButtonExport(ActionEvent event) {
-        exportFiles();
-    }
-
-    @FXML
-    void onActionButtonDelete(ActionEvent event) {
-        deleteSelectedFiles();
-    }
-
-    @FXML
-    void onActionButtonFind(ActionEvent event) {
-       openFindDialog();
-    }
-
-    @FXML
-    void onKeyPressedMainPane(KeyEvent event) {
-        if(event.isControlDown()){
-            if(event.getCode() == KeyCode.C){
-                copySelectedFiles();
-            }else if(event.getCode() == KeyCode.V){
-                pasteSelectedFiles();
-            }else if(event.getCode() == KeyCode.D) {
-                deleteSelectedFiles();
-            }else if(event.getCode() == KeyCode.R) {
-                renameSelectedFile();
-            }else if(event.getCode() == KeyCode.F) {
-                openFindDialog();
-            }else if(event.getCode() == KeyCode.I) {
-                importFiles();
-            }else if(event.getCode() == KeyCode.E) {
-                exportFiles();
-            }
-        }else if(event.getCode() == KeyCode.DELETE){
-            deleteSelectedFiles();
+    private void gotoParent(){
+        if(selectedDirectory.getParent() != null){
+            selectedDirectory = selectedDirectory.getParent();
+            selectVDirectory(selectedDirectory);
         }
     }
+
+    private void enterDirectory(){
+        System.out.println("MainController.enterDirectory");
+        System.out.println(listViewFiles.getSelectionModel().getSelectedItems().size());
+        System.out.println(listViewFiles.getSelectionModel().getSelectedItem());
+
+        if(listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory){
+            selectedDirectory = (VDirectory)listViewFiles.getSelectionModel().getSelectedItem();
+            selectVDirectory(selectedDirectory);
+        }
+    }
+
 
     private void importFiles() {
         final FileChooser fchooser = new FileChooser();
@@ -559,19 +597,11 @@ public class MainController {
         listViewFiles.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory){
-                    if(mouseEvent.getClickCount() == 2){
-                        selectedDirectory = (VDirectory)listViewFiles.getSelectionModel().getSelectedItem();
-
-                        selectVDirectory(selectedDirectory);
-                    }
+                if(mouseEvent.getClickCount() == 2) {
+                    enterDirectory();
                 }
-
             }
         });
-
-        exec = Executors.newCachedThreadPool();
-
     }
 
     private void renameSelectedFile() {
@@ -579,8 +609,6 @@ public class MainController {
     }
 
     private void deleteSelectedFiles() {
-        System.out.println("MainController.deleteSelectedFiles");
-
         try {
             new Task<Void>(){
                 @Override
@@ -597,6 +625,12 @@ public class MainController {
                     return null;
                 }
             }.call();
+
+            ignoreSelectionChanged = true;
+            refreshTreeView();
+            ignoreSelectionChanged = false;
+
+            selectVDirectory(selectedDirectory);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -614,16 +648,6 @@ public class MainController {
             //TODO: handle
         }
     }
-
-    public Node createFileIcon(VObject item){
-        VBox box = new VBox();
-        //Image icon = new Image();
-        Label name = new Label();
-        name.setWrapText(true);
-        return box;
-    }
-
-
 
     public class DirectoryListCell extends ListCell<VObject> {
         public DirectoryListCell() {

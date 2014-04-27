@@ -26,13 +26,13 @@
       </items>
     </Menu>
   </menus>
-</MenuBar><ToolBar fx:id="toolBarInterface" prefWidth="200.0">
-<items><Button fx:id="buttonImport" mnemonicParsing="false" onAction="#onActionButtonImport">
+</MenuBar><ToolBar fx:id="toolBarInterface" focusTraversable="false" prefWidth="200.0">
+<items><Button fx:id="buttonImport" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonImport">
 <graphic><ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
 <Image url="@/icons/import.png" />
 </image></ImageView>
-</graphic></Button><Button fx:id="buttonExport" mnemonicParsing="false" onAction="#onActionButtonExport">
+</graphic></Button><Button fx:id="buttonExport" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonExport">
 <graphic>
 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
@@ -40,7 +40,7 @@
 </image>
 </ImageView>
 </graphic>
-</Button><Button fx:id="buttonDelete" mnemonicParsing="false" onAction="#onActionButtonDelete">
+</Button><Button fx:id="buttonDelete" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonDelete">
 <graphic>
 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
@@ -48,7 +48,7 @@
 </image>
 </ImageView>
 </graphic>
-</Button><Button fx:id="buttonFind" mnemonicParsing="false" onAction="#onActionButtonFind">
+</Button><Button fx:id="buttonFind" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonFind">
 <graphic>
 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
@@ -70,7 +70,7 @@
 <Insets bottom="4.0" left="4.0" right="8.0" top="4.0" />
 </padding></Label>
 </left>
-<center><TextField id="textFieldPath" fx:id="textFieldPath" editable="false" onInputMethodTextChanged="#onTextChangedTextFieldPath" prefHeight="26.0" prefWidth="337.0" promptText="Path" BorderPane.alignment="CENTER" />
+<center><TextField id="textFieldPath" fx:id="textFieldPath" editable="false" focusTraversable="false" onInputMethodTextChanged="#onTextChangedTextFieldPath" prefHeight="26.0" prefWidth="337.0" promptText="Path" BorderPane.alignment="CENTER" />
 </center>
 <VBox.margin>
 <Insets />
