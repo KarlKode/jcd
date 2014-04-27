@@ -6,8 +6,9 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="574.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
-<children><MenuBar>
+<VBox fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressedMainPane" prefHeight="574.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
+<children>
+    <MenuBar>
   <menus>
     <Menu mnemonicParsing="true" text="_File">
       <items><MenuItem fx:id="menuItemCreateVFS" mnemonicParsing="false" onAction="#onActionMenuItemCreateVFS" text="Create VFS ..." /><MenuItem fx:id="menuItemLoadVFS" mnemonicParsing="false" onAction="#onActionMenuItemLoadVFS" text="Load VFS ..." />

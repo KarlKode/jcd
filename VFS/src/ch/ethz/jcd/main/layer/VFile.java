@@ -74,7 +74,7 @@ public class VFile extends VObject<FileBlock>
         {
             vUtil.free(b);
         }
-
+        this.parent.removeEntry(this);
         vUtil.free(block);
     }
 

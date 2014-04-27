@@ -37,6 +37,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -100,6 +101,7 @@ public class MainController {
     private boolean ignoreSelectionChanged = false;
 
     public MainController() {
+
     }
 
     private void refreshTreeView(){
@@ -138,41 +140,45 @@ public class MainController {
 
         final File fileVdisk = fchooser.showSaveDialog(null);
 
-        try {
-            // hm.. wouldn't it be better to return the new Vdisk?
-            VDisk.format(fileVdisk, 100*VUtil.BLOCK_SIZE);
-            this.vdisk = new VDisk(fileVdisk);
+        if(fileVdisk != null) {
+            try {
+                // hm.. wouldn't it be better to return the new Vdisk?
+                VDisk.format(fileVdisk, 100*VUtil.BLOCK_SIZE);
+                this.vdisk = new VDisk(fileVdisk);
 
-            VDirectory root = (VDirectory) this.vdisk.resolve("/");
+                VDirectory root = (VDirectory) this.vdisk.resolve("/");
 
-            VDirectory home = this.vdisk.mkdir(root, "home");
-            VDirectory phgamper = this.vdisk.mkdir(home, "phgamper");
+                VDirectory home = this.vdisk.mkdir(root, "home");
+                VDirectory phgamper = this.vdisk.mkdir(home, "phgamper");
 
-            this.vdisk.mkdir(phgamper, "Pictures");
-            this.vdisk.mkdir(phgamper, "Videos");
-            this.vdisk.mkdir(phgamper, "Documents");
-            this.vdisk.mkdir(phgamper, "Dropbox");
+                this.vdisk.mkdir(phgamper, "Pictures");
+                this.vdisk.mkdir(phgamper, "Videos");
+                this.vdisk.mkdir(phgamper, "Documents");
+                this.vdisk.mkdir(phgamper, "Dropbox");
 
-            VFile cache = this.vdisk.touch(phgamper, ".cache");
-            VFile xorg = this.vdisk.touch(phgamper, "xorg.conf");
-            VFile bar = this.vdisk.touch(phgamper, "bar.db");
-            VFile foo = this.vdisk.touch(root, "foo.c");
+                VFile cache = this.vdisk.touch(phgamper, ".cache");
+                VFile xorg = this.vdisk.touch(phgamper, "xorg.conf");
+                VFile bar = this.vdisk.touch(phgamper, "bar.db");
+                VFile foo = this.vdisk.touch(root, "foo.c");
 
-            refreshTreeView();
-            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
-        } catch (FileNotFoundException e) {
-            //TODO: create dialog
-            e.printStackTrace();
-        } catch (InvalidBlockAddressException e) {
-            e.printStackTrace();
-        } catch (InvalidSizeException e) {
-            e.printStackTrace();
-        } catch (InvalidBlockCountException e) {
-            e.printStackTrace();
-        } catch (VDiskCreationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+                refreshTreeView();
+                this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
+            } catch (FileNotFoundException e) {
+                //TODO: create dialog
+                e.printStackTrace();
+            } catch (InvalidBlockAddressException e) {
+                e.printStackTrace();
+            } catch (InvalidSizeException e) {
+                e.printStackTrace();
+            } catch (InvalidBlockCountException e) {
+                e.printStackTrace();
+            } catch (VDiskCreationException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            //no file was chosen / user pressed esc
         }
     }
 
@@ -182,14 +188,17 @@ public class MainController {
         fchooser.setTitle("Load VDisk.. ");
 
         final File fileVdisk = fchooser.showOpenDialog(null);
-
-        try {
-            this.vdisk = new VDisk(fileVdisk);
-            refreshTreeView();
-            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            //TODO: show dialog
+        if(fileVdisk != null) {
+            try {
+                this.vdisk = new VDisk(fileVdisk);
+                refreshTreeView();
+                this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                //TODO: show dialog
+            }
+        }else{
+            //no file was chosen / user pressed esc
         }
     }
 
@@ -231,21 +240,114 @@ public class MainController {
 
     @FXML
     void onActionButtonImport(ActionEvent event) {
-
+        importFiles();
     }
 
     @FXML
     void onActionButtonExport(ActionEvent event) {
-
+        exportFiles();
     }
 
     @FXML
     void onActionButtonDelete(ActionEvent event) {
-
+        deleteSelectedFiles();
     }
 
     @FXML
     void onActionButtonFind(ActionEvent event) {
+       openFindDialog();
+    }
+
+    @FXML
+    void onKeyPressedMainPane(KeyEvent event) {
+        if(event.isControlDown()){
+            if(event.getCode() == KeyCode.C){
+                copySelectedFiles();
+            }else if(event.getCode() == KeyCode.V){
+                pasteSelectedFiles();
+            }else if(event.getCode() == KeyCode.D) {
+                deleteSelectedFiles();
+            }else if(event.getCode() == KeyCode.R) {
+                renameSelectedFile();
+            }else if(event.getCode() == KeyCode.F) {
+                openFindDialog();
+            }else if(event.getCode() == KeyCode.I) {
+                importFiles();
+            }else if(event.getCode() == KeyCode.E) {
+                exportFiles();
+            }
+        }else if(event.getCode() == KeyCode.DELETE){
+            deleteSelectedFiles();
+        }
+    }
+
+    private void importFiles() {
+        final FileChooser fchooser = new FileChooser();
+        fchooser.setTitle("Import files .. ");
+
+        final List<File> filesToImport = fchooser.showOpenMultipleDialog(null);
+
+        if(filesToImport != null) {
+            try {
+                new Task<Void>(){
+                    @Override
+                    protected Void call() throws Exception {
+                        importFiles(filesToImport);
+                        return null;
+                    }
+                }.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            //no file was chosen / user pressed esc
+        }
+    }
+
+    private void exportFiles() {
+        final DirectoryChooser dchooser = new DirectoryChooser();
+        dchooser.setTitle("Export files .. ");
+
+        final File exportDir = dchooser.showDialog(null);
+
+        if(exportDir != null) {
+            try {
+                new Task<Void>(){
+                    @Override
+                    protected Void call() throws Exception {
+                        final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
+
+                        for(VObject d : items){
+                            try {
+                                if(d instanceof VFile){
+                                    File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
+                                    vdisk.exportToHost((VFile)d, f);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        return null;
+                    }
+                }.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            //no file was chosen / user pressed esc
+        }
+    }
+
+    private void copySelectedFiles() {
+
+    }
+
+    private void pasteSelectedFiles() {
+
+    }
+
+    private void openFindDialog() {
         try{
             Stage dialogStage = new Stage();
 
@@ -264,7 +366,6 @@ public class MainController {
         }catch(IOException ex){
             ex.printStackTrace();
         }
-
     }
 
     @FXML
@@ -296,6 +397,44 @@ public class MainController {
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
+    private void importFiles(List<File> files){
+        Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
+
+        for(File file : files){
+            items.add(new Pair<File, VDirectory>(file, selectedDirectory));
+        }
+
+        //TODO: maybe better if we update the List/TreeView on the fly, and not after the complete operation is finished
+        while(!items.isEmpty()){
+            Pair<File, VDirectory> tmpItem = items.pop();
+            File tmpFile = tmpItem.getKey();
+            VDirectory tmpVDir = tmpItem.getValue();
+
+            if(tmpFile.isDirectory()){
+                VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
+
+                for(File file : tmpFile.listFiles()){
+                    items.add(new Pair<File, VDirectory>(file, newVDir));
+                }
+            }else{
+                VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
+
+                //show progress
+//                if(tmpVDir.equals(selectedDirectory)){
+//                    refreshListView(selectedDirectory);
+//                }
+            }
+        }
+
+
+        ignoreSelectionChanged = true;
+        refreshTreeView();
+        ignoreSelectionChanged = false;
+
+        selectVDirectory(selectedDirectory);
+    }
+
+
     @FXML
     void onDragDroppedListViewFiles(DragEvent event) {
         Dragboard db = event.getDragboard();
@@ -309,41 +448,7 @@ public class MainController {
                 new Task<Void>(){
                     @Override
                     protected Void call() throws Exception {
-                        Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
-
-                        for(File file : db.getFiles()){
-                            items.add(new Pair<File, VDirectory>(file, selectedDirectory));
-                        }
-
-                        //TODO: maybe better if we update the List/TreeView on the fly, and not after the complete operation is finished
-                        while(!items.isEmpty()){
-                            Pair<File, VDirectory> tmpItem = items.pop();
-                            File tmpFile = tmpItem.getKey();
-                            VDirectory tmpVDir = tmpItem.getValue();
-
-                            if(tmpFile.isDirectory()){
-                                VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
-
-                                for(File file : tmpFile.listFiles()){
-                                    items.add(new Pair<File, VDirectory>(file, newVDir));
-                                }
-                            }else{
-                                VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-
-                                //show progress
-//                                if(tmpVDir.equals(selectedDirectory)){
-//                                    refreshListView(selectedDirectory);
-//                                }
-                            }
-                        }
-
-
-                        ignoreSelectionChanged = true;
-                        refreshTreeView();
-                        ignoreSelectionChanged = false;
-
-                        selectVDirectory(selectedDirectory);
-
+                        importFiles(db.getFiles());
                         return null;
                     }
                 }.call();
@@ -467,6 +572,34 @@ public class MainController {
 
         exec = Executors.newCachedThreadPool();
 
+    }
+
+    private void renameSelectedFile() {
+
+    }
+
+    private void deleteSelectedFiles() {
+        System.out.println("MainController.deleteSelectedFiles");
+
+        try {
+            new Task<Void>(){
+                @Override
+                protected Void call() throws Exception {
+                    final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
+
+                    for(VObject d : items){
+                        if(d instanceof VFile){
+                            System.out.println(d.getName());
+                            vdisk.delete(d);
+                        }
+                    }
+
+                    return null;
+                }
+            }.call();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void refreshListView(VDirectory dir) {

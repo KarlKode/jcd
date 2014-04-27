@@ -71,7 +71,6 @@ public class SearchDialogController {
         assert listViewResults != null : "fx:id=\"listViewResults\" was not injected: check your FXML file 'SearchDialog.fxml'.";
         assert checkBoxSubdirectories != null : "fx:id=\"checkBoxSubdirectories\" was not injected: check your FXML file 'SearchDialog.fxml'.";
         assert checkBoxCaseSensitive != null : "fx:id=\"checkBoxCaseSensitive\" was not injected: check your FXML file 'SearchDialog.fxml'.";
-
     }
 
     public void init(VDisk vdisk, VDirectory directory) {
