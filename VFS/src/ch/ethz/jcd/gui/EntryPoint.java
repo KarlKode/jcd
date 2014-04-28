@@ -10,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.IOException;
+
 /**
  * Created by leo on 15/04/14.
  */
@@ -17,11 +19,16 @@ public class EntryPoint extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("VFS Explorer");
 
         FXMLLoader loader = new FXMLLoader();
-        Parent root = (Parent)loader.load(getClass().getResource("Main.fxml").openStream());
+        Parent root = null;
+        try {
+            root = (Parent)loader.load(EntryPoint.class.getResource("Main.fxml").openStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         loader.setBuilderFactory(new JavaFXBuilderFactory());
 
         final MainController mainController = loader.getController();
@@ -38,6 +45,12 @@ public class EntryPoint extends Application {
                 System.exit(0);
             }
         });
+    }
+
+    @Override
+    public void stop(){
+        Platform.exit();
+        System.exit(0);
     }
 
     public static void main(String[] args) {

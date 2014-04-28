@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -37,6 +38,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -80,7 +82,7 @@ public class MainController {
     private MenuItem menuItemCopy;
 
     @FXML
-    private VBox paneBrowser;
+    private Text textStatus;
 
     @FXML
     private MenuItem menuItemLoadVFS;
@@ -240,7 +242,7 @@ public class MainController {
         if(fileVdisk != null) {
             try {
                 // hm.. wouldn't it be better to return the new Vdisk?
-                VDisk.format(fileVdisk, 100*VUtil.BLOCK_SIZE);
+                VDisk.format(fileVdisk, 500000*VUtil.BLOCK_SIZE);
                 this.vdisk = new VDisk(fileVdisk);
 
                 VDirectory root = (VDirectory) this.vdisk.resolve("/");
@@ -301,10 +303,6 @@ public class MainController {
     }
 
     private void enterDirectory(){
-        System.out.println("MainController.enterDirectory");
-        System.out.println(listViewFiles.getSelectionModel().getSelectedItems().size());
-        System.out.println(listViewFiles.getSelectionModel().getSelectedItem());
-
         if(listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory){
             selectedDirectory = (VDirectory)listViewFiles.getSelectionModel().getSelectedItem();
             selectVDirectory(selectedDirectory);
@@ -428,11 +426,37 @@ public class MainController {
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
+
+    private int countFiles(File dir){
+        Stack<File> obj = new Stack<File>();
+        obj.push(dir);
+        File curr;
+
+        int counter = 0;
+
+        while(!obj.isEmpty()){
+            curr = obj.pop();
+
+            if(curr.isDirectory()){
+                obj.addAll(Arrays.asList(curr.listFiles()));
+            }else{
+                counter++;
+            }
+        }
+
+        return counter;
+    }
+
     private void importFiles(List<File> files){
         Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
 
+        int total = 0;
+        int progress = 0;
+
         for(File file : files){
             items.add(new Pair<File, VDirectory>(file, selectedDirectory));
+
+            total += countFiles(file);
         }
 
         //TODO: maybe better if we update the List/TreeView on the fly, and not after the complete operation is finished
@@ -449,7 +473,9 @@ public class MainController {
                 }
             }else{
                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
+                progress++;
 
+                textStatus.setText(progress + "/" + total);
                 //show progress
 //                if(tmpVDir.equals(selectedDirectory)){
 //                    refreshListView(selectedDirectory);
@@ -540,20 +566,16 @@ public class MainController {
         assert menuItemAdd != null : "fx:id=\"menuItemAdd\" was not injected: check your FXML file 'Main.fxml'.";
         assert treeViewNavigation != null : "fx:id=\"treeViewNavigation\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemCopy != null : "fx:id=\"menuItemCopy\" was not injected: check your FXML file 'Main.fxml'.";
-        assert paneBrowser != null : "fx:id=\"paneBrowser\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemLoadVFS != null : "fx:id=\"menuItemLoadVFS\" was not injected: check your FXML file 'Main.fxml'.";
         assert textFieldPath != null : "fx:id=\"textFieldPath\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemClose != null : "fx:id=\"menuItemClose\" was not injected: check your FXML file 'Main.fxml'.";
         assert labelPath != null : "fx:id=\"labelPath\" was not injected: check your FXML file 'Main.fxml'.";
 
-        treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
-            @Override
-            public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
-                if(!ignoreSelectionChanged){
-                    selectedDirectory = newValue.getValue();
-                    refreshListView(newValue.getValue());
-                    selectVDirectory(selectedDirectory);
-                }
+        treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(newValue -> {
+            if(!ignoreSelectionChanged){
+                selectedDirectory = ((ObservableValue<TreeItem<VDirectory>>) newValue).getValue().getValue();
+                refreshListView(((ObservableValue<TreeItem<VDirectory>>) newValue).getValue().getValue());
+                selectVDirectory(selectedDirectory);
             }
         });
 
