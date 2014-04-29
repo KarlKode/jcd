@@ -4,3 +4,5 @@
 *.properties
 VFS/out/
 *.vdisk
+VFS/META-INF
+VFS/data/
