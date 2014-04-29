@@ -6,6 +6,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Text?>
 <VBox fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressedMainPane" prefHeight="574.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
 <children>
     <MenuBar>
@@ -84,4 +85,5 @@
 </center></BorderPane>
 </items>
 </SplitPane>
+    <Text fx:id="textStatus"></Text>
 </children></VBox>
