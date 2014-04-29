@@ -169,40 +169,46 @@ Different usages, for example in \texttt{VFile} to read a file with an \texttt{I
 Used in the console application (\texttt{VConsole}).
 
 
-% START multiline comment
-\ifx true false
-
-
 % PART II: VFS Browser
 % --------------------------------------
 
 \section{VFS Browser}
 
-% TODO: Remove this line
-\textbf{[This section has to be completed by April 22nd.]}
 
-%TODO: Remove this text and replace it with actual content
-\emph{Give a short (1-2 paragraphs) description of what VFS Browser is.}
+The \emph{VFS Browser} provides a graphical interface to the end user. The basic functionality it offers is listed below:
+\begin{itemize}
+\item Create a new \emph{VDisk file}
+\item Open an existing \emph{VDisk file}
+\item Browse the directory structure of a \emph{VFS}
+\item Import/export files and directories from the host's filesystem to the \emph{VFS} and the other way around
+\item Search the file and directory names for a certain pattern
+\end{itemize}
+
 
 
 \subsection{Requirements}
+In this section all requirements, that were implemented in the first part, are listed. For each requirement there is a short description of the requirement and how it is implemented in the project.
 
-% TODO: Remove this text and replace it with actual content
-\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+\subparagraph{The fle browser should be implemented for one of the following platforms: desktop, web, and mobile} \hfill\\
+The implementation described in this report is a desktop application built with JavaFX.
 
+\subparagraph{he browser should support all operations from Part 1 (\emph{VFS core}). For example, users should be able to select a file/folder and copy it to another location without using console commands.} \hfill\\
+The browser allows the user to perform all this operations.
 
-\subsection{Design}
+\subparagraph{The browser should support both single and multiple selections of files/folders.} \hfill\\
+The browser allows the user to perform multiple selection of files/folders.
 
-% TODO: Remove this text and replace it with actual content
-\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+\subparagraph{The browser should support keyboard navigation. The mandatory set of operations includes folder navigation and going to the parent and child folders.} \hfill\\
+The browser offers all this functionality.
 
+\subparagraph{The browser should support mouse navigation. The required operations are the same as in requirement 4} \hfill\\
+This functionality was not implemented.
 
-\subsection{Integration}
+\subparagraph{The browser should support file-name search based on user-given keywords. The search should provide options for: case sensitive/insensitive search; restricting search to a folder; restricting search to a folder and its subfolders} \hfill\\
+The browser offers all this functionality.
 
-% TODO: Remove this text and replace it with actual content
-\emph{If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.}
-
-
+% START multiline comment
+\ifx true false
 
 % PART III: Synchronization Server
 % --------------------------------------
