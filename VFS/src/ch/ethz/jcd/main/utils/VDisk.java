@@ -78,6 +78,7 @@ public class VDisk
         catch (IOException e)
         {
             // TODO do sth
+            e.printStackTrace();
         }
 
         return list;
