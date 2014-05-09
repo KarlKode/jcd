@@ -44,6 +44,7 @@ public class VFSConsole
         VFS_COMMANDS.put("cd", new VFScd());
         VFS_COMMANDS.put("cp", new VFScp());
         VFS_COMMANDS.put("export", new VFSexport());
+        VFS_COMMANDS.put("find", new VFSfind());
         VFS_COMMANDS.put("help", new VFShelp());
         VFS_COMMANDS.put("import", new VFSimport());
         VFS_COMMANDS.put("ls", new VFSls());

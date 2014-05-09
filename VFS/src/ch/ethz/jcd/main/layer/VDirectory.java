@@ -8,7 +8,10 @@ import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * VDirectory is a concrete implementation of VObject coming with additional features such as
@@ -94,6 +97,38 @@ public class VDirectory extends VObject<DirectoryBlock>
         }
 
         return object.resolve(path.substring(path.indexOf(VDisk.PATH_SEPARATOR) + 1));
+    }
+
+    /**
+     * Searches for files matching the given regular expression.
+     *
+     * @param regex compiled regular expression Pattern
+     * @param recursive indicates whether including sub folders or not
+     * @return HashMap filled with all search results
+     * @throws IOException
+     */
+    public HashMap<VFile, String> find(Pattern regex, boolean recursive)
+            throws IOException
+    {
+        HashMap<VFile, String> map = new HashMap<>();
+
+        for(VObject entry : this.getEntries())
+        {
+            if(entry instanceof VDirectory && recursive)
+            {
+                map.putAll(((VDirectory) entry).find(regex, recursive));
+            }
+            else if(entry instanceof VFile)
+            {
+                Matcher matcher = regex.matcher(entry.getName());
+                if(matcher.find())
+                {
+                    map.put((VFile) entry, entry.getPath());
+                }
+            }
+        }
+
+        return map;
     }
 
     /**

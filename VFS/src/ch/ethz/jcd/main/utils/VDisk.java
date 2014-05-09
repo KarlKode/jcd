@@ -9,6 +9,7 @@ import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Public high level interface that hides the implementation details of all operations on a virtual disk.
@@ -404,6 +405,26 @@ public class VDisk
         catch (IOException e)
         {
             return null;
+        }
+    }
+
+    /**
+     * Searches for files matching the given regular expression.
+     *
+     * @param regex compiled regular expression Patttern
+     * @param folder where to start searching
+     * @param recursive indicates whether including sub folders or not
+     * @return HashMap filled with all search results
+     */
+    public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive)
+    {
+        try
+        {
+            return folder.find(regex, recursive);
+        }
+        catch (IOException e)
+        {
+            return new HashMap<>();
         }
     }
 }

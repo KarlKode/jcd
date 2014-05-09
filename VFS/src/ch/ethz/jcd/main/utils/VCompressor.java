@@ -14,16 +14,16 @@ public class VCompressor
     /**
      * Code values used according to the occurrence probability
      * e.g.
-     * 0
+     *                              0
      * 00 - 0.4 ------------------------+------+
-     * |
-     * 10      1   |
+     *                                  |
+     *                      10      1   |
      * 11 - 0.3 ----------------+-------+
-     * |
-     * 110     11  |
+     *                          |
+     *              110     11  |
      * 01 - 0.2 --------+-------+
-     * |
-     * 111 |
+     *                  |
+     *              111 |
      * 10 - 0.1 --------+
      */
     public static final int[] CODE_BOOK = {0, 2, 6, 7};

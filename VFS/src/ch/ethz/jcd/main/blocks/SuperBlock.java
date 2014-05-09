@@ -10,12 +10,14 @@ import java.io.IOException;
 public class SuperBlock extends Block
 {
     public static final int OFFSET_BLOCK_COUNT = 0;
-    public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 4;
+    public static final int OFFSET_VDISK_STATE = 4;
+    public static final int OFFSET_ROOT_DIRECTORY_BLOCK = 8;
     public static final int SUPER_BLOCK_ADDRESS = 0;
     public static final int BIT_MAP_BLOCK_ADDRESS = 1;
     public static final int DATA_BLOCK_BEGIN_ADDRESS = 2;
 
-    public SuperBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException
+    public SuperBlock(FileManager fileManager, int blockAddress)
+            throws IllegalArgumentException
     {
         super(fileManager, blockAddress);
 
@@ -30,19 +32,23 @@ public class SuperBlock extends Block
      * the virtual file system.
      *
      * @return block count
+     *
      * @throws IOException
      */
-    public int getBlockCount() throws IOException
+    public int getBlockCount()
+            throws IOException
     {
         return fileManager.readInt(getBlockOffset(), OFFSET_BLOCK_COUNT);
     }
 
     /**
      * @param blockCount new block count
+     *
      * @throws IOException
      * @throws IllegalArgumentException if new block count is invalid
      */
-    public void setBlockCount(int blockCount) throws IOException, IllegalArgumentException
+    public void setBlockCount(int blockCount)
+            throws IOException, IllegalArgumentException
     {
         // Check validity of block count
         // TODO: Block count > number of supported blocks
@@ -55,27 +61,71 @@ public class SuperBlock extends Block
     }
 
     /**
+     * This method loads the maximum number of Blocks that could be stored in
+     * the virtual file system.
      *
-     * @return block address of root directory block
+     * @return block count
+     *
      * @throws IOException
      */
-    public int getRootDirectoryBlock() throws IOException
+    public int getVDiskState()
+            throws IOException
+    {
+        return fileManager.readInt(getBlockOffset(), OFFSET_VDISK_STATE);
+    }
+
+    /**
+     * Sets the properties of the loaded VDisk computed by interpreting the given state as follows
+     *
+     *  States
+     *  ------
+     *
+     *  0       file system does not have any properties
+     *  1       file system is compressed
+     *  2       file system is encrypted
+     *  4       file system is indexed
+     *
+     *  eg. given state = 5  =>  5 = 2^2 + 2^1 means that the file system is compressed and indexed
+     *
+     * @param state to set
+     * @throws IOException
+     * @throws IllegalArgumentException if new block count is invalid
+     */
+    public void setVDiskState(int state)
+            throws IOException, IllegalArgumentException
+    {
+        // Check validity of state
+        if (state < 0)
+        {
+            throw new IllegalArgumentException();
+        }
+        fileManager.writeInt(getBlockOffset(), OFFSET_VDISK_STATE, state);
+    }
+
+    /**
+     * @return block address of root directory block
+     *
+     * @throws IOException
+     */
+    public int getRootDirectoryBlock()
+            throws IOException
     {
         return fileManager.readInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK);
     }
 
+
     /**
-     *
      * @param rootDirectoryBlockAddress new root directory block
+     *
      * @throws IOException
      */
-    public void setRootDirectoryBlock(int rootDirectoryBlockAddress) throws IOException
+    public void setRootDirectoryBlock(int rootDirectoryBlockAddress)
+            throws IOException
     {
         fileManager.writeInt(getBlockOffset(), OFFSET_ROOT_DIRECTORY_BLOCK, rootDirectoryBlockAddress);
     }
 
     /**
-     *
      * @return block address of first bit map block
      */
     public int getFirstBitMapBlock()
@@ -84,7 +134,6 @@ public class SuperBlock extends Block
     }
 
     /**
-     *
      * @return block address of last bit map block
      */
     public int getLastBitMapBlock()

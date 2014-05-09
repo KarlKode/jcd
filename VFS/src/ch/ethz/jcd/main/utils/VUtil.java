@@ -18,6 +18,7 @@ public class VUtil
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
     private VDirectory rootDirectory;
+    private VCompressor compressor;
 
     public VUtil(File vDiskFile) throws FileNotFoundException
     {

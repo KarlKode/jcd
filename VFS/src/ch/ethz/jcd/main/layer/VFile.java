@@ -173,6 +173,15 @@ public class VFile extends VObject<FileBlock>
             }
         }
 
+        /**
+         *
+         * @param bytes to put into dataBlock
+         * @throws DiskFullException
+         * @throws IOException
+         * @throws InvalidBlockAddressException
+         * @throws InvalidBlockSizeException
+         * @throws BlockFullException
+         */
         public void put(byte[] bytes)
                 throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
         {
