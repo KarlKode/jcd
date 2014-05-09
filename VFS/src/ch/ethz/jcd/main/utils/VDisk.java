@@ -3,8 +3,7 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VFile.VFileImputStream;
-import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
+import ch.ethz.jcd.main.layer.VFile.*;
 import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
@@ -20,6 +19,7 @@ public class VDisk
 
     private final File diskFile;
     private final VUtil vUtil;
+    private VCompressor compressor;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -31,6 +31,7 @@ public class VDisk
     {
         this.diskFile = diskFile;
         vUtil = new VUtil(diskFile);
+        compressor = new VCompressor();
     }
 
     /**
@@ -292,13 +293,11 @@ public class VDisk
      */
     public VFile importFromHost(File source, VDirectory destination)
     {
-        VFile file = this.touch(destination, source.getName());
-
         try
         {
+            VFile file = this.touch(destination, source.getName());
             FileInputStream stream = new FileInputStream(source);
-            VFileImputStream vfile = file.inputStream(vUtil);
-
+            VFileInputStream vfile = file.inputStream(vUtil);
             long remaining = stream.available();
 
             while (0 < remaining)
@@ -310,7 +309,6 @@ public class VDisk
             }
 
             stream.close();
-
             return file;
         }
         catch (IOException e)
@@ -348,14 +346,12 @@ public class VDisk
         try
         {
             FileOutputStream stream = new FileOutputStream(destination);
-
             VFileOutputStream iterator = source.iterator();
 
             while (iterator.hasNext())
             {
                 stream.write(iterator.next().array());
             }
-
             stream.close();
         }
         catch (IOException e)

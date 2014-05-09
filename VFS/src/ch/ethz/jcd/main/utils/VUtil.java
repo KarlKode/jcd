@@ -18,7 +18,6 @@ public class VUtil
     private BitMapBlock bitMapBlock;
     private DirectoryBlock rootBlock;
     private VDirectory rootDirectory;
-    private VCompressor compressor;
 
     public VUtil(File vDiskFile) throws FileNotFoundException
     {
@@ -103,36 +102,6 @@ public class VUtil
     }
 
     /**
-     * This method returns the super block of the loaded disks
-     *
-     * @return SuperBlock of loaded VDisk
-     */
-    public SuperBlock getSuperBlock()
-    {
-        return superBlock;
-    }
-
-    /**
-     * This method returns the bit map block of the loaded disk
-     *
-     * @return BitMapBlock of loaded VDisk
-     */
-    public BitMapBlock getBitMapBlock()
-    {
-        return bitMapBlock;
-    }
-
-    /**
-     * This method returns the root directory block of the loaded disk
-     *
-     * @return DirectoryBlock
-     */
-    public DirectoryBlock getRootDirectoryBlock()
-    {
-        return rootBlock;
-    }
-
-    /**
      * Allocate a previously free block in the VFS
      *
      * @return Block instance that contains the data of the now used block
@@ -208,5 +177,51 @@ public class VUtil
     public VDirectory getRootDirectory()
     {
         return rootDirectory;
+    }
+
+    /**
+     * This method returns the super block of the loaded disks
+     *
+     * @return SuperBlock of loaded VDisk
+     */
+    public SuperBlock getSuperBlock()
+    {
+        return superBlock;
+    }
+
+    /**
+     * This method returns the bit map block of the loaded disk
+     *
+     * @return BitMapBlock of loaded VDisk
+     */
+    public BitMapBlock getBitMapBlock()
+    {
+        return bitMapBlock;
+    }
+
+    /**
+     * This method returns the root directory block of the loaded disk
+     *
+     * @return DirectoryBlock
+     */
+    public DirectoryBlock getRootDirectoryBlock()
+    {
+        return rootBlock;
+    }
+
+    /**
+     *
+     * @return true if the loaded VDisk is compressed, false otherwise
+     */
+    public boolean isCompressed()
+    {
+        try
+        {
+            return (superBlock.getVDiskState() & 1) == 1;
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
     }
 }
