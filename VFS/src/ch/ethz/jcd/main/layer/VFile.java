@@ -140,10 +140,10 @@ public class VFile extends VObject<FileBlock>
      *
      * @return the input stream
      */
-    public VFileImputStream inputStream(VUtil vUtil)
+    public VFileInputStream inputStream(VUtil vUtil)
             throws IOException
     {
-        return new VFileImputStream(vUtil, this);
+        return new VFileInputStream(vUtil, this);
     }
 
     /**
@@ -151,7 +151,7 @@ public class VFile extends VObject<FileBlock>
      * the virtual file system. Useful when doing imports to avoid loading big
      * files completely into memory.
      */
-    public class VFileImputStream
+    public class VFileInputStream
     {
         private VUtil vUtil;
         private VFile vFile;
@@ -161,7 +161,7 @@ public class VFile extends VObject<FileBlock>
          *
          * @param vUtil used to allocate Blocks
          */
-        private VFileImputStream(VUtil vUtil, VFile vFile)
+        private VFileInputStream(VUtil vUtil, VFile vFile)
                 throws IOException
         {
             this.vUtil = vUtil;
@@ -173,6 +173,15 @@ public class VFile extends VObject<FileBlock>
             }
         }
 
+        /**
+         *
+         * @param bytes to put into dataBlock
+         * @throws DiskFullException
+         * @throws IOException
+         * @throws InvalidBlockAddressException
+         * @throws InvalidBlockSizeException
+         * @throws BlockFullException
+         */
         public void put(byte[] bytes)
                 throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
         {

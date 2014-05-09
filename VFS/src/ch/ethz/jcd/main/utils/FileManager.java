@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 
 public class FileManager
 {
-    private final RandomAccessFile rand;
+    protected final RandomAccessFile rand;
 
     public FileManager(File file) throws FileNotFoundException
     {
