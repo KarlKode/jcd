@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.dialog.ProgressDialogController">
+<children><Label fx:id="labelMessage" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaa " wrapText="true">
+<VBox.margin>
+<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+</VBox.margin></Label><Label fx:id="labelInformation" text="Information: blublu">
+<VBox.margin>
+<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+</VBox.margin></Label><ProgressBar fx:id="progressBarStatus" maxWidth="1.7976931348623157E308" progress="0.0">
+<VBox.margin>
+<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+</VBox.margin></ProgressBar><HBox alignment="CENTER_RIGHT" prefWidth="200.0">
+<children><Button fx:id="buttonCancel" cancelButton="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onActionButtonCancel" text="Cancel">
+<HBox.margin>
+<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+</HBox.margin></Button>
+</children></HBox>
+</children></VBox>
