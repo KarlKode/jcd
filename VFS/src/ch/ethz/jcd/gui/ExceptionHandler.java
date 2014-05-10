@@ -1,6 +1,18 @@
 package ch.ethz.jcd.gui;
 
+import ch.ethz.jcd.dialog.MessageDialogController;
+import ch.ethz.jcd.dialog.NewVDiskController;
+import ch.ethz.jcd.dialog.SearchDialogController;
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.utils.VDisk;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 /**
  * Created by leo on 10.05.14.
@@ -39,8 +51,20 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             message = e.toString();
         }
 
-        System.out.println("ExceptionHandler.uncaughtException");
+        try{
+            Stage dialogStage = new Stage();
 
-        e.printStackTrace();
+            FXMLLoader loader = new FXMLLoader();
+            Parent root = (Parent)loader.load(MessageDialogController.class.getResource("MessageDialog.fxml").openStream());
+            loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+            final MessageDialogController controller = loader.getController();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 }
