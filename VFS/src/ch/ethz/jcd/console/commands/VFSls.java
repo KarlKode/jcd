@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -12,23 +13,26 @@ import java.util.HashMap;
  */
 public class VFSls extends AbstractVFSCommand
 {
+    public static final String COMMAND = "ls";
+
     /**
      * NAME
-     *      ls - list directory contents
+     * ls - list directory contents
      * SYNOPSIS
-     *      ls [OPTION]... [FILE]
+     * ls [OPTION]... [FILE]
      * DESCRIPTION
-     *      Outputs the objects that the directory at given path contains. If no path
-     *      is given the current directory is used as destination.
-     *
-     *      -h, --help
-     *          prints information about usage
+     * Outputs the objects that the directory at given path contains. If no path
+     * is given the current directory is used as destination.
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
@@ -41,15 +45,24 @@ public class VFSls extends AbstractVFSCommand
             }
             case 2:
             {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                int expr = args.length - 1;
+
+                for (int i = 1; i < args.length; i++)
                 {
-                    help();
-                    break;
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        expr = Math.min(i, expr);
+                    }
                 }
 
-                VObject destination = resolve(console, args[1]);
+                VObject destination = resolve(console, args[expr]);
 
-                if(destination != null && destination instanceof VDirectory)
+                if (destination instanceof VDirectory)
                 {
                     out(vDisk.list((VDirectory) destination));
                     break;
@@ -79,9 +92,17 @@ public class VFSls extends AbstractVFSCommand
      */
     private void out(HashMap<String, VObject> list)
     {
-        for(String key : list.keySet())
+        for (String key : list.keySet())
         {
             System.out.println(key);
         }
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

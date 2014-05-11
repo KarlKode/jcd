@@ -1,10 +1,7 @@
 package ch.ethz.jcd.gui;
 
 import ch.ethz.jcd.dialog.MessageDialogController;
-import ch.ethz.jcd.dialog.NewVDiskController;
-import ch.ethz.jcd.dialog.SearchDialogController;
-import ch.ethz.jcd.main.exceptions.*;
-import ch.ethz.jcd.main.utils.VDisk;
+import ch.ethz.jcd.main.exceptions.command.*;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;

@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -10,22 +11,25 @@ import ch.ethz.jcd.main.utils.VDisk;
  */
 public class VFStouch extends AbstractVFSCommand
 {
+    public static final String COMMAND = "touch";
+
     /**
      * NAME
-     *      touch - creates a new empty file
+     * touch - creates a new empty file
      * SYNOPSIS
-     *      touch [OPTION]... FILE
+     * touch [OPTION]... FILE
      * DESCRIPTION
-     *      Creates a new FILE resolving the path before the FILE name.
-     *
-     *      -h, --help
-     *          prints information about usage
+     * Creates a new FILE resolving the path before the FILE name.
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
@@ -33,25 +37,36 @@ public class VFStouch extends AbstractVFSCommand
         {
             case 2:
             {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                int expr = args.length - 1;
+
+                for (int i = 1; i < args.length; i++)
                 {
-                    help();
-                    break;
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        expr = Math.min(i, expr);
+                    }
                 }
-                String name = args[1];
+
+                String name = args[expr];
                 VObject destination = console.getCurrent();
 
-                if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
+                if (args[expr].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
-                    name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolve(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                    name = args[expr].substring(args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                    destination = resolve(console, args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
-                if(destination != null && destination instanceof VDirectory)
+
+                if (destination instanceof VDirectory)
                 {
                     vDisk.touch((VDirectory) destination, name);
                     break;
                 }
-           }
+            }
             default:
             {
                 usage();
@@ -67,5 +82,13 @@ public class VFStouch extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\ttouch FILE");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

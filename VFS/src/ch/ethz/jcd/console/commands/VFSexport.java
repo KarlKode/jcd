@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -13,45 +14,60 @@ import java.io.File;
  */
 public class VFSexport extends AbstractVFSCommand
 {
+    public static final String COMMAND = "export";
+
     /**
      * NAME
-     *      export - exports a file on VFS to the host file system
+     * export - exports a file on VFS to the host file system
      * SYNOPSIS
-     *      export [OPTION]... PATH_TO_HOST_FILE... DEST
+     * export [OPTION]... PATH_TO_HOST_FILE... DEST
      * DESCRIPTION
-     *      Exports the given file form the virtual file system into the given
-     *      location at the host file system.
-     *
-     *      -h, --help
-     *          prints information about usage
+     * Exports the given file form the virtual file system into the given
+     * location at the host file system.
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
         switch (args.length)
         {
-            case 2:
-            {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
-                {
-                    help();
-                }
-                break;
-            }
             case 3:
             {
-                File file = new File(args[1]);
-                VObject source = resolve(console, args[2]);
+                int host = args.length - 1;
+                int dest = 0;
 
-                if(source != null &&  source instanceof VFile)
+                for (int i = 1; i < args.length; i++)
                 {
-                    vDisk.exportToHost((VFile) source, file);
-                    break;
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        host = Math.min(i, host);
+                        dest = Math.max(i, dest);
+                    }
+                }
+
+                if (!(host == dest))
+                {
+                    File file = new File(args[host]);
+                    VObject source = resolve(console, args[dest]);
+
+                    if (source instanceof VFile)
+                    {
+                        vDisk.exportToHost((VFile) source, file);
+                        break;
+                    }
                 }
             }
             default:
@@ -69,5 +85,13 @@ public class VFSexport extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\texport PATH_TO_HOST_FILE SOURCE");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

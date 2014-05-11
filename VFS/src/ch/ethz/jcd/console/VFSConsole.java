@@ -1,10 +1,9 @@
 package ch.ethz.jcd.console;
 
 import ch.ethz.jcd.console.commands.*;
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
+import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
@@ -144,8 +143,16 @@ public class VFSConsole
      */
     public VFSConsole(VDisk vDisk)
     {
+        try
+        {
+            current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
+        }
+        catch (ResolveException e)
+        {
+            e.printStackTrace();
+        }
+
         this.vDisk = vDisk;
-        current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
 
         while(true)
         {
@@ -196,7 +203,15 @@ public class VFSConsole
 
         if(cmd != null)
         {
-            cmd.execute(this, args);
+            try
+            {
+                cmd.execute(this, args);
+            }
+            catch (CommandException e)
+            {
+                // TODO luege wege causes und message
+                cmd.error(e.getCause().getMessage());
+            }
         }
         else
         {

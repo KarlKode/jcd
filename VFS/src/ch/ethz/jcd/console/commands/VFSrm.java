@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -10,6 +11,7 @@ import ch.ethz.jcd.main.utils.VDisk;
  */
 public class VFSrm extends AbstractVFSCommand
 {
+    protected static final String COMMAND = "rm";
     protected static final String OPTION_R = "-r";
     protected static final String OPTION_RECURSIVE = "--recursive";
 
@@ -29,6 +31,7 @@ public class VFSrm extends AbstractVFSCommand
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
@@ -38,7 +41,7 @@ public class VFSrm extends AbstractVFSCommand
             case 3:
             {
                 boolean recursive = false;
-                int expr = 3;
+                int expr = args.length - 1;
 
                 for (int i = 1; i < args.length; i++)
                 {
@@ -60,17 +63,14 @@ public class VFSrm extends AbstractVFSCommand
                 String path = args[expr].startsWith(VDisk.PATH_SEPARATOR) ? args[expr] : console.getCurrent() + args[expr];
                 VObject destination = resolve(console, path);
 
-                if(destination instanceof VDirectory && !recursive)
+                if (destination instanceof VDirectory && !recursive)
                 {
-                    System.out.println("rm: cannot remove '"+ path +"': Is a directory");
+                    this.error("cannot remove '" + path + "': Is a directory");
                     break;
                 }
 
-                if (destination != null)
-                {
-                    vDisk.delete(destination);
-                    break;
-                }
+                vDisk.delete(destination);
+                break;
             }
             default:
             {
@@ -87,5 +87,13 @@ public class VFSrm extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\trm FILE");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

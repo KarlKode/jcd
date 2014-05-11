@@ -6,16 +6,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import ch.ethz.jcd.dialog.NewVDiskController;
 import ch.ethz.jcd.dialog.SearchDialogController;
-import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.command.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.main.utils.VUtil;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,7 +24,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -152,7 +149,8 @@ public class MainController {
     }
 
     @FXML
-    void onActionMenuItemFind(ActionEvent event) throws FindException {
+    void onActionMenuItemFind(ActionEvent event) throws FindException
+    {
         openFindDialog();
         throw new FindException(null);
     }
@@ -178,7 +176,8 @@ public class MainController {
     }
 
     @FXML
-    void onActionButtonExport(ActionEvent event) throws IOException, ExportException {
+    void onActionButtonExport(ActionEvent event) throws IOException, ExportException
+    {
         exportFiles();
     }
 

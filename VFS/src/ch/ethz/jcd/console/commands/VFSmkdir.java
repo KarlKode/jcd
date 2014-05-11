@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -10,22 +11,25 @@ import ch.ethz.jcd.main.utils.VDisk;
  */
 public class VFSmkdir extends AbstractVFSCommand
 {
+    public static final String COMMAND = "mkdir";
+
     /**
      * NAME
-     *      mkdir - make directories
+     * mkdir - make directories
      * SYNOPSIS
-     *      mkdir [OPTION]... DIRECTORY
+     * mkdir [OPTION]... DIRECTORY
      * DESCRIPTION
-     *      Create the DIRECTORY(ies), if they do not already exist.
-     *
-     *      -h, --help
-     *          prints information about usage
+     * Create the DIRECTORY(ies), if they do not already exist.
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
@@ -33,20 +37,31 @@ public class VFSmkdir extends AbstractVFSCommand
         {
             case 2:
             {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                int expr = args.length - 1;
+
+                for (int i = 1; i < args.length; i++)
                 {
-                    help();
-                    break;
-                }
-                String name = args[1];
-                VObject destination = console.getCurrent();
-                if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
-                {
-                    name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolve(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        expr = Math.min(i, expr);
+                    }
                 }
 
-                if(destination != null && destination instanceof VDirectory)
+                String name = args[expr];
+                VObject destination = console.getCurrent();
+
+                if (args[expr].split(VDisk.PATH_SEPARATOR).length > 1)
+                {
+                    name = args[expr].substring(args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                    destination = resolve(console, args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
+                }
+
+                if (destination instanceof VDirectory)
                 {
                     vDisk.mkdir((VDirectory) destination, name);
                     break;
@@ -67,5 +82,13 @@ public class VFSmkdir extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\tmkdir DIRECTORY");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

@@ -1,6 +1,8 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
+import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
  */
 public abstract class AbstractVFSCommand
 {
+    protected static final String COMMAND = "cmd";
     protected static final String OPTION_H = "-h";
     protected static final String OPTION_HELP = "--help";
 
@@ -20,14 +23,15 @@ public abstract class AbstractVFSCommand
      * Executes the concrete command according to the passed arguments.
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
-    public abstract void execute(VFSConsole console, String[] args);
+    public abstract void execute(VFSConsole console, String[] args)
+            throws CommandException;
 
     /**
      * Prints how to use the concrete command.
      */
-    public void usage( )
+    public void usage()
     {
         System.out.print("Usage: ");
         help();
@@ -36,30 +40,47 @@ public abstract class AbstractVFSCommand
     /**
      * Prints the help of the concrete command.
      */
-    public abstract void help( );
+    public abstract void help();
 
     /**
      * Resolves the given path of a object.
      *
      * @param console that executes the command
-     * @param path to resolve
+     * @param path    to resolve
+     *
      * @return the object if found, otherwise null
      */
     protected VObject resolve(VFSConsole console, String path)
+            throws ResolveException
     {
-        if(!path.startsWith(VDisk.PATH_SEPARATOR))
+        try
         {
-            try
+            if (!path.startsWith(VDisk.PATH_SEPARATOR))
             {
                 String pwd = console.getCurrent().getPath();
-                path = pwd.endsWith(VDisk.PATH_SEPARATOR) ?  pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
-            }
-            catch (IOException e)
-            {
-                return null;
+                path = pwd.endsWith(VDisk.PATH_SEPARATOR) ? pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
             }
         }
+        catch (IOException ingored)
+        {
 
+        }
         return console.getVDisk().resolve(path);
     }
+
+
+    /**
+     * method to out standardized error message in the console
+     *
+     * @param reason to print
+     */
+    public void error(String reason)
+    {
+        System.out.println(this.command() + ": " + reason);
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected abstract String command();
 }

@@ -1,8 +1,9 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
+import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
-import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
@@ -11,49 +12,96 @@ import ch.ethz.jcd.main.utils.VDisk;
  */
 public class VFScp extends AbstractVFSCommand
 {
+    public static final String COMMAND = "cp";
+
     /**
      * NAME
-     *      cp - copy files and directories
+     * cp - copy files and directories
      * SYNOPSIS
-     *      cp [OPTION]... SOURCE... DEST
+     * cp [OPTION]... SOURCE... DEST
      * DESCRIPTION
-     *      Copy SOURCE to DEST.
-     *
-     *      -h, --help
-     *          prints information about usage
+     * Copy SOURCE to DEST.
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
         VDisk vDisk = console.getVDisk();
 
         switch (args.length)
         {
             case 2:
-            {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
-                {
-                    help();
-                    break;
-                }
-            }
             case 3:
             {
-                String name = args[1];
-                VFile file = (VFile) vDisk.resolve(args[1]);
-                VObject destination = console.getCurrent();
-                if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
+                int src = args.length - 1;
+                int dest = 0;
+
+                for (int i = 1; i < args.length; i++)
                 {
-                    name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolve(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        src = Math.min(i, src);
+                        dest = Math.max(i, dest);
+                    }
                 }
-                if(destination != null && destination instanceof VDirectory && file != null)
+
+                if (!(src == dest))
                 {
-                    vDisk.copy(file, (VDirectory) destination, name);
-                    break;
+                    String name = args[dest];
+                    VObject source = vDisk.resolve(args[src]);
+                    VObject destination;
+
+                    try
+                    {
+                        /**
+                         * copying into directory w/o renaming the object
+                         *
+                         * eg. cp tmp/bla.txt /usr/local/
+                         */
+                        destination = resolve(console, args[dest]);
+
+                        if (destination instanceof VDirectory)
+                        {
+                            name = args[src];
+
+                            if (args[src].split(VDisk.PATH_SEPARATOR).length > 1)
+                            {
+                                name = args[src].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                            }
+                        }
+                    }
+                    catch (ResolveException ignored)
+                    {
+                        /**
+                         * copying into directory doing the renaming of the object
+                         *
+                         * eg. cp tmp/bla.txt /usr/local/foo.txt
+                         */
+                        destination = console.getCurrent();
+
+                        if (args[dest].split(VDisk.PATH_SEPARATOR).length > 1)
+                        {
+                            name = args[dest].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                            destination = resolve(console, args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                        }
+                    }
+
+                    if (destination instanceof VDirectory)
+                    {
+                        vDisk.copy(source, (VDirectory) destination, name);
+                        break;
+                    }
                 }
             }
             default:
@@ -71,5 +119,13 @@ public class VFScp extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\tcp SOURCE DEST");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

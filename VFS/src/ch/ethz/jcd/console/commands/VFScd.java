@@ -1,6 +1,7 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -10,41 +11,51 @@ import ch.ethz.jcd.main.utils.VDisk;
  */
 public class VFScd extends AbstractVFSCommand
 {
+    public final String COMMAND = "cd";
+
     /**
      * NAME
-     *      cd - change the working directory
+     * cd - change the working directory
      * SYNOPSIS
-     *      cd [OPTION]... DEST
+     * cd [OPTION]... DEST
      * DESCRIPTION
-     *      change the working directory to the given DEST
-     *
-     *      -h, --help
-     *          prints information about usage
+     * change the working directory to the given DEST
+     * <p>
+     * -h, --help
+     * prints information about usage
      *
      * @param console that executes the command
-     * @param args passed with the command
+     * @param args    passed with the command
      */
     @Override
     public void execute(VFSConsole console, String[] args)
+            throws CommandException
     {
-        VDisk vDisk = console.getVDisk();
-
         switch (args.length)
         {
             case 1:
             {
-                console.setCurrent((VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR));
+                console.setCurrent((VDirectory) resolve(console, VDisk.PATH_SEPARATOR));
                 break;
             }
             case 2:
             {
-                if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
+                int expr = args.length - 1;
+
+                for (int i = 1; i < args.length; i++)
                 {
-                    help();
-                    break;
+                    if (args[i].equals(AbstractVFSCommand.OPTION_H) || args[i].equals(AbstractVFSCommand.OPTION_HELP))
+                    {
+                        help();
+                        break;
+                    }
+                    else
+                    {
+                        expr = Math.min(i, expr);
+                    }
                 }
 
-                VObject destination = resolve(console, args[1]);
+                VObject destination = resolve(console, args[expr]);
                 if (destination != null && destination instanceof VDirectory)
                 {
                     console.setCurrent((VDirectory) destination);
@@ -66,5 +77,13 @@ public class VFScd extends AbstractVFSCommand
     public void help()
     {
         System.out.println("\tcd [DEST]");
+    }
+
+    /**
+     * @return the command in text form
+     */
+    protected String command()
+    {
+        return COMMAND;
     }
 }

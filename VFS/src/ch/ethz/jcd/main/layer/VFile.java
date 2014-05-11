@@ -40,7 +40,7 @@ public class VFile extends VObject<FileBlock>
      * @throws DiskFullException
      */
     @Override
-    public VObject copy(VUtil vUtil, VDirectory destination)
+    public VObject copy(VUtil vUtil, VDirectory destination, String name)
             throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException
     {
         FileBlock fileBlock = vUtil.allocateFileBlock();
@@ -54,9 +54,8 @@ public class VFile extends VObject<FileBlock>
 
         fileBlock.setSize(block.size());
         VFile copy = new VFile(fileBlock, destination);
-        copy.setName(this.getName());
+        copy.setName(name);
         destination.addEntry(copy);
-
         return copy;
     }
 
@@ -94,12 +93,10 @@ public class VFile extends VObject<FileBlock>
     {
         if (path == null || path.length() <= 0 || path.startsWith(VDisk.PATH_SEPARATOR) || path.endsWith(VDisk.PATH_SEPARATOR))
         {
-            // TODO: Throw correct exception
             return null;
         }
 
         String[] split = path.split(VDisk.PATH_SEPARATOR);
-
         return (split.length == 1) ? this : null;
     }
 
