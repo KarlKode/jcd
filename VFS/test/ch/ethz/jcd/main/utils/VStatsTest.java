@@ -38,7 +38,7 @@ public class VStatsTest
 
     @Test
     public void testFreeSpace( )
-            throws IOException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -56,7 +56,7 @@ public class VStatsTest
 
     @Test
     public void testUsedSpace( )
-            throws IOException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -74,7 +74,7 @@ public class VStatsTest
 
     @Test
     public void testFreeBlocks( )
-            throws IOException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -92,7 +92,7 @@ public class VStatsTest
 
     @Test
     public void testUsedBlocks( )
-            throws IOException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");

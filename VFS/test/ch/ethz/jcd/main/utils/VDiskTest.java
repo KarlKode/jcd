@@ -1,9 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
@@ -41,7 +38,7 @@ public class VDiskTest
 
     @Test
     public void testList()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -69,7 +66,7 @@ public class VDiskTest
 
     @Test
     public void testMkdir()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -92,7 +89,7 @@ public class VDiskTest
 
     @Test
     public void testTouch()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -120,7 +117,7 @@ public class VDiskTest
 
     @Test
     public void testRename()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -158,8 +155,7 @@ public class VDiskTest
 
     @Test
     public void testMove()
-            throws FileNotFoundException
-    {
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
@@ -206,8 +202,7 @@ public class VDiskTest
 
     @Test
     public void testCopy()
-            throws FileNotFoundException
-    {
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory etc = vDisk.mkdir(root, "etc");
@@ -275,8 +270,7 @@ public class VDiskTest
 
     @Test
     public void testDelete( )
-            throws FileNotFoundException
-    {
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
@@ -308,7 +302,7 @@ public class VDiskTest
 
     @Test
     public void testImportFromHost()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -333,7 +327,7 @@ public class VDiskTest
 
     @Test
     public void testExportFromHost()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -348,7 +342,7 @@ public class VDiskTest
 
     @Test
     public void testImprtExport()
-            throws IOException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
@@ -383,7 +377,7 @@ public class VDiskTest
 
     @Test
     public void testResolve()
-            throws FileNotFoundException
+            throws Exception
     {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");

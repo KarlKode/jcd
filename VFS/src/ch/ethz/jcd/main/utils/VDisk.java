@@ -3,8 +3,7 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VFile.VFileInputStream;
-import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
+import ch.ethz.jcd.main.layer.VFile.*;
 import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
@@ -70,21 +69,16 @@ public class VDisk
      *
      * @return list of the content as a HashMap using the object's name as key
      */
-    public HashMap<String, VObject> list(VDirectory destination)
-    {
+    public HashMap<String, VObject> list(VDirectory destination) throws ListException {
         HashMap<String, VObject> list = new HashMap<>();
 
-        try
-        {
+        try {
             for (VObject object : destination.getEntries())
             {
                 list.put(object.getName(), object);
             }
-        }
-        catch (IOException e)
-        {
-            // TODO do sth
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ListException(e);
         }
 
         return list;
@@ -98,37 +92,15 @@ public class VDisk
      *
      * @return the created directory
      */
-    public VDirectory mkdir(VDirectory destination, String name)
-    {
-        try
-        {
-            // directory is created unlinked and then is named and linked
+    public VDirectory mkdir(VDirectory destination, String name) throws MkDirException {// directory is created unlinked and then is named and linked
+        try {
             VDirectory directory = new VDirectory(vUtil.allocateDirectoryBlock(), destination);
             directory.setName(name);
             directory.move(destination);
             return directory;
+        } catch (Exception ex){
+            throw new MkDirException(ex);
         }
-        catch (DiskFullException e)
-        {
-            //TODO do sth
-        }
-        catch (IOException e)
-        {
-            //TODO do sth
-        }
-        catch (InvalidBlockAddressException e)
-        {
-            //TODO do sth
-        }
-        catch (InvalidNameException e)
-        {
-            //TODO do sth
-        }
-        catch (BlockFullException e)
-        {
-            //TODO do sth
-        }
-        return null;
     }
 
     /**
@@ -139,59 +111,30 @@ public class VDisk
      *
      * @return the created file
      */
-    public VFile touch(VDirectory destination, String name)
-    {
-        try
-        {
+    public VFile touch(VDirectory destination, String name) throws TouchException {
+        try {
             // file is created unlinked and then is named and linked
             VFile file = new VFile(vUtil.allocateFileBlock(), destination);
             file.setName(name);
             file.move(destination);
             return file;
+        } catch (Exception ex){
+            throw new TouchException(ex);
         }
-        catch (InvalidNameException e)
-        {
-            //TODO do sth
-        }
-        catch (IOException e)
-        {
-            //TODO do sth
-        }
-        catch (InvalidBlockAddressException e)
-        {
-            e.printStackTrace();
-        }
-        catch (DiskFullException e)
-        {
-            e.printStackTrace();
-        }
-        catch (BlockFullException e)
-        {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
      * This method renames the given VObject
-     * <p>
+     * <p/>
      *
      * @param object to rename
      * @param name   to set
      */
-    public void rename(VObject object, String name)
-    {
-        try
-        {
+    public void rename(VObject object, String name) throws RenameException {
+        try {
             object.setName(name);
-        }
-        catch (InvalidNameException e)
-        {
-            //TODO do sth
-        }
-        catch (IOException e)
-        {
-            //TODO do sth
+        } catch (Exception ex){
+            throw new RenameException(ex);
         }
     }
 
@@ -203,23 +146,15 @@ public class VDisk
      * @param destination where to move
      * @param name        to set
      */
-    public void move(VObject object, VDirectory destination, String name)
-    {
-        try
-        {
+    public void move(VObject object, VDirectory destination, String name) throws MoveException {
+        try {
             object.move(destination);
             if (name != null)
             {
                 this.rename(object, name);
             }
-        }
-        catch (BlockFullException e)
-        {
-            //TODO do sth
-        }
-        catch (IOException e)
-        {
-            //TODO do sth
+        } catch (Exception ex){
+            throw new MoveException(ex);
         }
     }
 
@@ -231,10 +166,8 @@ public class VDisk
      * @param destination where to copy
      * @param name        of copied VObject
      */
-    public <T extends VObject> T copy(T object, VDirectory destination, String name)
-    {
-        try
-        {
+    public <T extends VObject> T copy(T object, VDirectory destination, String name) throws CopyException {
+        try {
             T copy = (T) object.copy(vUtil, destination);
 
             if (name != null)
@@ -243,38 +176,9 @@ public class VDisk
             }
 
             return copy;
+        } catch (Exception ex){
+            throw new CopyException(ex);
         }
-        catch (BlockFullException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (InvalidBlockAddressException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (DiskFullException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (InvalidBlockSizeException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (InvalidNameException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        return null;
     }
 
     /**
@@ -283,16 +187,11 @@ public class VDisk
      *
      * @param object to delete
      */
-    public void delete(VObject object)
-    {
-        try
-        {
+    public void delete(VObject object) throws DeleteException {
+        try {
             object.delete(vUtil);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            //TODO do sth WRAAAAAH...
+        } catch (Exception e) {
+            throw new DeleteException(e);
         }
     }
 
@@ -303,10 +202,8 @@ public class VDisk
      * @param source      file to import
      * @param destination directory where to import
      */
-    public VFile importFromHost(File source, VDirectory destination)
-    {
-        try
-        {
+    public VFile importFromHost(File source, VDirectory destination) throws ImportException {
+        try {
             VFile file = this.touch(destination, source.getName());
             FileInputStream stream = new FileInputStream(source);
             VFileInputStream vfile = file.inputStream(vUtil, compressed);
@@ -330,38 +227,9 @@ public class VDisk
 
             stream.close();
             return file;
+        } catch (Exception e) {
+            throw new ImportException(e);
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (InvalidBlockSizeException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (InvalidBlockAddressException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (DiskFullException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (BlockFullException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        catch (BlockEmptyException e)
-        {
-            e.printStackTrace();
-            //TODO do sth
-        }
-        return null;
     }
 
     /**
@@ -371,10 +239,8 @@ public class VDisk
      * @param source      object to export
      * @param destination file to write in
      */
-    public void exportToHost(VFile source, File destination)
-    {
-        try
-        {
+    public void exportToHost(VFile source, File destination) throws IOException, ExportException {
+        try {
             FileOutputStream stream = new FileOutputStream(destination);
             VFileOutputStream iterator = source.iterator(vUtil.isCompressed());
 
@@ -390,10 +256,8 @@ public class VDisk
                 }
             }
             stream.close();
-        }
-        catch (IOException e)
-        {
-            //TODO do sth
+        } catch (Exception e) {
+            throw new ExportException(e);
         }
     }
 
@@ -410,34 +274,30 @@ public class VDisk
 
     /**
      * This methods resolves a given path and returns the VDirectory.
-     * <p>
+     *
      * TODO Direcotry
      *
      * @param path given
      *
      * @return VDirectory to the given path
      */
-    public VObject resolve(String path)
-    {
-        if (path == null || path.length() <= 0 || !path.startsWith(PATH_SEPARATOR))
-        {
-            // TODO: Throw correct exception
-            return null;
-        }
+    public VObject resolve(String path) throws IOException, ResolveException {
+        try {
+            if (path == null || path.length() <= 0 || !path.startsWith(PATH_SEPARATOR))
+            {
+                // TODO: Throw correct exception
+                return null;
+            }
 
         if (path.endsWith(PATH_SEPARATOR))
         {
             path = path.substring(0, path.length() - 1);
         }
 
-        try
-        {
             path = path.substring(path.indexOf(VDisk.PATH_SEPARATOR) + 1);
             return vUtil.getRootDirectory().resolve(path);
-        }
-        catch (IOException e)
-        {
-            return null;
+        } catch (Exception e) {
+            throw new ResolveException(e);
         }
     }
 
@@ -450,15 +310,11 @@ public class VDisk
      *
      * @return HashMap filled with all search results
      */
-    public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive)
-    {
-        try
-        {
+    public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive) throws FindException {
+        try {
             return folder.find(regex, recursive);
-        }
-        catch (IOException e)
-        {
-            return new HashMap<>();
+        } catch (Exception e){
+            throw new FindException(e);
         }
     }
 }

@@ -1,10 +1,16 @@
 package ch.ethz.jcd.gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import ch.ethz.jcd.dialog.NewVDiskController;
 import ch.ethz.jcd.dialog.SearchDialogController;
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
+import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
@@ -20,6 +26,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,13 +41,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Pair;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Executor;
 
 
 public class MainController {
@@ -102,33 +102,28 @@ public class MainController {
 
     }
 
-    private void refreshTreeView(){
-        try {
-            VDirectory root = (VDirectory) vdisk.resolve("/");
+    private void refreshTreeView() throws ResolveException, IOException {
+        VDirectory root = (VDirectory) vdisk.resolve("/");
 
-            Stack<TreeItem<VDirectory>> dirs =  new Stack<TreeItem<VDirectory>>();
-            TreeItem<VDirectory> rootNode = new TreeItem<VDirectory>(root);
-            dirs.add(rootNode);
+        Stack<TreeItem<VDirectory>> dirs =  new Stack<TreeItem<VDirectory>>();
+        TreeItem<VDirectory> rootNode = new TreeItem<VDirectory>(root);
+        dirs.add(rootNode);
 
-            while(!dirs.isEmpty()){
-                final TreeItem<VDirectory> currNode = dirs.pop();
+        while(!dirs.isEmpty()){
+            final TreeItem<VDirectory> currNode = dirs.pop();
 
-                currNode.getValue().getEntries().forEach(a -> {
-                    if (a instanceof VDirectory) {
-                        final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
-                        tmp.setExpanded(true);
-                        dirs.add(tmp);
-                        currNode.getChildren().add(tmp);
-                    }
-                });
-            }
-
-            this.treeViewNavigation.setRoot(rootNode);
-            this.treeViewNavigation.getRoot().setExpanded(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            //TODO: dialog
+            currNode.getValue().getEntries().forEach(a -> {
+                if (a instanceof VDirectory) {
+                    final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
+                    tmp.setExpanded(true);
+                    dirs.add(tmp);
+                    currNode.getChildren().add(tmp);
+                }
+            });
         }
+
+        this.treeViewNavigation.setRoot(rootNode);
+        this.treeViewNavigation.getRoot().setExpanded(true);
     }
 
     @FXML
@@ -137,7 +132,7 @@ public class MainController {
     }
 
     @FXML
-    void onActionMenuItemLoadVFS(ActionEvent event) {
+    void onActionMenuItemLoadVFS(ActionEvent event) throws ResolveException, IOException {
         openVDisk();
     }
 
@@ -157,8 +152,9 @@ public class MainController {
     }
 
     @FXML
-    void onActionMenuItemFind(ActionEvent event) {
+    void onActionMenuItemFind(ActionEvent event) throws FindException {
         openFindDialog();
+        throw new FindException(null);
     }
 
     @FXML
@@ -182,7 +178,7 @@ public class MainController {
     }
 
     @FXML
-    void onActionButtonExport(ActionEvent event) {
+    void onActionButtonExport(ActionEvent event) throws IOException, ExportException {
         exportFiles();
     }
 
@@ -197,7 +193,7 @@ public class MainController {
     }
 
     @FXML
-    void onKeyPressedMainPane(KeyEvent event) {
+    void onKeyPressedMainPane(KeyEvent event) throws IOException, ExportException, ResolveException {
         if(event.isControlDown()){
             if(event.getCode() == KeyCode.C){
                 copySelectedFiles();
@@ -230,49 +226,30 @@ public class MainController {
     }
 
     private void newVDisk() {
-        final FileChooser fchooser = new FileChooser();
-        fchooser.setTitle("Create new VDisk.. ");
+        try{
+            Stage dialogStage = new Stage();
 
-        final File fileVdisk = fchooser.showSaveDialog(null);
+            FXMLLoader loader = new FXMLLoader();
+            Parent root = (Parent)loader.load(SearchDialogController.class.getResource("NewVDiskDialog.fxml").openStream());
+            loader.setBuilderFactory(new JavaFXBuilderFactory());
 
-        if(fileVdisk != null) {
-            try {
-                // hm.. wouldn't it be better to return the new Vdisk?
-                VDisk.format(fileVdisk, 3000*VUtil.BLOCK_SIZE, false);
-                this.vdisk = new VDisk(fileVdisk);
+            final NewVDiskController controller = loader.getController();
 
-                VDirectory root = (VDirectory) this.vdisk.resolve("/");
+            dialogStage.setTitle("New VDisk ... ");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
 
-                VDirectory home = this.vdisk.mkdir(root, "home");
-                VDirectory phgamper = this.vdisk.mkdir(home, "phgamper");
 
-                this.vdisk.mkdir(phgamper, "Pictures");
-                this.vdisk.mkdir(phgamper, "Videos");
-                this.vdisk.mkdir(phgamper, "Documents");
-                this.vdisk.mkdir(phgamper, "Dropbox");
 
-                refreshTreeView();
-                this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
-            } catch (FileNotFoundException e) {
-                //TODO: create dialog
-                e.printStackTrace();
-            } catch (InvalidBlockAddressException e) {
-                e.printStackTrace();
-            } catch (InvalidSizeException e) {
-                e.printStackTrace();
-            } catch (InvalidBlockCountException e) {
-                e.printStackTrace();
-            } catch (VDiskCreationException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else{
-            //no file was chosen / user pressed esc
+
+            vdisk = new VDisk(controller.getVDiskFile());
+        }catch(IOException ex){
+            ex.printStackTrace();
         }
     }
 
-    private void openVDisk() {
+    private void openVDisk() throws ResolveException, IOException {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Load VDisk.. ");
 
@@ -333,36 +310,28 @@ public class MainController {
         }
     }
 
-    private void exportFiles() {
+    private void exportFiles() throws IOException, ExportException {
         final DirectoryChooser dchooser = new DirectoryChooser();
         dchooser.setTitle("Export files .. ");
 
         final File exportDir = dchooser.showDialog(null);
 
         if(exportDir != null) {
-            try {
-                new Task<Void>(){
-                    @Override
-                    protected Void call() throws Exception {
-                        final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
+            new Task<Void>(){
+                @Override
+                protected Void call() throws IOException, ExportException {
+                    final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
 
-                        for(VObject d : items){
-                            try {
-                                if(d instanceof VFile){
-                                    File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
-                                    vdisk.exportToHost((VFile)d, f);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                    for(VObject d : items){
+                        if(d instanceof VFile){
+                            File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
+                            vdisk.exportToHost((VFile)d, f);
                         }
-
-                        return null;
                     }
-                }.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+                    return null;
+                }
+            }.call();
         }else{
             //no file was chosen / user pressed esc
         }
@@ -398,20 +367,16 @@ public class MainController {
     }
 
     @FXML
-    void onDragDetectedListViewFiles(MouseEvent event) {
+    void onDragDetectedListViewFiles(MouseEvent event) throws IOException, ExportException {
         ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
         Map<DataFormat, Object> files = new HashMap<>();
         List<File> aa = new ArrayList<File>();
 
         for(VObject d : items){
-            try {
-                if(d instanceof VFile){
-                    File f = new File(System.getProperty("java.io.tmpdir") + "/" + d.getName());
-                    vdisk.exportToHost((VFile)d, f);
-                    aa.add(f);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(d instanceof VFile){
+                File f = new File(System.getProperty("java.io.tmpdir") + "/" + d.getName());
+                vdisk.exportToHost((VFile)d, f);
+                aa.add(f);
             }
         }
 
@@ -426,7 +391,7 @@ public class MainController {
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
-    private void importFiles(List<File> files){
+    private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException {
         Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
 
         for(File file : files){

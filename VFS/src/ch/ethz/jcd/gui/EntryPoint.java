@@ -38,6 +38,8 @@ public class EntryPoint extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
