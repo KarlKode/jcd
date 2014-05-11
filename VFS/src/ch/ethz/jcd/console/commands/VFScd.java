@@ -2,6 +2,7 @@ package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
 /**
@@ -43,10 +44,10 @@ public class VFScd extends AbstractVFSCommand
                     break;
                 }
 
-                VDirectory destination = resolveDirectory(console, args[1]);
-                if (destination != null)
+                VObject destination = resolve(console, args[1]);
+                if (destination != null && destination instanceof VDirectory)
                 {
-                    console.setCurrent(destination);
+                    console.setCurrent((VDirectory) destination);
                     break;
                 }
             }

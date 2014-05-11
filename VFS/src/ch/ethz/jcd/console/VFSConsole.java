@@ -36,6 +36,17 @@ import java.util.HashMap;
  */
 public class VFSConsole
 {
+
+    private static final String OPTION_H = "-h";
+    private static final String OPTION_HELP = "--help";
+    private static final String OPTION_N = "-n";
+    private static final String OPTION_NEW_DISK = "--new_disk";
+    private static final String OPTION_C = "-c";
+    private static final String OPTION_COMPRESSED = "--compressed";
+    private static final String OPTION_S = "-s";
+    private static final String OPTION_SIZE = "--size";
+    private static final int DEFAULT_SIZE = 1024;
+
     public static final String QUIT_CMD = "quit";
     public static final HashMap<String, AbstractVFSCommand> VFS_COMMANDS;
     static
@@ -73,11 +84,49 @@ public class VFSConsole
     {
         try
         {
-            quitWithUsageIfLessThan(args, 1);
-            File vdiskFile = new File(args[0]);
-            if(args.length > 1)
+            boolean newDisk = false;
+            boolean compressed = false;
+            int file = args.length - 1;
+            int size = DEFAULT_SIZE;
+            int i = 0;
+
+            while(i < args.length)
             {
-                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * Integer.parseInt(args[1]));
+                if(args[i].equals(OPTION_H) || args[i].equals(OPTION_HELP))
+                {
+                    usage();
+                    System.exit(1);
+                }
+                else if(args[i].equals(OPTION_C) || args[i].equals(OPTION_COMPRESSED))
+                {
+                    compressed = true;
+                }
+                else if(args[i].equals(OPTION_N) || args[i].equals(OPTION_NEW_DISK))
+                {
+                    newDisk = true;
+                }
+                else if(args[i].equals(OPTION_S) || args[i].equals(OPTION_SIZE))
+                {
+                    i++;
+
+                    if(i >= args.length)
+                    {
+                        usage();
+                        System.exit(1);
+                    }
+                    size = Integer.parseInt(args[i]);
+                }
+                else
+                {
+                    file = Math.min(i, file);
+                }
+                i++;
+            }
+
+            File vdiskFile = new File(args[file]);
+            if(newDisk)
+            {
+                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed);
             }
             new VFSConsole(new VDisk(vdiskFile));
         }

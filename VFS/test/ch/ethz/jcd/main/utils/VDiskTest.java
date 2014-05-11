@@ -27,7 +27,7 @@ public class VDiskTest
     public void setUp()
             throws InvalidBlockAddressException, InvalidSizeException, InvalidBlockCountException, VDiskCreationException, IOException
     {
-        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT);
+        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, false);
     }
 
     @Test

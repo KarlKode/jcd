@@ -1,13 +1,5 @@
 package ch.ethz.jcd.gui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import ch.ethz.jcd.dialog.SearchDialogController;
 import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
 import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
@@ -28,7 +20,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -43,6 +34,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Pair;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.Executor;
 
 
 public class MainController {
@@ -240,7 +238,7 @@ public class MainController {
         if(fileVdisk != null) {
             try {
                 // hm.. wouldn't it be better to return the new Vdisk?
-                VDisk.format(fileVdisk, 3000*VUtil.BLOCK_SIZE);
+                VDisk.format(fileVdisk, 3000*VUtil.BLOCK_SIZE, false);
                 this.vdisk = new VDisk(fileVdisk);
 
                 VDirectory root = (VDirectory) this.vdisk.resolve("/");

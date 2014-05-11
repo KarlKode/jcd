@@ -3,7 +3,8 @@ package ch.ethz.jcd.main.utils;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
-import ch.ethz.jcd.main.layer.VFile.*;
+import ch.ethz.jcd.main.layer.VFile.VFileInputStream;
+import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
 import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
@@ -20,6 +21,7 @@ public class VDisk
     private final File diskFile;
     private final VUtil vUtil;
     private VCompressor compressor;
+    private boolean compressed;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -31,6 +33,7 @@ public class VDisk
     {
         this.diskFile = diskFile;
         vUtil = new VUtil(diskFile);
+        compressed = vUtil.isCompressed();
         compressor = new VCompressor();
     }
 
@@ -42,10 +45,11 @@ public class VDisk
      *                 of blockSize and have space for at least 16 blocks
      *                 (size >= blockSize * 16)
      */
-    public static void format(File diskFile, long size)
+    public static void format(File diskFile, long size, boolean compressed)
             throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
-        VUtil.format(diskFile, size);
+        int state = compressed ? 1 : 0;
+        VUtil.format(diskFile, size, state);
     }
 
     /**
@@ -85,11 +89,6 @@ public class VDisk
 
         return list;
     }
-
-    public HashMap<String, VObject> list(){
-        return list(vUtil.getRootDirectory());
-    }
-
 
     /**
      * This method creates a new directory at the given destination.
@@ -175,7 +174,7 @@ public class VDisk
 
     /**
      * This method renames the given VObject
-     * <p/>
+     * <p>
      *
      * @param object to rename
      * @param name   to set
@@ -310,7 +309,7 @@ public class VDisk
         {
             VFile file = this.touch(destination, source.getName());
             FileInputStream stream = new FileInputStream(source);
-            VFileInputStream vfile = file.inputStream(vUtil);
+            VFileInputStream vfile = file.inputStream(vUtil, compressed);
             long remaining = stream.available();
 
             while (0 < remaining)
@@ -318,7 +317,15 @@ public class VDisk
                 int len = remaining < VUtil.BLOCK_SIZE ? (int) remaining : VUtil.BLOCK_SIZE;
                 byte[] bytes = new byte[len];
                 remaining -= stream.read(bytes);
-                vfile.put(bytes);
+
+                if (compressed)
+                {
+                    vfile.put(compressor.compress(bytes));
+                }
+                else
+                {
+                    vfile.put(bytes);
+                }
             }
 
             stream.close();
@@ -349,6 +356,11 @@ public class VDisk
             e.printStackTrace();
             //TODO do sth
         }
+        catch (BlockEmptyException e)
+        {
+            e.printStackTrace();
+            //TODO do sth
+        }
         return null;
     }
 
@@ -364,11 +376,18 @@ public class VDisk
         try
         {
             FileOutputStream stream = new FileOutputStream(destination);
-            VFileOutputStream iterator = source.iterator();
+            VFileOutputStream iterator = source.iterator(vUtil.isCompressed());
 
             while (iterator.hasNext())
             {
-                stream.write(iterator.next().array());
+                if(compressed)
+                {
+                    stream.write(compressor.decompress(iterator.next().array()));
+                }
+                else
+                {
+                    stream.write(iterator.next().array());
+                }
             }
             stream.close();
         }
@@ -391,7 +410,7 @@ public class VDisk
 
     /**
      * This methods resolves a given path and returns the VDirectory.
-     *
+     * <p>
      * TODO Direcotry
      *
      * @param path given
@@ -408,7 +427,7 @@ public class VDisk
 
         if (path.endsWith(PATH_SEPARATOR))
         {
-            path = path.substring(0, path.length()-1);
+            path = path.substring(0, path.length() - 1);
         }
 
         try
@@ -425,9 +444,10 @@ public class VDisk
     /**
      * Searches for files matching the given regular expression.
      *
-     * @param regex compiled regular expression Patttern
-     * @param folder where to start searching
+     * @param regex     compiled regular expression Patttern
+     * @param folder    where to start searching
      * @param recursive indicates whether including sub folders or not
+     *
      * @return HashMap filled with all search results
      */
     public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive)

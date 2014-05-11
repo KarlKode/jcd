@@ -1,8 +1,6 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
-import ch.ethz.jcd.main.layer.VDirectory;
-import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
@@ -41,13 +39,13 @@ public abstract class AbstractVFSCommand
     public abstract void help( );
 
     /**
-     * Resolves the given path of a directory.
+     * Resolves the given path of a object.
      *
      * @param console that executes the command
      * @param path to resolve
-     * @return the directory if found, otherwise null
+     * @return the object if found, otherwise null
      */
-    protected VDirectory resolveDirectory(VFSConsole console, String path)
+    protected VObject resolve(VFSConsole console, String path)
     {
         if(!path.startsWith(VDisk.PATH_SEPARATOR))
         {
@@ -62,35 +60,6 @@ public abstract class AbstractVFSCommand
             }
         }
 
-        VObject destination = console.getVDisk().resolve(path);
-
-        return (destination instanceof VDirectory) ? (VDirectory) destination : null;
-    }
-
-    /**
-     * Resolves the given path of a file.
-     *
-     * @param console that executes the command
-     * @param path to resolve
-     * @return the file if found, otherwise null
-     */
-    protected VFile resolveFile(VFSConsole console, String path)
-    {
-        if(!path.startsWith(VDisk.PATH_SEPARATOR))
-        {
-            try
-            {
-                String pwd = console.getCurrent().getPath();
-                path = pwd.endsWith(VDisk.PATH_SEPARATOR) ?  pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
-            }
-            catch (IOException e)
-            {
-                return null;
-            }
-        }
-
-        VObject destination = console.getVDisk().resolve(path);
-
-        return (destination instanceof VFile) ? (VFile) destination : null;
+        return console.getVDisk().resolve(path);
     }
 }

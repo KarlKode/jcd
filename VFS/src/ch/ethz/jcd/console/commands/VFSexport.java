@@ -2,6 +2,7 @@ package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.layer.VFile;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
 import java.io.File;
@@ -39,17 +40,17 @@ public class VFSexport extends AbstractVFSCommand
                 if(args[1].equals(AbstractVFSCommand.OPTION_H) || args[1].equals(AbstractVFSCommand.OPTION_HELP))
                 {
                     help();
-                    break;
                 }
+                break;
             }
             case 3:
             {
                 File file = new File(args[1]);
-                VFile source = resolveFile(console, args[2]);
+                VObject source = resolve(console, args[2]);
 
-                if(source != null)
+                if(source != null &&  source instanceof VFile)
                 {
-                    vDisk.exportToHost(source, file);
+                    vDisk.exportToHost((VFile) source, file);
                     break;
                 }
             }

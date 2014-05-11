@@ -47,11 +47,11 @@ public class VFSls extends AbstractVFSCommand
                     break;
                 }
 
-                VDirectory destination = resolveDirectory(console, args[1]);
+                VObject destination = resolve(console, args[1]);
 
-                if(destination != null)
+                if(destination != null && destination instanceof VDirectory)
                 {
-                    out(vDisk.list(destination));
+                    out(vDisk.list((VDirectory) destination));
                     break;
                 }
             }

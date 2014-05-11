@@ -2,6 +2,7 @@ package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
 /**
@@ -38,16 +39,16 @@ public class VFSmkdir extends AbstractVFSCommand
                     break;
                 }
                 String name = args[1];
-                VDirectory destination = console.getCurrent();
+                VObject destination = console.getCurrent();
                 if(args[1].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
                     name = args[1].substring(args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolveDirectory(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR)+1));
+                    destination = resolve(console, args[1].substring(0, args[1].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
                 }
 
-                if(destination != null)
+                if(destination != null && destination instanceof VDirectory)
                 {
-                    vDisk.mkdir(destination, name);
+                    vDisk.mkdir((VDirectory) destination, name);
                     break;
                 }
             }

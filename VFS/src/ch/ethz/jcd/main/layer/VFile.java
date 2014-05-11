@@ -8,6 +8,7 @@ import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -82,7 +83,9 @@ public class VFile extends VObject<FileBlock>
      * This method recursively resolves the given path.
      *
      * @param path to resolveDirectory
+     *
      * @return the resolved object, null if no object found
+     *
      * @throws IOException
      */
     @Override
@@ -105,7 +108,7 @@ public class VFile extends VObject<FileBlock>
      * are equal or not. For the equality of two VFile the following
      * properties must be equal.
      * - name, path, size
-     * <p/>
+     * <p>
      * WARNING: due to performance reasons, checking the underlying structure
      * of its equality is skipped
      *
@@ -140,9 +143,13 @@ public class VFile extends VObject<FileBlock>
      *
      * @return the input stream
      */
-    public VFileInputStream inputStream(VUtil vUtil)
+    public VFileInputStream inputStream(VUtil vUtil, boolean compressed)
             throws IOException
     {
+        if (compressed)
+        {
+            return new CompressedVFileInputStream(vUtil, this);
+        }
         return new VFileInputStream(vUtil, this);
     }
 
@@ -153,13 +160,14 @@ public class VFile extends VObject<FileBlock>
      */
     public class VFileInputStream
     {
-        private VUtil vUtil;
-        private VFile vFile;
+        protected VUtil vUtil;
+        protected VFile vFile;
 
         /**
          * Visibility is set to private to ensure correct instantiation
          *
          * @param vUtil used to allocate Blocks
+         * @param vFile to apply the input stream
          */
         private VFileInputStream(VUtil vUtil, VFile vFile)
                 throws IOException
@@ -167,15 +175,17 @@ public class VFile extends VObject<FileBlock>
             this.vUtil = vUtil;
             this.vFile = vFile;
 
-            for (DataBlock b : block.getDataBlockList())
+            // TODO why the fuck this?
+            /*
+            for (DataBlock b : this.vFile.block.getDataBlockList())
             {
                 this.vUtil.free(b);
-            }
+            }*/
         }
 
         /**
-         *
          * @param bytes to put into dataBlock
+         *
          * @throws DiskFullException
          * @throws IOException
          * @throws InvalidBlockAddressException
@@ -183,21 +193,86 @@ public class VFile extends VObject<FileBlock>
          * @throws BlockFullException
          */
         public void put(byte[] bytes)
-                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException
+                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException
         {
+            // adding a new DataBlock
             DataBlock dataBlock = vUtil.allocateDataBlock();
             dataBlock.setContent(bytes);
             vFile.block.addDataBlock(dataBlock, bytes.length);
         }
     }
 
+
+    /**
+     * The VFileOutputStream is used to buffered write into a file stored in
+     * the virtual file system. Useful when doing imports to avoid loading big
+     * files completely into memory.
+     */
+    public class CompressedVFileInputStream extends VFileInputStream
+    {
+        /**
+         * Visibility is set to private to ensure correct instantiation
+         *
+         * @param vUtil used to allocate Blocks
+         * @param vFile to apply the input stream
+         */
+        private CompressedVFileInputStream(VUtil vUtil, VFile vFile)
+                throws IOException
+        {
+            super(vUtil, vFile);
+        }
+
+        /**
+         * @param bytes to put into dataBlock
+         *
+         * @throws DiskFullException
+         * @throws IOException
+         * @throws InvalidBlockAddressException
+         * @throws InvalidBlockSizeException
+         * @throws BlockFullException
+         */
+        public void put(byte[] bytes)
+                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException
+        {
+            int lastBlockSize = (int) block.size() % VUtil.BLOCK_SIZE;
+            int freeBytes = VUtil.BLOCK_SIZE - lastBlockSize;
+            int index = 0;
+
+            if (lastBlockSize != 0)
+            {
+                // fill last DataBlock
+                index = Math.min(freeBytes, bytes.length);
+                DataBlock dataBlock = vFile.block.removeLastDataBlock();
+                byte[] content = new byte[Math.min(VUtil.BLOCK_SIZE, lastBlockSize + bytes.length)];
+                ByteBuffer buf = ByteBuffer.wrap(content);
+                buf.put(dataBlock.getContent(), 0, lastBlockSize);
+                buf.put(bytes, 0, index);
+                dataBlock.setContent(buf.array());
+                vFile.block.addDataBlock(dataBlock, content.length);
+            }
+
+            // adding DataBlocks until no bytes left to store
+            while (index < bytes.length)
+            {
+                int len = Math.min(VUtil.BLOCK_SIZE, bytes.length - index);
+                super.put(Arrays.copyOfRange(bytes, index, index + len));
+                index += len;
+            }
+        }
+    }
+
+
     /**
      * This method instantiate an iterator to buffered read this file.
      *
      * @return the iterator
      */
-    public VFileOutputStream iterator()
+    public VFileOutputStream iterator(boolean compressed)
     {
+        if (compressed)
+        {
+            return new CompressedVFileOutputStream(this);
+        }
         return new VFileOutputStream(this);
     }
 
@@ -208,8 +283,9 @@ public class VFile extends VObject<FileBlock>
      */
     public class VFileOutputStream implements Iterator<ByteBuffer>
     {
-        private VFile vFile;
-        private int next = 0;
+        protected VFile vFile;
+        protected int next = 0;
+        protected int byteOffset = 0;
 
         /**
          * Visibility is set to private to ensure the iterator is instantiated
@@ -249,15 +325,15 @@ public class VFile extends VObject<FileBlock>
         {
             try
             {
-                int len = VUtil.BLOCK_SIZE;
+                int len = VUtil.BLOCK_SIZE - byteOffset;
 
-                if(vFile.block.isLastDataBlock(next))
+                if (vFile.block.isLastDataBlock(next))
                 {
                     int remainder = (int) vFile.block.size() % VUtil.BLOCK_SIZE;
-                    len = remainder > 0 ? remainder : len;
+                    len = remainder > 0 ? remainder - byteOffset : len;
                 }
 
-                ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent(0, len));
+                ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, len));
                 next++;
                 return buf;
             }
@@ -277,106 +353,62 @@ public class VFile extends VObject<FileBlock>
             throw new UnsupportedOperationException();
         }
     }
+
+
+    /**
+     * The VFileOutputStream is used to buffered read a file stored in the virtual
+     * file system. Useful when doing exports to avoid loading big files completely
+     * into memory.
+     */
+    public class CompressedVFileOutputStream extends VFileOutputStream
+    {
+        /**
+         * Visibility is set to private to ensure the iterator is instantiated
+         * correctly
+         *
+         * @param vFile to apply the output stream
+         */
+        private CompressedVFileOutputStream(VFile vFile)
+        {
+            super(vFile);
+        }
+
+        /**
+         * This method read the next DataBlock and extract the bytes stored in
+         * it.
+         *
+         * @return the read bytes
+         */
+        @Override
+        public ByteBuffer next()
+        {
+            try
+            {
+                 int size = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, 4)).getInt();
+                byte[] compressedBytes = new byte[size];
+                ByteBuffer buf = ByteBuffer.wrap(compressedBytes);
+                int index = 0;
+
+                while (index < compressedBytes.length)
+                {
+                    // the current DataBlock is not fully read yet
+                    if(byteOffset != 0)
+                    {
+                        next--;
+                    }
+                    byte[] bytes = super.next().array();
+                    byteOffset = Math.min(bytes.length, compressedBytes.length - index);
+                    buf.put(bytes, 0, byteOffset);
+                    index += byteOffset;
+                    byteOffset %= VUtil.BLOCK_SIZE;
+                }
+
+                return buf;
+            }
+            catch (IOException e)
+            {
+                return ByteBuffer.wrap(null);
+            }
+        }
+    }
 }
-
-/*
-
-    // TODO: bruched mer worschindli nid
-    // TODO fix exceptions
-    // TODO: Check whole method for off by 1 errors!
-    // TODO: fix usedBytes
-    public void write(byte[] bytes, long startPosition)
-            throws IOException, InvalidDataBlockOffsetException, BlockFullException, InvalidBlockSizeException
-    {
-        // Add new blocks to the end of the file if needed
-        for (long remainingBytes = startPosition + bytes.length - block.size();
-             remainingBytes > 0;
-             remainingBytes = startPosition + bytes.length - block.size())
-        {
-            int usedBytes = remainingBytes > VUtil.BLOCK_SIZE ? VUtil.BLOCK_SIZE : (int) remainingBytes;
-
-            // TODO: Create new DataBlock
-            block.addDataBlock(null);
-        }
-
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
-        int lastDataBlockIndex = (int) ((startPosition + bytes.length) / VUtil.BLOCK_SIZE);
-        byte[] buffer;
-
-        // Write first block
-        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
-        int firstDataBlockLength = Math.min(bytes.length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
-        buffer = new byte[firstDataBlockLength];
-        // TODO: read might not fill the whole buffer
-        if (in.read(buffer) != buffer.length)
-        {
-            throw new IOException();
-        }
-        block.getDataBlock(firstDataBlockIndex).setContent(buffer, firstDataBlockOffset);
-
-        // Write all block between the first and the last block
-        for (int currentBlockIndex = firstDataBlockIndex + 1;
-             currentBlockIndex < lastDataBlockIndex;
-             currentBlockIndex++)
-        {
-            buffer = new byte[VUtil.BLOCK_SIZE];
-            // TODO: read might not fill the whole buffer
-            if (in.read(buffer) != buffer.length)
-            {
-                throw new IOException();
-            }
-            block.getDataBlock(currentBlockIndex).setContent(buffer);
-        }
-
-        // If necessary write the last block
-        if (firstDataBlockIndex != lastDataBlockIndex)
-        {
-            int lastDataBlockLength = (int) ((startPosition + bytes.length) % VUtil.BLOCK_SIZE);
-            buffer = new byte[lastDataBlockLength];
-            // TODO: read might not fill the whole buffer
-            if (in.read(buffer) != buffer.length)
-            {
-                throw new IOException();
-            }
-            block.getDataBlock(lastDataBlockIndex).setContent(buffer);
-        }
-    }
-
-    public byte[] read(long startPosition, int length)
-            throws IOException, FileTooSmallException, InvalidDataBlockOffsetException
-    {
-        if (startPosition + length > block.size())
-        {
-            throw new FileTooSmallException();
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int firstDataBlockIndex = (int) (startPosition / VUtil.BLOCK_SIZE);
-
-        //(VUtil.BLOCK_SIZE - 1)) / VUtil.BLOCK_SIZE) is equivalent to Math.ceil()
-        int lastDataBlockIndex = (int) ((startPosition + length) / VUtil.BLOCK_SIZE);
-
-        // Read first block
-        int firstDataBlockOffset = (int) (startPosition % VUtil.BLOCK_SIZE);
-        int firstDataBlockLength = Math.min(length, VUtil.BLOCK_SIZE - firstDataBlockOffset);
-        out.write(block.getDataBlock(firstDataBlockIndex).getContent(firstDataBlockOffset, firstDataBlockLength));
-
-        // Read all block between the first and the last block
-        for (int currentBlock = firstDataBlockIndex + 1;
-             currentBlock < lastDataBlockIndex;
-             currentBlock++)
-        {
-            out.write(block.getDataBlock(currentBlock).getContent());
-        }
-
-        // If necessary read the last block
-        if (firstDataBlockIndex != lastDataBlockIndex)
-        {
-            int lastDataBlockLength = (int) ((startPosition + length) % VUtil.BLOCK_SIZE);
-            out.write(block.getDataBlock(lastDataBlockIndex).getContent(0, lastDataBlockLength));
-        }
-
-        return out.toByteArray();
-    }
- */

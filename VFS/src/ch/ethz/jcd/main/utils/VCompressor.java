@@ -52,10 +52,11 @@ public class VCompressor
             }
         }
 
-        byte[] buf = new byte[5 + bits.size()];
+        byte[] buf = new byte[9 + bits.size()];
         ByteBuffer buffer = ByteBuffer.wrap(buf);
-        buffer.put(dict.toByte());
+        buffer.putInt(buffer.array().length);
         buffer.putInt(bytes.length);
+        buffer.put(dict.toByte());
         buffer.put(bits.bytes());
         return buffer.array();
     }
@@ -70,10 +71,12 @@ public class VCompressor
     public byte[] decompress(byte[] bytes)
     {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        Dictionary dict = new Dictionary(buffer.get());
+        // length of compressed byte array
+        buffer.getInt();
         // length of the decompressed byte array
         int len = buffer.getInt();
-        BitDecompressStream bits = new BitDecompressStream(Arrays.copyOfRange(bytes, 5, bytes.length));
+        Dictionary dict = new Dictionary(buffer.get());
+        BitDecompressStream bits = new BitDecompressStream(Arrays.copyOfRange(bytes, 9, bytes.length));
         byte[] out = new byte[len];
 
         for (int q = 0; !bits.hasNext() && q < len; q++)
