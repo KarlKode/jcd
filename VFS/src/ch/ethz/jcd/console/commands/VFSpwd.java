@@ -1,6 +1,6 @@
 package ch.ethz.jcd.console.commands;
 
-import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.console.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 
 import java.io.IOException;
@@ -22,12 +22,11 @@ public class VFSpwd extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     *
-     * @param console that executes the command
+     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(VFSConsole console, String[] args)
+    public void execute(AbstractVFSApplication console, String[] args)
             throws CommandException
     {
         switch (args.length)

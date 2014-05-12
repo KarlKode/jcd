@@ -1,5 +1,6 @@
 package ch.ethz.jcd.console.commands;
 
+import ch.ethz.jcd.console.AbstractVFSApplication;
 import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
@@ -21,11 +22,10 @@ public abstract class AbstractVFSCommand
 
     /**
      * Executes the concrete command according to the passed arguments.
-     *
-     * @param console that executes the command
+     *  @param console that executes the command
      * @param args    passed with the command
      */
-    public abstract void execute(VFSConsole console, String[] args)
+    public abstract void execute(AbstractVFSApplication console, String[] args)
             throws CommandException;
 
     /**
@@ -50,7 +50,7 @@ public abstract class AbstractVFSCommand
      *
      * @return the object if found, otherwise null
      */
-    protected VObject resolve(VFSConsole console, String path)
+    protected VObject resolve(AbstractVFSApplication console, String path)
             throws ResolveException
     {
         try

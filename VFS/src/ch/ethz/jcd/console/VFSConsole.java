@@ -33,7 +33,7 @@ import java.util.HashMap;
  *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
  *
  */
-public class VFSConsole
+public class VFSConsole extends AbstractVFSApplication
 {
 
     private static final String OPTION_H = "-h";
@@ -65,9 +65,6 @@ public class VFSConsole
         VFS_COMMANDS.put("touch", new VFStouch());
     }
 
-    private VDirectory current;
-    private VDisk vDisk;
-
     /**
      * Start the console and open an existing VDisk
      *
@@ -83,6 +80,8 @@ public class VFSConsole
     {
         try
         {
+            quitWithUsageIfLessThan(args, 1);
+
             boolean newDisk = false;
             boolean compressed = false;
             int file = args.length - 1;
@@ -217,34 +216,6 @@ public class VFSConsole
         {
             usage();
         }
-    }
-
-    /**
-     *
-     * @return the vDisk
-     */
-    public VDisk getVDisk( )
-    {
-        return vDisk;
-    }
-
-    /**
-     *
-     * @return the current/working directory
-     */
-    public VDirectory getCurrent( )
-    {
-        return current;
-    }
-
-    /**
-     * Sets the current/working directory
-     *
-     * @param dir to set
-     */
-    public void setCurrent(VDirectory dir)
-    {
-        this.current = dir;
     }
 
     /**

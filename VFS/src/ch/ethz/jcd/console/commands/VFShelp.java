@@ -1,5 +1,6 @@
 package ch.ethz.jcd.console.commands;
 
+import ch.ethz.jcd.console.AbstractVFSApplication;
 import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 
@@ -17,12 +18,11 @@ public class VFShelp extends AbstractVFSCommand
      * help
      * DESCRIPTION
      * print how to use VFS and what commands are provided
-     *
-     * @param console that executes the command
+     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(VFSConsole console, String[] args)
+    public void execute(AbstractVFSApplication console, String[] args)
             throws CommandException
     {
         System.out.println("Commands:");
