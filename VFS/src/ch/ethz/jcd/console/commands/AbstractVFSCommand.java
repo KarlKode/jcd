@@ -1,7 +1,6 @@
 package ch.ethz.jcd.console.commands;
 
 import ch.ethz.jcd.console.AbstractVFSApplication;
-import ch.ethz.jcd.console.VFSConsole;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VObject;
@@ -61,7 +60,7 @@ public abstract class AbstractVFSCommand
                 path = pwd.endsWith(VDisk.PATH_SEPARATOR) ? pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
             }
         }
-        catch (IOException ingored)
+        catch (IOException ignored)
         {
 
         }
