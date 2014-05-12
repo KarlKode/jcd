@@ -1,6 +1,6 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
+import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;

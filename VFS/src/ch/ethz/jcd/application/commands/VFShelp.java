@@ -1,7 +1,7 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
-import ch.ethz.jcd.console.VFSConsole;
+import ch.ethz.jcd.application.AbstractVFSApplication;
+import ch.ethz.jcd.application.VFSConsole;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 
 /**

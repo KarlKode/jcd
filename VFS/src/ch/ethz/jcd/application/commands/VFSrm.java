@@ -1,24 +1,27 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
+import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
-
-import java.io.IOException;
+import ch.ethz.jcd.main.layer.VDirectory;
+import ch.ethz.jcd.main.layer.VObject;
+import ch.ethz.jcd.main.utils.VDisk;
 
 /**
- * This command provides functionality to the VFS similar to the unix command pwd.
+ * This command provides functionality to the VFS similar to the unix command rm.
  */
-public class VFSpwd extends AbstractVFSCommand
+public class VFSrm extends AbstractVFSCommand
 {
-    public static final String COMMAND = "pwd";
+    protected static final String COMMAND = "rm";
+    protected static final String OPTION_R = "-r";
+    protected static final String OPTION_RECURSIVE = "--recursive";
 
     /**
      * NAME
-     * pwd - print the name of current/working directory
+     * rm - remove files or directories
      * SYNOPSIS
-     * pwd [OPTION]...
+     * rm [OPTION]... FILE...
      * DESCRIPTION
-     * Print the full filename of the current working directory.
+     * Recursively removes the given file or directory and its underlying structure
      * <p>
      * -h, --help
      * prints information about usage
@@ -29,11 +32,14 @@ public class VFSpwd extends AbstractVFSCommand
     public void execute(AbstractVFSApplication console, String[] args)
             throws CommandException
     {
+        VDisk vDisk = console.getVDisk();
+
         switch (args.length)
         {
-            case 1:
             case 2:
+            case 3:
             {
+                boolean recursive = false;
                 int expr = args.length - 1;
 
                 for (int i = 1; i < args.length; i++)
@@ -43,18 +49,26 @@ public class VFSpwd extends AbstractVFSCommand
                         help();
                         break;
                     }
+                    else if (args[i].equals(OPTION_R) || args[i].equals(OPTION_RECURSIVE))
+                    {
+                        recursive = true;
+                    }
                     else
                     {
                         expr = Math.min(i, expr);
                     }
                 }
-                try
+
+                String path = args[expr].startsWith(VDisk.PATH_SEPARATOR) ? args[expr] : console.getCurrent() + args[expr];
+                VObject destination = resolve(console, path);
+
+                if (destination instanceof VDirectory && !recursive)
                 {
-                    System.out.println(console.getCurrent().getPath());
+                    this.error("cannot remove '" + path + "': Is a directory");
+                    break;
                 }
-                catch (IOException ingnored)
-                {
-                }
+
+                vDisk.delete(destination);
                 break;
             }
             default:
@@ -71,7 +85,7 @@ public class VFSpwd extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\tpwd");
+        System.out.println("\trm FILE");
     }
 
     /**

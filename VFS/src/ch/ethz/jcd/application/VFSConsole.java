@@ -1,17 +1,14 @@
-package ch.ethz.jcd.console;
+package ch.ethz.jcd.application;
 
-import ch.ethz.jcd.console.commands.*;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
+import ch.ethz.jcd.application.commands.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -33,19 +30,8 @@ import java.util.HashMap;
  *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
  *
  */
-public class VFSConsole implements AbstractVFSApplication
+public class VFSConsole implements AbstractVFSApplication, Runnable
 {
-
-    private static final String OPTION_H = "-h";
-    private static final String OPTION_HELP = "--help";
-    private static final String OPTION_N = "-n";
-    private static final String OPTION_NEW_DISK = "--new_disk";
-    private static final String OPTION_C = "-c";
-    private static final String OPTION_COMPRESSED = "--compressed";
-    private static final String OPTION_S = "-s";
-    private static final String OPTION_SIZE = "--size";
-    private static final int DEFAULT_SIZE = 1024;
-
     public static final String QUIT_CMD = "quit";
     public static final HashMap<String, AbstractVFSCommand> VFS_COMMANDS;
     static
@@ -67,6 +53,9 @@ public class VFSConsole implements AbstractVFSApplication
 
     protected VDirectory current;
     protected VDisk vDisk;
+
+    private InputStream inputStream;
+    private Thread console = new Thread(this);
 
     /**
      * Start the console and open an existing VDisk
@@ -129,7 +118,7 @@ public class VFSConsole implements AbstractVFSApplication
             {
                 VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed);
             }
-            new VFSConsole(new VDisk(vdiskFile));
+            new VFSConsole(new VDisk(vdiskFile), System.in);
         }
         catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
         {
@@ -143,8 +132,9 @@ public class VFSConsole implements AbstractVFSApplication
      *
      * @param vDisk to operate on
      */
-    public VFSConsole(VDisk vDisk)
+    public VFSConsole(VDisk vDisk, InputStream inputStream)
     {
+        this.inputStream = inputStream;
         try
         {
             current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
@@ -153,9 +143,13 @@ public class VFSConsole implements AbstractVFSApplication
         {
             e.printStackTrace();
         }
-
         this.vDisk = vDisk;
+        console.start();
+    }
 
+    @Override
+    public void run()
+    {
         while(true)
         {
             String[] args = prompt("> ");
@@ -213,7 +207,7 @@ public class VFSConsole implements AbstractVFSApplication
         try
         {
             System.out.print(prompt);
-            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(inputStream));
             return bufferRead.readLine().split("\\s+");
         }
         catch (IOException e)
@@ -254,7 +248,7 @@ public class VFSConsole implements AbstractVFSApplication
      */
     private static void usage()
     {
-        System.out.println("Usage: vdisk <command>[ arguments]");
+        System.out.println("Usage: [OPTIONS] vdisk");
         System.out.println();
         System.out.println("Commands:");
         for(AbstractVFSCommand cmd : VFS_COMMANDS.values())

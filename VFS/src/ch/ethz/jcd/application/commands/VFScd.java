@@ -1,29 +1,25 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
+import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
-import ch.ethz.jcd.main.layer.VFile;
+import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
-import java.io.File;
-
 /**
- * This command provides functionality to the VFS to export from the VFS to the
- * host file system.
+ * This command provides functionality to the VFS similar to the unix command cd.
  */
-public class VFSexport extends AbstractVFSCommand
+public class VFScd extends AbstractVFSCommand
 {
-    public static final String COMMAND = "export";
+    public final String COMMAND = "cd";
 
     /**
      * NAME
-     * export - exports a file on VFS to the host file system
+     * cd - change the working directory
      * SYNOPSIS
-     * export [OPTION]... PATH_TO_HOST_FILE... DEST
+     * cd [OPTION]... DEST
      * DESCRIPTION
-     * Exports the given file form the virtual file system into the given
-     * location at the host file system.
+     * change the working directory to the given DEST
      * <p>
      * -h, --help
      * prints information about usage
@@ -34,14 +30,16 @@ public class VFSexport extends AbstractVFSCommand
     public void execute(AbstractVFSApplication console, String[] args)
             throws CommandException
     {
-        VDisk vDisk = console.getVDisk();
-
         switch (args.length)
         {
-            case 3:
+            case 1:
             {
-                int host = args.length - 1;
-                int dest = 0;
+                console.setCurrent((VDirectory) resolve(console, VDisk.PATH_SEPARATOR));
+                break;
+            }
+            case 2:
+            {
+                int expr = args.length - 1;
 
                 for (int i = 1; i < args.length; i++)
                 {
@@ -52,21 +50,15 @@ public class VFSexport extends AbstractVFSCommand
                     }
                     else
                     {
-                        host = Math.min(i, host);
-                        dest = Math.max(i, dest);
+                        expr = Math.min(i, expr);
                     }
                 }
 
-                if (!(host == dest))
+                VObject destination = resolve(console, args[expr]);
+                if (destination != null && destination instanceof VDirectory)
                 {
-                    File file = new File(args[host]);
-                    VObject source = resolve(console, args[dest]);
-
-                    if (source instanceof VFile)
-                    {
-                        vDisk.exportToHost((VFile) source, file);
-                        break;
-                    }
+                    console.setCurrent((VDirectory) destination);
+                    break;
                 }
             }
             default:
@@ -83,7 +75,7 @@ public class VFSexport extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\texport PATH_TO_HOST_FILE SOURCE");
+        System.out.println("\tcd [DEST]");
     }
 
     /**

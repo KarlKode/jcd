@@ -1,28 +1,25 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
+import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
-import java.util.HashMap;
-
 /**
- * This command provides functionality to the VFS similar to the unix command ls.
+ * This command provides functionality to the VFS similar to the unix command mkdir.
  */
-public class VFSls extends AbstractVFSCommand
+public class VFSmkdir extends AbstractVFSCommand
 {
-    public static final String COMMAND = "ls";
+    public static final String COMMAND = "mkdir";
 
     /**
      * NAME
-     * ls - list directory contents
+     * mkdir - make directories
      * SYNOPSIS
-     * ls [OPTION]... [FILE]
+     * mkdir [OPTION]... DIRECTORY
      * DESCRIPTION
-     * Outputs the objects that the directory at given path contains. If no path
-     * is given the current directory is used as destination.
+     * Create the DIRECTORY(ies), if they do not already exist.
      * <p>
      * -h, --help
      * prints information about usage
@@ -37,11 +34,6 @@ public class VFSls extends AbstractVFSCommand
 
         switch (args.length)
         {
-            case 1:
-            {
-                out(vDisk.list(console.getCurrent()));
-                break;
-            }
             case 2:
             {
                 int expr = args.length - 1;
@@ -59,11 +51,18 @@ public class VFSls extends AbstractVFSCommand
                     }
                 }
 
-                VObject destination = resolve(console, args[expr]);
+                String name = args[expr];
+                VObject destination = console.getCurrent();
+
+                if (args[expr].split(VDisk.PATH_SEPARATOR).length > 1)
+                {
+                    name = args[expr].substring(args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
+                    destination = resolve(console, args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
+                }
 
                 if (destination instanceof VDirectory)
                 {
-                    out(vDisk.list((VDirectory) destination));
+                    vDisk.mkdir((VDirectory) destination, name);
                     break;
                 }
             }
@@ -81,20 +80,7 @@ public class VFSls extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\tls [DEST]");
-    }
-
-    /**
-     * Prints a list of the given objects on the console.
-     *
-     * @param list to print
-     */
-    private void out(HashMap<String, VObject> list)
-    {
-        for (String key : list.keySet())
-        {
-            System.out.println(key);
-        }
+        System.out.println("\tmkdir DIRECTORY");
     }
 
     /**

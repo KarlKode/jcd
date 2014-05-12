@@ -1,25 +1,24 @@
-package ch.ethz.jcd.console.commands;
+package ch.ethz.jcd.application.commands;
 
-import ch.ethz.jcd.console.AbstractVFSApplication;
+import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
-import ch.ethz.jcd.main.layer.VDirectory;
-import ch.ethz.jcd.main.layer.VObject;
-import ch.ethz.jcd.main.utils.VDisk;
+
+import java.io.IOException;
 
 /**
- * This command provides functionality to the VFS similar to the unix command cd.
+ * This command provides functionality to the VFS similar to the unix command pwd.
  */
-public class VFScd extends AbstractVFSCommand
+public class VFSpwd extends AbstractVFSCommand
 {
-    public final String COMMAND = "cd";
+    public static final String COMMAND = "pwd";
 
     /**
      * NAME
-     * cd - change the working directory
+     * pwd - print the name of current/working directory
      * SYNOPSIS
-     * cd [OPTION]... DEST
+     * pwd [OPTION]...
      * DESCRIPTION
-     * change the working directory to the given DEST
+     * Print the full filename of the current working directory.
      * <p>
      * -h, --help
      * prints information about usage
@@ -33,10 +32,6 @@ public class VFScd extends AbstractVFSCommand
         switch (args.length)
         {
             case 1:
-            {
-                console.setCurrent((VDirectory) resolve(console, VDisk.PATH_SEPARATOR));
-                break;
-            }
             case 2:
             {
                 int expr = args.length - 1;
@@ -53,13 +48,14 @@ public class VFScd extends AbstractVFSCommand
                         expr = Math.min(i, expr);
                     }
                 }
-
-                VObject destination = resolve(console, args[expr]);
-                if (destination != null && destination instanceof VDirectory)
+                try
                 {
-                    console.setCurrent((VDirectory) destination);
-                    break;
+                    System.out.println(console.getCurrent().getPath());
                 }
+                catch (IOException ingnored)
+                {
+                }
+                break;
             }
             default:
             {
@@ -75,7 +71,7 @@ public class VFScd extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\tcd [DEST]");
+        System.out.println("\tpwd");
     }
 
     /**
