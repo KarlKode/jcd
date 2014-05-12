@@ -19,12 +19,18 @@ public abstract class AbstractVFSCommand
     protected static final String OPTION_H = "-h";
     protected static final String OPTION_HELP = "--help";
 
+    public AbstractVFSApplication application;
+
+    public AbstractVFSCommand(AbstractVFSApplication application)
+    {
+        this.application = application;
+    }
+
     /**
      * Executes the concrete command according to the passed arguments.
-     *  @param console that executes the command
      * @param args    passed with the command
      */
-    public abstract void execute(AbstractVFSApplication console, String[] args)
+    public abstract void execute(String[] args)
             throws CommandException;
 
     /**
@@ -32,7 +38,7 @@ public abstract class AbstractVFSCommand
      */
     public void usage()
     {
-        System.out.print("Usage: ");
+        application.print("Usage: ");
         help();
     }
 
@@ -44,19 +50,18 @@ public abstract class AbstractVFSCommand
     /**
      * Resolves the given path of a object.
      *
-     * @param console that executes the command
      * @param path    to resolve
      *
      * @return the object if found, otherwise null
      */
-    protected VObject resolve(AbstractVFSApplication console, String path)
+    protected VObject resolve(String path)
             throws ResolveException
     {
         try
         {
             if (!path.startsWith(VDisk.PATH_SEPARATOR))
             {
-                String pwd = console.getCurrent().getPath();
+                String pwd = application.getCurrent().getPath();
                 path = pwd.endsWith(VDisk.PATH_SEPARATOR) ? pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
             }
         }
@@ -64,7 +69,7 @@ public abstract class AbstractVFSCommand
         {
 
         }
-        return console.getVDisk().resolve(path);
+        return application.getVDisk().resolve(path);
     }
 
 
@@ -75,7 +80,7 @@ public abstract class AbstractVFSCommand
      */
     public void error(String reason)
     {
-        System.out.println(this.command() + ": " + reason);
+        application.println(this.command() + ": " + reason);
     }
 
     /**

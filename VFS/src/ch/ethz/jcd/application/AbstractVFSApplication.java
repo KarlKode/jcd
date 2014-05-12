@@ -1,19 +1,16 @@
 package ch.ethz.jcd.application;
 
+import ch.ethz.jcd.application.commands.AbstractVFSCommand;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 
+import java.util.HashMap;
+
 public interface AbstractVFSApplication
 {
-    static final String OPTION_H = "-h";
-    static final String OPTION_HELP = "--help";
-    static final String OPTION_N = "-n";
-    static final String OPTION_NEW_DISK = "--new_disk";
-    static final String OPTION_C = "-c";
-    static final String OPTION_COMPRESSED = "--compressed";
-    static final String OPTION_S = "-s";
-    static final String OPTION_SIZE = "--size";
-    static final int DEFAULT_SIZE = 1024;
+    public final HashMap<String, AbstractVFSCommand> commands = new HashMap<>();
+
+    //public HashMap<String, AbstractVFSCommand> commands();
 
     /**
      * @return the vDisk
@@ -31,4 +28,8 @@ public interface AbstractVFSApplication
      * @param dir to set
      */
     public void setCurrent(VDirectory dir);
+
+    public void println(String line);
+
+    public void print(String s);
 }

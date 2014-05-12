@@ -10,10 +10,9 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Console application to operate on the VFS.
@@ -34,9 +33,19 @@ import java.io.InputStreamReader;
  *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
  *
  */
-public class VFSServer implements AbstractVFSApplication
+public class VFSServer
 {
-    private VFSConsole console;
+    static final String OPTION_H = "-h";
+    static final String OPTION_HELP = "--help";
+    static final String OPTION_N = "-n";
+    static final String OPTION_NEW_DISK = "--new_disk";
+    static final String OPTION_C = "-c";
+    static final String OPTION_COMPRESSED = "--compressed";
+    static final String OPTION_S = "-s";
+    static final String OPTION_SIZE = "--size";
+    static final int DEFAULT_SIZE = 1024;
+
+    private ServerSocket socket;
 
     /**
      * Start the console and open an existing VDisk
@@ -115,37 +124,22 @@ public class VFSServer implements AbstractVFSApplication
      */
     public VFSServer(VDisk vDisk)
     {
-        //console = new VFSConsole(vDisk, );
-    }
+        try
+        {
+            this.socket = new ServerSocket(2000);
 
-    /**
-     *
-     * @return the vDisk
-     */
-    public VDisk getVDisk( )
-    {
-        return console.getVDisk();
+            while(true)
+            {
+                Socket client = this.socket.accept();
+                new VFSConsole(vDisk, client.getInputStream(), new DataOutputStream(client.getOutputStream()));
+            }
+            //client.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
-
-    /**
-     *
-     * @return the current/working directory
-     */
-    public VDirectory getCurrent( )
-    {
-        return console.getCurrent();
-    }
-
-    /**
-     * Sets the current/working directory
-     *
-     * @param dir to set
-     */
-    public void setCurrent(VDirectory dir)
-    {
-        this.console.setCurrent(dir);
-    }
-
 
     /**
      * Prints the usage of the console application

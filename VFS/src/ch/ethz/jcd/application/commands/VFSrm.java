@@ -15,6 +15,11 @@ public class VFSrm extends AbstractVFSCommand
     protected static final String OPTION_R = "-r";
     protected static final String OPTION_RECURSIVE = "--recursive";
 
+    public VFSrm(AbstractVFSApplication application)
+    {
+        super(application);
+    }
+
     /**
      * NAME
      * rm - remove files or directories
@@ -25,14 +30,13 @@ public class VFSrm extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(AbstractVFSApplication console, String[] args)
+    public void execute(String[] args)
             throws CommandException
     {
-        VDisk vDisk = console.getVDisk();
+        VDisk vDisk = application.getVDisk();
 
         switch (args.length)
         {
@@ -59,8 +63,8 @@ public class VFSrm extends AbstractVFSCommand
                     }
                 }
 
-                String path = args[expr].startsWith(VDisk.PATH_SEPARATOR) ? args[expr] : console.getCurrent() + args[expr];
-                VObject destination = resolve(console, path);
+                String path = args[expr].startsWith(VDisk.PATH_SEPARATOR) ? args[expr] : application.getCurrent() + args[expr];
+                VObject destination = resolve(path);
 
                 if (destination instanceof VDirectory && !recursive)
                 {
@@ -85,7 +89,7 @@ public class VFSrm extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\trm FILE");
+        application.println("\trm FILE");
     }
 
     /**

@@ -14,6 +14,11 @@ public class VFScp extends AbstractVFSCommand
 {
     public static final String COMMAND = "cp";
 
+    public VFScp(AbstractVFSApplication application)
+    {
+        super(application);
+    }
+
     /**
      * NAME
      * cp - copy files and directories
@@ -24,14 +29,13 @@ public class VFScp extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(AbstractVFSApplication console, String[] args)
+    public void execute(String[] args)
             throws CommandException
     {
-        VDisk vDisk = console.getVDisk();
+        VDisk vDisk = application.getVDisk();
 
         switch (args.length)
         {
@@ -68,7 +72,7 @@ public class VFScp extends AbstractVFSCommand
                          *
                          * eg. cp tmp/bla.txt /usr/local/
                          */
-                        destination = resolve(console, args[dest]);
+                        destination = resolve(args[dest]);
 
                         if (destination instanceof VDirectory)
                         {
@@ -87,12 +91,12 @@ public class VFScp extends AbstractVFSCommand
                          *
                          * eg. cp tmp/bla.txt /usr/local/foo.txt
                          */
-                        destination = console.getCurrent();
+                        destination = application.getCurrent();
 
                         if (args[dest].split(VDisk.PATH_SEPARATOR).length > 1)
                         {
                             name = args[dest].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                            destination = resolve(console, args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                            destination = resolve(args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
                         }
                     }
 
@@ -117,7 +121,7 @@ public class VFScp extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\tcp SOURCE DEST");
+        application.println("\tcp SOURCE DEST");
     }
 
     /**

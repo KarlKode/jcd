@@ -21,6 +21,11 @@ public class VFSfind extends AbstractVFSCommand
     protected static final String OPTION_I = "-i";
     protected static final String OPTION_CASE_INSENSITIVE = "--case-insensitive";
 
+    public VFSfind(AbstractVFSApplication application)
+    {
+        super(application);
+    }
+
     /**
      * NAME
      * find - search for files in a directory hierarchy
@@ -36,14 +41,13 @@ public class VFSfind extends AbstractVFSCommand
      * enables case insensitive search
      * -r, --recursive
      * enables recursive search
-     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(AbstractVFSApplication console, String[] args)
+    public void execute(String[] args)
             throws CommandException
     {
-        VDisk vDisk = console.getVDisk();
+        VDisk vDisk = application.getVDisk();
 
         switch (args.length)
         {
@@ -76,7 +80,7 @@ public class VFSfind extends AbstractVFSCommand
                     }
                 }
                 Pattern pattern = insensitive ? Pattern.compile("\\w*" + args[expr], Pattern.CASE_INSENSITIVE) : Pattern.compile("\\w*" + args[expr] + "\\w*");
-                out(vDisk.find(pattern, console.getCurrent(), recursive));
+                out(vDisk.find(pattern, application.getCurrent(), recursive));
                 break;
             }
             default:
@@ -105,7 +109,7 @@ public class VFSfind extends AbstractVFSCommand
     {
         for (String value : list.values())
         {
-            System.out.println(value);
+            application.println(value);
         }
     }
 

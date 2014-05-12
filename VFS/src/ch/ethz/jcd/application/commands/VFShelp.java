@@ -11,6 +11,11 @@ public class VFShelp extends AbstractVFSCommand
 {
     public static final String COMMAND = "help";
 
+    public VFShelp(AbstractVFSApplication application)
+    {
+        super(application);
+    }
+
     /**
      * NAME
      * help - print usage
@@ -18,15 +23,14 @@ public class VFShelp extends AbstractVFSCommand
      * help
      * DESCRIPTION
      * print how to use VFS and what commands are provided
-     *  @param console that executes the command
      * @param args    passed with the command
      */
     @Override
-    public void execute(AbstractVFSApplication console, String[] args)
+    public void execute(String[] args)
             throws CommandException
     {
-        System.out.println("Commands:");
-        for (AbstractVFSCommand cmd : VFSConsole.VFS_COMMANDS.values())
+        application.println("Commands:");
+        for (AbstractVFSCommand cmd : application.commands.values())
         {
             cmd.help();
         }
@@ -38,7 +42,7 @@ public class VFShelp extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\thelp");
+        application.println("\thelp");
     }
 
     /**
