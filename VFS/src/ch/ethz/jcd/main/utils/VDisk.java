@@ -378,4 +378,10 @@ public class VDisk
             throw new FindException(e);
         }
     }
+
+
+    public boolean exists(String path) throws IOException {
+        return vUtil.getRootDirectory().resolve(path) != null;
+
+    }
 }
