@@ -5,8 +5,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.text.Text?>
 <VBox fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressedMainPane" prefHeight="574.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ethz.jcd.gui.MainController">
 <children>
     <MenuBar>
@@ -27,7 +27,7 @@
       </items>
     </Menu>
   </menus>
-</MenuBar><ToolBar fx:id="toolBarInterface" focusTraversable="false" prefWidth="200.0">
+</MenuBar><ToolBar fx:id="toolBarInterface" disable="true" focusTraversable="false" prefWidth="200.0">
 <items><Button fx:id="buttonImport" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonImport">
 <graphic><ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
@@ -54,6 +54,22 @@
 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
 <Image url="@/icons/search.png" />
+</image>
+</ImageView>
+</graphic>
+</Button><Button fx:id="buttonNewFile" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonNewFile">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/newfile.png" />
+</image>
+</ImageView>
+</graphic>
+</Button><Button fx:id="buttonNewDir" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonNewDir">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/newdir.png" />
 </image>
 </ImageView>
 </graphic>
@@ -85,5 +101,5 @@
 </center></BorderPane>
 </items>
 </SplitPane>
-    <Text fx:id="textStatus"></Text>
+    <Text fx:id="textStatus" />
 </children></VBox>

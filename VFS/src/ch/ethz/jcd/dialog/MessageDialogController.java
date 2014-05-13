@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class MessageDialogController {
 
@@ -49,9 +50,27 @@ public class MessageDialogController {
         assert okParent != null : "fx:id=\"okParent\" was not injected: check your FXML file 'MessageDialog.fxml'.";
         assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'MessageDialog.fxml'.";
 
+
+        cancelButton.setVisible(false);
+        actionButton.setVisible(false);
+
+        okButton.setOnAction((param) -> {
+            ((Stage)this.actionButton.getScene().getWindow()).close();
+        });
     }
 
-    public void setMessage(String d){
-
+    public void setMessage(Throwable ex){
+        this.messageLabel.setText(ex.getClass().getSimpleName());
+        this.detailsLabel.setText(getInnerCause(ex).getMessage());
     }
+
+    private Throwable getInnerCause(Throwable ex){
+        while(ex.getCause() != null){
+            ex = ex.getCause();
+        }
+        return ex;
+    }
+
+
+
 }
