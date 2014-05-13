@@ -1,4 +1,4 @@
-package ch.ethz.jcd.commands;
+package ch.ethz.jcd.commands_test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,15 @@ import java.util.Observer;
 public abstract class AbstractObservableCommand<T> extends Observable{
     private List<Observer> observers = new ArrayList<Observer>();
 
+    public AbstractObservableCommand(Observer observer){
+        addObserver(observer);
+    }
+
     public void preExecution(){
         this.notifyObservers();
     }
-    public abstract void execute(T parameter);
+
+    public abstract void execute();
 
     public void postExecution(){
         this.notifyObservers();
