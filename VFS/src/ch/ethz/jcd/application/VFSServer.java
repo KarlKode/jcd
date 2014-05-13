@@ -101,7 +101,7 @@ public class VFSServer implements AbstractVFSApplication
             }
             new VFSServer(new VDisk(vdiskFile));
         }
-        catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }

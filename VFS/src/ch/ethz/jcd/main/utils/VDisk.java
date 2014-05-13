@@ -48,10 +48,14 @@ public class VDisk
      *                 (size >= blockSize * 16)
      */
     public static void format(File diskFile, long size, boolean compressed)
-            throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         int state = compressed ? 1 : 0;
-        VUtil.format(diskFile, size, state);
+        try {
+            VUtil.format(diskFile, size, state);
+        } catch (Exception e) {
+            throw new FormatExcepion(e);
+        }
+
     }
 
     /**

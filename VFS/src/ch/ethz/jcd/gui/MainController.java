@@ -256,8 +256,10 @@ public class MainController {
             this.vdisk.mkdir(selectedDirectory, dirname);
 
             ignoreSelectionChanged = true;
+
             try {
                 refreshTreeView();
+                refreshListView(selectedDirectory);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -315,7 +317,11 @@ public class MainController {
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
+            VDisk.format(controller.getVDiskFile(), controller.getSize(), false);
             vdisk = new VDisk(controller.getVDiskFile());
+
+            refreshTreeView();
+            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
             this.toolBarInterface.setDisable(false);
         }catch(IOException ex){
             ex.printStackTrace();

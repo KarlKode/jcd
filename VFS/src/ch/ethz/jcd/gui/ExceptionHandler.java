@@ -50,6 +50,8 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             message = e.toString();
         } else if(e instanceof TouchException){
             message = e.toString();
+        } else if(e instanceof TouchException){
+            message = e.toString();
         }else{
             message = e.toString();
         }

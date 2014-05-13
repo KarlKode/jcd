@@ -120,7 +120,7 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
             }
             new VFSConsole(new VDisk(vdiskFile), System.in);
         }
-        catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
