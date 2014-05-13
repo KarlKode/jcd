@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -33,6 +35,16 @@ public class EntryPoint extends Application {
 
         final MainController mainController = loader.getController();
         Scene scene = new Scene(root);
+
+        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            Keys.setCtrlPressed(event.isControlDown());
+            Keys.setAltPressed(event.isAltDown());
+        });
+
+        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            Keys.setCtrlPressed(event.isControlDown());
+            Keys.setAltPressed(event.isAltDown());
+        });
 
         scene.setRoot(root);
         primaryStage.setScene(scene);

@@ -462,7 +462,7 @@ public class MainController {
 
         files.put(DataFormat.FILES, aa);
 
-        Dragboard d = listViewFiles.startDragAndDrop(TransferMode.COPY);
+        Dragboard d = listViewFiles.startDragAndDrop(TransferMode.MOVE);
         d.setContent(files);
     }
 
@@ -499,7 +499,6 @@ public class MainController {
 //                }
             }
         }
-
 
         ignoreSelectionChanged = true;
         refreshTreeView();
@@ -567,7 +566,7 @@ public class MainController {
         Dragboard db = event.getDragboard();
 
         if (db.hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY);
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
         } else {
             event.consume();
         }
