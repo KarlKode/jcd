@@ -10,10 +10,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import ch.ethz.jcd.dialog.DialogResult;
-import ch.ethz.jcd.dialog.InputDialogController;
-import ch.ethz.jcd.dialog.NewVDiskController;
-import ch.ethz.jcd.dialog.SearchDialogController;
+import ch.ethz.jcd.dialog.*;
 import ch.ethz.jcd.main.exceptions.command.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
@@ -126,6 +123,9 @@ public class MainController {
     private MenuItem menuItemFind;
 
     @FXML
+    private MenuItem menuItemPaste;
+
+    @FXML
     private Label labelPath;
 
     @FXML
@@ -137,6 +137,9 @@ public class MainController {
 
     private boolean ignoreSelectionChanged = false;
 
+    private final List<VObject> selectedFiles = new ArrayList<VObject>();
+
+    private FileOperation fileOp;
 
     public MainController() {
 
@@ -196,10 +199,14 @@ public class MainController {
     }
 
     @FXML
+    void onActionMenuItemRename(ActionEvent event) {
+        renameSelectedFile();
+    }
+
+    @FXML
     void onActionMenuItemFind(ActionEvent event)
     {
         openFindDialog();
-        throw new FindException(null);
     }
 
     @FXML
@@ -214,8 +221,14 @@ public class MainController {
 
     @FXML
     void onActionMenuItemCopy(ActionEvent event) {
-
+        copySelectedFiles();
     }
+
+    @FXML
+    void onActionMenuItemPaste(ActionEvent event) throws IOException {
+        pasteSelectedFiles();
+    }
+
 
     @FXML
     void onActionButtonImport(ActionEvent event) {
@@ -229,6 +242,25 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    void onActionMenuItemExport(ActionEvent event) throws IOException {
+        exportFiles();
+    }
+
+    @FXML
+    void onActionMenuItemMove(ActionEvent event) throws IOException {
+        moveSelectedFiles();
+    }
+
+    private void moveSelectedFiles() {
+        fileOp = FileOperation.MOVE;
+
+        this.selectedFiles.clear();
+        this.selectedFiles.addAll(this.listViewFiles.getSelectionModel().getSelectedItems());
+
+        this.menuItemPaste.setDisable(false);
     }
 
     @FXML
@@ -255,27 +287,26 @@ public class MainController {
         showInputDialog("New Directory ... ", "Directory name:", "Directory name", dirname -> {
             this.vdisk.mkdir(selectedDirectory, dirname);
 
-            ignoreSelectionChanged = true;
-
             try {
-                refreshTreeView();
-                refreshListView(selectedDirectory);
+                updateUI();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            ignoreSelectionChanged = false;
-
         });
     }
 
 
     @FXML
     void onKeyPressedMainPane(KeyEvent event) throws IOException {
+        System.out.println("event = " + event);
         if(event.isControlDown()){
             if(event.getCode() == KeyCode.C){
                 copySelectedFiles();
+            }else if(event.getCode() == KeyCode.X){
+                moveSelectedFiles();
             }else if(event.getCode() == KeyCode.V){
                 pasteSelectedFiles();
+                event.consume();
             }else if(event.getCode() == KeyCode.D) {
                 deleteSelectedFiles();
             }else if(event.getCode() == KeyCode.R) {
@@ -293,12 +324,16 @@ public class MainController {
             }else if(event.getCode() == KeyCode.N) {
                 newVDisk();
             }
+            event.consume();
         }else if(event.getCode() == KeyCode.DELETE) {
             deleteSelectedFiles();
+            event.consume();
         }else if(event.getCode() == KeyCode.BACK_SPACE) {
             gotoParent();
+            event.consume();
         }else if(event.getCode() == KeyCode.ENTER) {
             enterDirectory();
+            event.consume();
         }
     }
 
@@ -317,12 +352,14 @@ public class MainController {
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
-            VDisk.format(controller.getVDiskFile(), controller.getSize(), false);
-            vdisk = new VDisk(controller.getVDiskFile());
+            if(controller.getResult() == DialogResult.OK){
+                VDisk.format(controller.getVDiskFile(), controller.getSize(), false);
+                vdisk = new VDisk(controller.getVDiskFile());
 
-            refreshTreeView();
-            this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
-            this.toolBarInterface.setDisable(false);
+                refreshTreeView();
+                this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
+                this.toolBarInterface.setDisable(false);
+            }
         }catch(IOException ex){
             ex.printStackTrace();
         }
@@ -413,12 +450,61 @@ public class MainController {
     }
 
     private void copySelectedFiles() {
+        fileOp = FileOperation.COPY;
 
+        this.selectedFiles.clear();
+        this.selectedFiles.addAll(this.listViewFiles.getSelectionModel().getSelectedItems());
+
+        this.menuItemPaste.setDisable(false);
     }
 
-    private void pasteSelectedFiles() {
+    private void pasteSelectedFiles() throws IOException {
+        for(VObject vobj : this.selectedFiles){
+            try {
+                if(fileOp == FileOperation.COPY){
+                    if(selectedDirectory.getEntries().contains(vobj)) {
+                        DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
+                        if (res == DialogResult.OK) {
+                            showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
+                                vdisk.copy(vobj, selectedDirectory, filename);
+                            });
+                        }
+                    }
+                }else{
+                    if(selectedDirectory.getEntries().contains(vobj)) {
+                        DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
+
+                        if (res == DialogResult.OK) {
+                            showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
+                                vdisk.move(vobj, selectedDirectory, filename);
+                            });
+                        }
+                    }
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        this.selectedFiles.clear();
+        this.menuItemPaste.setDisable(true);
+        this.fileOp = FileOperation.NULL;
+
+        updateUI();
     }
+
+
+    private void updateUI() throws IOException {
+        ignoreSelectionChanged = true;
+        refreshTreeView();
+        ignoreSelectionChanged = false;
+
+        selectVDirectory(selectedDirectory);
+    }
+
 
     private void openFindDialog() {
         try{
@@ -500,11 +586,7 @@ public class MainController {
             }
         }
 
-        ignoreSelectionChanged = true;
-        refreshTreeView();
-        ignoreSelectionChanged = false;
-
-        selectVDirectory(selectedDirectory);
+        updateUI();
     }
 
     @FXML
@@ -636,6 +718,8 @@ public class MainController {
                 }
             }
         });
+
+        this.menuItemPaste.setDisable(true);
     }
 
     private void renameSelectedFile() {
@@ -660,11 +744,7 @@ public class MainController {
                 }
             }.call();
 
-            ignoreSelectionChanged = true;
-            refreshTreeView();
-            ignoreSelectionChanged = false;
-
-            selectVDirectory(selectedDirectory);
+            updateUI();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -710,6 +790,34 @@ public class MainController {
             }
         }
     }
+
+
+    private DialogResult showMessageDialog(String title, String message, String info){
+        try{
+            Stage dialogStage = new Stage();
+
+            FXMLLoader loader = new FXMLLoader();
+            Parent root = (Parent)loader.load(MessageDialogController.class.getResource("MessageDialog.fxml").openStream());
+            loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+            final MessageDialogController controller = loader.getController();
+
+            dialogStage.setTitle(title);
+            controller.init(message, info, true);
+
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+
+            return controller.getResult();
+        }catch(IOException ex){
+            ex.printStackTrace();
+            return DialogResult.CANCEL;
+        }finally{
+            //return DialogResult.CANCEL;
+        }
+    }
+
 
 
     private void showInputDialog(String title, String labelString, String promptString, Consumer<String> actionOk){

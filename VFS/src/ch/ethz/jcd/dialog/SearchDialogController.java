@@ -30,8 +30,6 @@ public class SearchDialogController {
     @FXML
     private TextField textFieldDirectory;
 
-    @FXML
-    private VBox main;
 
     @FXML
     private TextField textFieldFind;

@@ -18,12 +18,16 @@
     </Menu>
     <Menu mnemonicParsing="true" text="_Edit">
       <items><MenuItem fx:id="menuItemImport" mnemonicParsing="true" onAction="#onActionMenuItemAdd" text="_Add" />
-          <MenuItem fx:id="menuItemExport" mnemonicParsing="true" onAction="#onActionMenuItemCopy" text="_Copy" />
+          <MenuItem fx:id="menuItemExport" mnemonicParsing="true" onAction="#onActionMenuItemExport" text="_Export" />
         <MenuItem fx:id="menuItemDelete" mnemonicParsing="true" onAction="#onActionMenuItemDelete" text="_Delete" />
           <MenuItem fx:id="menuItemFind" mnemonicParsing="true" onAction="#onActionMenuItemFind" text="_Find" />
           <SeparatorMenuItem mnemonicParsing="false" />
-          <MenuItem fx:id="menuItemRename" mnemonicParsing="false" text="Rename" />
-          <MenuItem fx:id="menuItemCopy" mnemonicParsing="false" text="Copy" />
+          <MenuItem fx:id="menuItemRename" mnemonicParsing="false" text="Rename" onAction="#onActionMenuItemRename"/>
+          <MenuItem fx:id="menuItemMove" mnemonicParsing="false" text="Move" onAction="#onActionMenuItemMove"/>
+
+          <MenuItem fx:id="menuItemCopy" mnemonicParsing="false" text="Copy" onAction="#onActionMenuItemCopy" />
+          <MenuItem fx:id="menuItemPaste" mnemonicParsing="false" text="Paste" onAction="#onActionMenuItemPaste"/>
+
       </items>
     </Menu>
   </menus>

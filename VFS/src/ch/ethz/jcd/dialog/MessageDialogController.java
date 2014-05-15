@@ -40,6 +40,8 @@ public class MessageDialogController {
     @FXML
     private Label messageLabel;
 
+    private DialogResult result;
+
     @FXML
     void initialize() {
         assert cancelButton != null : "fx:id=\"cancelButton\" was not injected: check your FXML file 'MessageDialog.fxml'.";
@@ -50,11 +52,18 @@ public class MessageDialogController {
         assert okParent != null : "fx:id=\"okParent\" was not injected: check your FXML file 'MessageDialog.fxml'.";
         assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'MessageDialog.fxml'.";
 
-
         cancelButton.setVisible(false);
         actionButton.setVisible(false);
 
         okButton.setOnAction((param) -> {
+            System.out.println("ok!!");
+            result = DialogResult.OK;
+            ((Stage)this.actionButton.getScene().getWindow()).close();
+        });
+
+        cancelButton.setOnAction((param) -> {
+            result = DialogResult.CANCEL;
+            System.out.println("cancel!!");
             ((Stage)this.actionButton.getScene().getWindow()).close();
         });
     }
@@ -64,6 +73,13 @@ public class MessageDialogController {
         this.detailsLabel.setText(getInnerCause(ex).getMessage());
     }
 
+    public void init(String message, String detail, boolean showCancelButton){
+        this.messageLabel.setText(message);
+        this.detailsLabel.setText(detail);
+
+        this.cancelButton.setVisible(showCancelButton);
+    }
+
     private Throwable getInnerCause(Throwable ex){
         while(ex.getCause() != null){
             ex = ex.getCause();
@@ -71,6 +87,7 @@ public class MessageDialogController {
         return ex;
     }
 
-
-
+    public DialogResult getResult(){
+        return result;
+    }
 }
