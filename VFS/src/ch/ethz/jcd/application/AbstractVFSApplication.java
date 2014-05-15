@@ -5,12 +5,14 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 
 import java.util.HashMap;
+import java.util.Observer;
+import java.util.Queue;
 
 public interface AbstractVFSApplication
 {
     public final HashMap<String, AbstractVFSCommand> commands = new HashMap<>();
 
-    //public HashMap<String, AbstractVFSCommand> commands();
+    public Queue<AbstractVFSCommand> getHistory();
 
     /**
      * @return the vDisk
@@ -29,7 +31,5 @@ public interface AbstractVFSApplication
      */
     public void setCurrent(VDirectory dir);
 
-    public void println(String line);
-
-    public void print(String s);
+    public void quit();
 }

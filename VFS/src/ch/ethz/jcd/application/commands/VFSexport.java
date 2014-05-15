@@ -16,11 +16,6 @@ public class VFSexport extends AbstractVFSCommand
 {
     public static final String COMMAND = "export";
 
-    public VFSexport(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * export - exports a file on VFS to the host file system
@@ -32,10 +27,10 @@ public class VFSexport extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -64,7 +59,7 @@ public class VFSexport extends AbstractVFSCommand
                 if (!(host == dest))
                 {
                     File file = new File(args[host]);
-                    VObject source = resolve(args[dest]);
+                    VObject source = resolve(application, args[dest]);
 
                     if (source instanceof VFile)
                     {
@@ -87,7 +82,7 @@ public class VFSexport extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\texport PATH_TO_HOST_FILE SOURCE");
+        System.out.println("\texport PATH_TO_HOST_FILE SOURCE");
     }
 
     /**

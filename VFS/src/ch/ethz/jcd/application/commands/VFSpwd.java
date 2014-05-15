@@ -12,11 +12,6 @@ public class VFSpwd extends AbstractVFSCommand
 {
     public static final String COMMAND = "pwd";
 
-    public VFSpwd(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * pwd - print the name of current/working directory
@@ -27,10 +22,10 @@ public class VFSpwd extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         switch (args.length)
@@ -56,7 +51,7 @@ public class VFSpwd extends AbstractVFSCommand
                 {
                     System.out.println(application.getCurrent().getPath());
                 }
-                catch (IOException ingnored)
+                catch (IOException ignored)
                 {
                 }
                 break;
@@ -75,7 +70,7 @@ public class VFSpwd extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\tpwd");
+        System.out.println("\tpwd");
     }
 
     /**

@@ -1,7 +1,6 @@
 package ch.ethz.jcd.application.commands;
 
 import ch.ethz.jcd.application.AbstractVFSApplication;
-import ch.ethz.jcd.application.VFSConsole;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 
 /**
@@ -11,11 +10,6 @@ public class VFShelp extends AbstractVFSCommand
 {
     public static final String COMMAND = "help";
 
-    public VFShelp(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * help - print usage
@@ -23,13 +17,13 @@ public class VFShelp extends AbstractVFSCommand
      * help
      * DESCRIPTION
      * print how to use VFS and what commands are provided
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
-        application.println("Commands:");
+        System.out.println("Commands:");
         for (AbstractVFSCommand cmd : application.commands.values())
         {
             cmd.help();
@@ -42,7 +36,7 @@ public class VFShelp extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\thelp");
+        System.out.println("\thelp");
     }
 
     /**

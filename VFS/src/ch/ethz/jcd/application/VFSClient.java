@@ -1,36 +1,62 @@
 package ch.ethz.jcd.application;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import ch.ethz.jcd.application.commands.VFSQuit;
+import ch.ethz.jcd.main.utils.VDisk;
+
+import java.io.*;
 import java.net.Socket;
+import java.util.Observable;
+import java.util.Observer;
 
-public class VFSClient
+public class VFSClient implements Observer
 {
-    public static void main(String argv[]) throws Exception
+    private VFSConsole console;
+    private Socket socket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+
+    public static void main(String args[]) throws Exception
     {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Socket client = new Socket("localhost", 2000);
-        DataOutputStream out = new DataOutputStream(client.getOutputStream());
-        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        new VFSClient(VFSApplicationPreProcessor.prepareDisk(args));
+    }
 
-        while(true)
+    public VFSClient(VDisk vDisk)
+    {
+        console = new VFSConsole(vDisk);
+        console.addObserver(this);
+        try
         {
-            String line = reader.readLine();
-            out.writeBytes(line+"\n");
-            String input = in.readLine();
+            socket = new Socket("localhost", 2000);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
-            while(!input.equals("\0"))
-            {
-                System.out.println(input);
-                input = in.readLine();
-            }
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        try
+        {
+            // send
+            //System.out.println("sending command");
+            out.writeObject(arg);
+            // receive
+            //System.out.println("waiting for acknowledge");
+            in.readObject();
+            //System.out.println("acknowledge received");
 
-            if(line.equals("quit"))
+            if(arg instanceof VFSQuit)
             {
-                break;
+                socket.close();
             }
         }
-        client.close();
+        catch (IOException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

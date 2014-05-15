@@ -14,11 +14,6 @@ public class VFScp extends AbstractVFSCommand
 {
     public static final String COMMAND = "cp";
 
-    public VFScp(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * cp - copy files and directories
@@ -29,10 +24,10 @@ public class VFScp extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -72,7 +67,7 @@ public class VFScp extends AbstractVFSCommand
                          *
                          * eg. cp tmp/bla.txt /usr/local/
                          */
-                        destination = resolve(args[dest]);
+                        destination = resolve(application, args[dest]);
 
                         if (destination instanceof VDirectory)
                         {
@@ -96,7 +91,7 @@ public class VFScp extends AbstractVFSCommand
                         if (args[dest].split(VDisk.PATH_SEPARATOR).length > 1)
                         {
                             name = args[dest].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                            destination = resolve(args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                            destination = resolve(application, args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
                         }
                     }
 
@@ -121,7 +116,7 @@ public class VFScp extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\tcp SOURCE DEST");
+        System.out.println("\tcp SOURCE DEST");
     }
 
     /**

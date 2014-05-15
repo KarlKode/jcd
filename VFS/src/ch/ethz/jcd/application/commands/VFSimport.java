@@ -16,11 +16,6 @@ public class VFSimport extends AbstractVFSCommand
 {
     public static final String COMMAND = "import";
 
-    public VFSimport(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * import - imports a file into VFS
@@ -32,10 +27,10 @@ public class VFSimport extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -74,7 +69,7 @@ public class VFSimport extends AbstractVFSCommand
                 if (!(src == dest))
                 {
                     File file = new File(args[src]);
-                    VObject destination = resolve(args[dest]);
+                    VObject destination = resolve(application, args[dest]);
 
                     if (destination instanceof VDirectory && file.exists())
                     {
@@ -97,7 +92,7 @@ public class VFSimport extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\timport PATH_TO_HOST_FILE DEST");
+        System.out.println("\timport PATH_TO_HOST_FILE DEST");
     }
 
     /**

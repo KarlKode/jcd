@@ -14,11 +14,6 @@ public class VFSmv extends AbstractVFSCommand
 {
     public static final String COMMAND = "mv";
 
-    public VFSmv(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * mv - move (rename) files or directory
@@ -29,10 +24,10 @@ public class VFSmv extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -61,7 +56,7 @@ public class VFSmv extends AbstractVFSCommand
                 if (!(src == dest))
                 {
                     String name = args[dest];
-                    VObject source = resolve(args[src]);
+                    VObject source = resolve(application, args[src]);
                     VObject destination;
 
                     try
@@ -71,7 +66,7 @@ public class VFSmv extends AbstractVFSCommand
                          *
                          * eg. mv tmp/bla.txt /usr/local/
                          */
-                        destination = resolve(args[dest]);
+                        destination = resolve(application, args[dest]);
 
                         if (destination instanceof VDirectory)
                         {
@@ -95,7 +90,7 @@ public class VFSmv extends AbstractVFSCommand
                         if (args[dest].split(VDisk.PATH_SEPARATOR).length > 1)
                         {
                             name = args[dest].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                            destination = resolve(args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                            destination = resolve(application, args[dest].substring(0, args[dest].lastIndexOf(VDisk.PATH_SEPARATOR)));
                         }
                     }
 

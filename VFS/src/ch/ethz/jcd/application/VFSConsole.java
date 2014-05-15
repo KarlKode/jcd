@@ -1,14 +1,15 @@
 package ch.ethz.jcd.application;
 
-import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.main.utils.VUtil;
 import ch.ethz.jcd.application.commands.*;
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.Observable;
+import java.util.Queue;
 
 /**
  * Console application to operate on the VFS.
@@ -29,25 +30,17 @@ import java.io.*;
  *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
  *
  */
-public class VFSConsole implements AbstractVFSApplication, Runnable
+public class VFSConsole extends Observable implements AbstractVFSApplication, Runnable
 {
-    static final String OPTION_H = "-h";
-    static final String OPTION_HELP = "--help";
-    static final String OPTION_N = "-n";
-    static final String OPTION_NEW_DISK = "--new_disk";
-    static final String OPTION_C = "-c";
-    static final String OPTION_COMPRESSED = "--compressed";
-    static final String OPTION_S = "-s";
-    static final String OPTION_SIZE = "--size";
-    static final int DEFAULT_SIZE = 1024;
+    private boolean quit = false;
 
-    public static final String QUIT_CMD = "quit";
-
+    /**
+     * The VDisk is the receiver in the command pattern, while the VFSConsole
+     * is the invoker that holds the command history
+     */
+    private final VDisk vDisk;
+    private final Queue<AbstractVFSCommand> history = new LinkedList<>();
     protected VDirectory current;
-    protected VDisk vDisk;
-
-    private InputStream inputStream;
-    private OutputStream outputStream;
 
     /**
      * Start the console and open an existing VDisk
@@ -62,60 +55,7 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
      */
     public static void main(String[] args)
     {
-        try
-        {
-            quitWithUsageIfLessThan(args, 1);
-
-            boolean newDisk = false;
-            boolean compressed = false;
-            int file = args.length - 1;
-            int size = DEFAULT_SIZE;
-            int i = 0;
-
-            while(i < args.length)
-            {
-                if(args[i].equals(OPTION_H) || args[i].equals(OPTION_HELP))
-                {
-                    usage();
-                    System.exit(1);
-                }
-                else if(args[i].equals(OPTION_C) || args[i].equals(OPTION_COMPRESSED))
-                {
-                    compressed = true;
-                }
-                else if(args[i].equals(OPTION_N) || args[i].equals(OPTION_NEW_DISK))
-                {
-                    newDisk = true;
-                }
-                else if(args[i].equals(OPTION_S) || args[i].equals(OPTION_SIZE))
-                {
-                    i++;
-
-                    if(i >= args.length)
-                    {
-                        usage();
-                        System.exit(1);
-                    }
-                    size = Integer.parseInt(args[i]);
-                }
-                else
-                {
-                    file = Math.min(i, file);
-                }
-                i++;
-            }
-
-            File vdiskFile = new File(args[file]);
-            if(newDisk)
-            {
-                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed);
-            }
-            new VFSConsole(new VDisk(vdiskFile), System.in, System.out);
-        }
-        catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
-        {
-            e.printStackTrace();
-        }
+        new VFSConsole(VFSApplicationPreProcessor.prepareDisk(args));
     }
 
     /**
@@ -124,23 +64,22 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
      *
      * @param vDisk to operate on
      */
-    public VFSConsole(VDisk vDisk, InputStream inputStream, OutputStream outputStream)
+    public VFSConsole(VDisk vDisk)
     {
-        commands.put("cd", new VFScd(this));
-        commands.put("cp", new VFScp(this));
-        commands.put("export", new VFSexport(this));
-        commands.put("find", new VFSfind(this));
-        commands.put("help", new VFShelp(this));
-        commands.put("import", new VFSimport(this));
-        commands.put("ls", new VFSls(this));
-        commands.put("mkdir", new VFSmkdir(this));
-        commands.put("mv", new VFSmv(this));
-        commands.put("pwd", new VFSpwd(this));
-        commands.put("rm", new VFSrm(this));
-        commands.put("touch", new VFStouch(this));
+        commands.put("cd", new VFScd());
+        commands.put("cp", new VFScp());
+        commands.put("export", new VFSexport());
+        commands.put("find", new VFSfind());
+        commands.put("help", new VFShelp());
+        commands.put("import", new VFSimport());
+        commands.put("ls", new VFSls());
+        commands.put("mkdir", new VFSmkdir());
+        commands.put("mv", new VFSmv());
+        commands.put("pwd", new VFSpwd());
+        commands.put("quit", new VFSQuit());
+        commands.put("rm", new VFSrm());
+        commands.put("touch", new VFStouch());
 
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
         try
         {
             current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
@@ -156,15 +95,19 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
     @Override
     public void run()
     {
-        String[] args = prompt("> ");
-
-        while(args != null && !args[0].equals(QUIT_CMD))
+        while(!quit)
         {
-            execute(args);
-            println("\0");
-            args = prompt("> ");
+            String[] args = prompt("> ");
+            AbstractVFSCommand cmd = commands.get(args[0]);
+            cmd.setArgs(args);
+            execute(cmd);
         }
-        println("\0");
+    }
+
+    @Override
+    public Queue<AbstractVFSCommand> getHistory()
+    {
+        return this.history;
     }
 
     /**
@@ -198,6 +141,12 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
         this.current = dir;
     }
 
+    @Override
+    public void quit( )
+    {
+        this.quit = true;
+    }
+
     /**
      * Prints the prompt of the console application and reads the command
      * entered by the user.
@@ -211,8 +160,8 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
     {
         try
         {
-            this.print(prompt);
-            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(inputStream));
+            System.out.print(prompt);
+            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
             return bufferRead.readLine().split("\\s+");
         }
         catch (IOException e)
@@ -221,43 +170,25 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
         }
     }
 
-    @Override
-    public void print(String s)
-    {
-        try
-        {
-            outputStream.write(s.getBytes());
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void println(String line)
-    {
-        this.print(line + "\n");
-    }
-
     /**
      * Executes the entered command.
      *
-     * @param args to pass
+     * @param cmd to execute
      */
-    private void execute(String[] args)
+    private void execute(AbstractVFSCommand cmd)
     {
-        AbstractVFSCommand cmd = commands.get(args[0]);
+        this.setChanged();
+        this.notifyObservers(cmd);
+        history.add(cmd);
 
         if(cmd != null)
         {
             try
             {
-                cmd.execute(args);
+                cmd.execute(this);
             }
             catch (CommandException e)
             {
-                // TODO luege wege causes und message
                 cmd.error(e.getCause().getMessage());
             }
         }
@@ -270,29 +201,15 @@ public class VFSConsole implements AbstractVFSApplication, Runnable
     /**
      * Prints the usage of the console application
      */
-    private static void usage()
+    private void usage()
     {
-        System.out.println("Usage: [OPTIONS] vdisk");
-        /*System.out.println();
-        System.out.println("Commands:");
-        for(AbstractVFSCommand cmd : commands.values())
+        try
         {
-            cmd.help();
-        }*/
-    }
-
-    /**
-     * Checks if the minimum required arguments are passed, quit otherwise.
-     *
-     * @param arguments to check
-     * @param minArgumentLength required
-     */
-    private static void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)
-    {
-        if (arguments.length < minArgumentLength)
+            commands.get("help").execute(this);
+        }
+        catch (CommandException e)
         {
-            usage();
-            System.exit(1);
+            commands.get("help").error(e.getCause().getMessage());
         }
     }
 }

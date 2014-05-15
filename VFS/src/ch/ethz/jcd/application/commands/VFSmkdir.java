@@ -13,11 +13,6 @@ public class VFSmkdir extends AbstractVFSCommand
 {
     public static final String COMMAND = "mkdir";
 
-    public VFSmkdir(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * mkdir - make directories
@@ -28,10 +23,10 @@ public class VFSmkdir extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -61,7 +56,7 @@ public class VFSmkdir extends AbstractVFSCommand
                 if (args[expr].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
                     name = args[expr].substring(args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolve(args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
+                    destination = resolve(application, args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1));
                 }
 
                 if (destination instanceof VDirectory)
@@ -84,7 +79,7 @@ public class VFSmkdir extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\tmkdir DIRECTORY");
+        System.out.println("\tmkdir DIRECTORY");
     }
 
     /**

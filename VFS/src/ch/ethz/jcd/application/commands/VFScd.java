@@ -13,11 +13,6 @@ public class VFScd extends AbstractVFSCommand
 {
     public final String COMMAND = "cd";
 
-    public VFScd(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * cd - change the working directory
@@ -28,17 +23,17 @@ public class VFScd extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application to execute on
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         switch (args.length)
         {
             case 1:
             {
-                application.setCurrent((VDirectory) resolve(VDisk.PATH_SEPARATOR));
+                application.setCurrent((VDirectory) resolve(application, VDisk.PATH_SEPARATOR));
                 break;
             }
             case 2:
@@ -58,7 +53,7 @@ public class VFScd extends AbstractVFSCommand
                     }
                 }
 
-                VObject destination = resolve(args[expr]);
+                VObject destination = resolve(application, args[expr]);
                 if (destination != null && destination instanceof VDirectory)
                 {
                     application.setCurrent((VDirectory) destination);
@@ -79,7 +74,7 @@ public class VFScd extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\tcd [DEST]");
+        System.out.println("\tcd [DEST]");
     }
 
     /**

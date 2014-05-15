@@ -15,10 +15,6 @@ public class VFSls extends AbstractVFSCommand
 {
     public static final String COMMAND = "ls";
 
-    public VFSls(AbstractVFSApplication application) {
-        super(application);
-    }
-
     /**
      * NAME
      * ls - list directory contents
@@ -30,10 +26,10 @@ public class VFSls extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -62,7 +58,7 @@ public class VFSls extends AbstractVFSCommand
                     }
                 }
 
-                VObject destination = resolve(args[expr]);
+                VObject destination = resolve(application, args[expr]);
 
                 if (destination instanceof VDirectory)
                 {
@@ -84,7 +80,7 @@ public class VFSls extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\tls [DEST]");
+        System.out.println("\tls [DEST]");
     }
 
     /**
@@ -96,7 +92,7 @@ public class VFSls extends AbstractVFSCommand
     {
         for (String key : list.keySet())
         {
-            application.println(key);
+            System.out.println(key);
         }
     }
 

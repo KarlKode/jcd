@@ -13,11 +13,6 @@ public class VFStouch extends AbstractVFSCommand
 {
     public static final String COMMAND = "touch";
 
-    public VFStouch(AbstractVFSApplication application)
-    {
-        super(application);
-    }
-
     /**
      * NAME
      * touch - creates a new empty file
@@ -28,10 +23,10 @@ public class VFStouch extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param args    passed with the command
+     * @param application
      */
     @Override
-    public void execute(String[] args)
+    public void execute(AbstractVFSApplication application)
             throws CommandException
     {
         VDisk vDisk = application.getVDisk();
@@ -61,7 +56,7 @@ public class VFStouch extends AbstractVFSCommand
                 if (args[expr].split(VDisk.PATH_SEPARATOR).length > 1)
                 {
                     name = args[expr].substring(args[expr].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
-                    destination = resolve(args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR)));
+                    destination = resolve(application, args[expr].substring(0, args[expr].lastIndexOf(VDisk.PATH_SEPARATOR)));
                 }
 
                 if (destination instanceof VDirectory)
@@ -84,7 +79,7 @@ public class VFStouch extends AbstractVFSCommand
     @Override
     public void help()
     {
-        application.println("\ttouch FILE");
+        System.out.println("\ttouch FILE");
     }
 
     /**
