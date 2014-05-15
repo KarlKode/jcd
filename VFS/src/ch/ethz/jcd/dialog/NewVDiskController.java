@@ -58,8 +58,6 @@ public class NewVDiskController {
     @FXML
     private Slider sliderFileSize;
 
-    private File fileVdisk;
-
     private long size;
 
     private DialogResult result;
@@ -71,7 +69,8 @@ public class NewVDiskController {
         fchooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         fchooser.setTitle("Create new VDisk.. ");
 
-        fileVdisk = fchooser.showSaveDialog(null);
+        File fileVdisk = fchooser.showSaveDialog(null);
+
         if(fileVdisk != null) {
             textFieldFile.setText(fileVdisk.getAbsolutePath());
         }else{
@@ -104,13 +103,18 @@ public class NewVDiskController {
         sliderFileSize.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                labelSize.setText(new Double((newValue.doubleValue() * 1e5  * VUtil.BLOCK_SIZE)/1e6d).toString());
+                labelSize.setText(new Double((newValue.doubleValue() * 1e3  * VUtil.BLOCK_SIZE)/1e6d).toString());
             }
         });
+
+        sliderFileSize.setValue(5);
     }
 
     public File getVDiskFile() {
-        return fileVdisk;
+        if(new File(textFieldFile.getText()).isDirectory()){
+            return new File(textFieldFile.getText() + "unnamed.vdisk");
+        }
+        return new File(textFieldFile.getText());
     }
 
     public DialogResult getResult(){
@@ -118,6 +122,6 @@ public class NewVDiskController {
     }
 
     public long getSize(){
-        return Math.round(sliderFileSize.getValue());
+        return Math.round(sliderFileSize.getValue() * 1e3  * VUtil.BLOCK_SIZE);
     }
 }

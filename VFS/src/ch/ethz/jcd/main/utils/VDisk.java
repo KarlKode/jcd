@@ -9,6 +9,7 @@ import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
 import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -47,10 +48,14 @@ public class VDisk
      *                 (size >= blockSize * 16)
      */
     public static void format(File diskFile, long size, boolean compressed)
-            throws InvalidBlockAddressException, IOException, InvalidBlockCountException, VDiskCreationException, InvalidSizeException
     {
         int state = compressed ? 1 : 0;
-        VUtil.format(diskFile, size, state);
+        try {
+            VUtil.format(diskFile, size, state);
+        } catch (Exception e) {
+            throw new FormatExcepion(e);
+        }
+
     }
 
     /**
@@ -372,5 +377,11 @@ public class VDisk
         {
             throw new FindException(e);
         }
+    }
+
+
+    public boolean exists(String path) throws IOException {
+        return vUtil.getRootDirectory().resolve(path) != null;
+
     }
 }

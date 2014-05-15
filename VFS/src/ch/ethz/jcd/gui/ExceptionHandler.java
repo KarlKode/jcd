@@ -10,6 +10,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by leo on 10.05.14.
@@ -19,6 +20,11 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         String title = "Error!";
         String message;
+
+        e.printStackTrace();
+
+        //http://stackoverflow.com/questions/17279050/javafx-bad-logs-invocation-target-exception
+        e = shortThrowable(e);
 
         if(e instanceof CopyException) {
             message = e.getMessage();
@@ -44,6 +50,8 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             message = e.toString();
         } else if(e instanceof TouchException){
             message = e.toString();
+        } else if(e instanceof TouchException){
+            message = e.toString();
         }else{
             message = e.toString();
         }
@@ -57,6 +65,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
             final MessageDialogController controller = loader.getController();
             dialogStage.setTitle(title);
+            controller.setMessage(e);
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
@@ -64,4 +73,9 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             ex.printStackTrace();
         }
     }
+
+    public static Throwable shortThrowable(Throwable ex) {
+        return ex.getCause() instanceof InvocationTargetException ? ex.getCause().getCause() : ex;
+    }
+
 }
