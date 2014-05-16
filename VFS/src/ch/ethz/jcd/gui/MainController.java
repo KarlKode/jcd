@@ -298,7 +298,6 @@ public class MainController {
 
     @FXML
     void onKeyPressedMainPane(KeyEvent event) throws IOException {
-        System.out.println("event = " + event);
         if(event.isControlDown()){
             if(event.getCode() == KeyCode.C){
                 copySelectedFiles();
@@ -306,7 +305,6 @@ public class MainController {
                 moveSelectedFiles();
             }else if(event.getCode() == KeyCode.V){
                 pasteSelectedFiles();
-                event.consume();
             }else if(event.getCode() == KeyCode.D) {
                 deleteSelectedFiles();
             }else if(event.getCode() == KeyCode.R) {
@@ -324,16 +322,12 @@ public class MainController {
             }else if(event.getCode() == KeyCode.N) {
                 newVDisk();
             }
-            event.consume();
         }else if(event.getCode() == KeyCode.DELETE) {
             deleteSelectedFiles();
-            event.consume();
         }else if(event.getCode() == KeyCode.BACK_SPACE) {
             gotoParent();
-            event.consume();
         }else if(event.getCode() == KeyCode.ENTER) {
             enterDirectory();
-            event.consume();
         }
     }
 
@@ -459,6 +453,8 @@ public class MainController {
     }
 
     private void pasteSelectedFiles() throws IOException {
+        System.out.println("selectedDirectory: " + selectedDirectory.getPath());
+
         for(VObject vobj : this.selectedFiles){
             try {
                 if(fileOp == FileOperation.COPY){
@@ -470,6 +466,8 @@ public class MainController {
                                 vdisk.copy(vobj, selectedDirectory, filename);
                             });
                         }
+                    }else{
+                        vdisk.copy(vobj, selectedDirectory, vobj.getName());
                     }
                 }else{
                     if(selectedDirectory.getEntries().contains(vobj)) {
@@ -480,6 +478,8 @@ public class MainController {
                                 vdisk.move(vobj, selectedDirectory, filename);
                             });
                         }
+                    }else{
+                        vdisk.move(vobj, selectedDirectory, vobj.getName());
                     }
                 }
 
@@ -685,9 +685,12 @@ public class MainController {
             @Override
             public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
                 if(!ignoreSelectionChanged){
-                    selectedDirectory = newValue.getValue();
-                    refreshListView(newValue.getValue());
-                    selectVDirectory(selectedDirectory);
+                    //sometime got nullpointerexception, no clue why ..
+                    if(newValue != null) {
+                        selectedDirectory = newValue.getValue();
+                        refreshListView(newValue.getValue());
+                        selectVDirectory(selectedDirectory);
+                    }
                 }
             }
         });
@@ -723,7 +726,20 @@ public class MainController {
     }
 
     private void renameSelectedFile() {
+        if(listViewFiles.getSelectionModel().getSelectedIndices().size() > 1){
+            showMessageDialog("Information", "Too many files selected", "Please select only one file!");
+            return;
+        }else{
+            showInputDialog("Rename File... ", "New Filename: ", "new filename", (filename) -> {
+                vdisk.rename(listViewFiles.getSelectionModel().getSelectedItem(), filename);
 
+                try {
+                    updateUI();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void deleteSelectedFiles() {
@@ -759,7 +775,6 @@ public class MainController {
             listViewFiles.getItems().addAll(items);
         } catch (IOException e) {
             e.printStackTrace();
-            //TODO: handle
         }
     }
 
@@ -793,6 +808,8 @@ public class MainController {
 
 
     private DialogResult showMessageDialog(String title, String message, String info){
+        DialogResult result = DialogResult.CANCEL;
+
         try{
             Stage dialogStage = new Stage();
 
@@ -809,13 +826,12 @@ public class MainController {
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
-            return controller.getResult();
+            result =  controller.getResult();
         }catch(IOException ex){
             ex.printStackTrace();
-            return DialogResult.CANCEL;
-        }finally{
-            //return DialogResult.CANCEL;
         }
+
+        return result;
     }
 
 
