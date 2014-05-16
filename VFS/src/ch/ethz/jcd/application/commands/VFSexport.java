@@ -16,6 +16,11 @@ public class VFSexport extends AbstractVFSCommand
 {
     public static final String COMMAND = "export";
 
+    public VFSexport(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * export - exports a file on VFS to the host file system

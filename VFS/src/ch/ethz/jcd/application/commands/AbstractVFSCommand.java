@@ -22,6 +22,11 @@ public abstract class AbstractVFSCommand implements Serializable
 
     protected String[] args = null;
 
+    public AbstractVFSCommand(String[] args)
+    {
+        this.setArgs(args);
+    }
+
     public void setArgs(String[] args)
     {
         this.args = args;
@@ -89,4 +94,14 @@ public abstract class AbstractVFSCommand implements Serializable
      * @return the command in text form
      */
     protected abstract String command();
+
+    public String toString()
+    {
+        String s = command();
+        for(int i = 1; i < args.length; i++)
+        {
+            s += " " + args[i];
+        }
+        return  s;
+    }
 }

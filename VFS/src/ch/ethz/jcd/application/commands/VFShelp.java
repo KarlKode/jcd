@@ -10,6 +10,10 @@ public class VFShelp extends AbstractVFSCommand
 {
     public static final String COMMAND = "help";
 
+    public VFShelp(String[] args) {
+        super(args);
+    }
+
     /**
      * NAME
      * help - print usage
@@ -24,10 +28,12 @@ public class VFShelp extends AbstractVFSCommand
             throws CommandException
     {
         System.out.println("Commands:");
+        // TODO print all
+        /*
         for (AbstractVFSCommand cmd : application.commands.values())
         {
             cmd.help();
-        }
+        }*/
     }
 
     /**

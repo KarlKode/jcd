@@ -13,6 +13,11 @@ public class VFStouch extends AbstractVFSCommand
 {
     public static final String COMMAND = "touch";
 
+    public VFStouch(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * touch - creates a new empty file
@@ -23,7 +28,7 @@ public class VFStouch extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
-     * @param application
+     * @param application to execute on
      */
     @Override
     public void execute(AbstractVFSApplication application)

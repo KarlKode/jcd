@@ -10,8 +10,6 @@ import java.util.Queue;
 
 public interface AbstractVFSApplication
 {
-    public final HashMap<String, AbstractVFSCommand> commands = new HashMap<>();
-
     public Queue<AbstractVFSCommand> getHistory();
 
     /**

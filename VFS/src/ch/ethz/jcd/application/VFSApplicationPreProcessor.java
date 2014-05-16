@@ -76,7 +76,7 @@ public class VFSApplicationPreProcessor
 
             return new VDisk(vdiskFile);
         }
-        catch (InvalidBlockAddressException | InvalidSizeException | InvalidBlockCountException | VDiskCreationException | IOException e)
+        catch (IOException e)
         {
             e.printStackTrace();
             System.exit(1);

@@ -15,6 +15,11 @@ public class VFSls extends AbstractVFSCommand
 {
     public static final String COMMAND = "ls";
 
+    public VFSls(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * ls - list directory contents

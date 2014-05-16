@@ -3,15 +3,20 @@ package ch.ethz.jcd.application.commands;
 import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 
-public class VFSQuit extends AbstractVFSCommand
+public class VFSNull extends AbstractVFSCommand
 {
-    public final String COMMAND = "quit";
+    public final String COMMAND = "null";
+
+    public VFSNull(String[] args)
+    {
+        super(args);
+    }
 
     @Override
     public void execute(AbstractVFSApplication application)
             throws CommandException
     {
-        application.quit();
+        this.error(args[0] + ": command not found");
     }
 
     /**
@@ -20,7 +25,7 @@ public class VFSQuit extends AbstractVFSCommand
     @Override
     public void help()
     {
-        System.out.println("\tquit");
+        // TODO
     }
 
     /**

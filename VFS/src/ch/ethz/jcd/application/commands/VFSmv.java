@@ -14,6 +14,11 @@ public class VFSmv extends AbstractVFSCommand
 {
     public static final String COMMAND = "mv";
 
+    public VFSmv(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * mv - move (rename) files or directory

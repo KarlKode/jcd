@@ -13,6 +13,11 @@ public class VFScd extends AbstractVFSCommand
 {
     public final String COMMAND = "cd";
 
+    public VFScd(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * cd - change the working directory

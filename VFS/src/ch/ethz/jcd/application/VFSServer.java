@@ -26,10 +26,10 @@ public class VFSServer
 
     public static void main(String[] args)
     {
-        new VFSServer(VFSApplicationPreProcessor.prepareDisk(args));
+        new VFSServer();
     }
 
-    public VFSServer(VDisk vDisk)
+    public VFSServer()
     {
         try
         {
@@ -37,9 +37,31 @@ public class VFSServer
 
             while(true)
             {
+                System.out.println("Waiting for clients to accept");
                 Socket client = this.socket.accept();
-                //System.out.println("Socket accepted");
-                new VFSCommandExecutor(vDisk, client);
+                System.out.println("Socket accepted");
+
+                ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+                ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+                try
+                {
+                    // load the client's VDisk
+                    System.out.println("loading VDisk");
+                    VDisk vDisk = VFSApplicationPreProcessor.prepareDisk((String[]) in.readObject());
+                    System.out.println("VDisk loaded");
+                    // sending ACK
+                    System.out.println("Sending ACK");
+                    out.writeObject(true);
+                    System.out.println("Acknowledge sent");
+                    System.out.println("running executor");
+                    new VFSCommandExecutor(vDisk, client, in, out);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // send NAK
+                    System.out.println("Sending NAK");
+                    out.writeObject(false);
+                }
             }
         }
         catch (IOException e)
@@ -50,28 +72,28 @@ public class VFSServer
 
     private class VFSCommandExecutor implements AbstractVFSApplication, Runnable
     {
-        private Socket client;
+        private final Socket client;
+        private final ObjectOutputStream out;
+        private final ObjectInputStream in;
+
         private final VDisk vDisk;
         private final Queue<AbstractVFSCommand> history = new LinkedList<>();
+
         private VDirectory current;
         private boolean quit = false;
 
-        private ObjectOutputStream out;
-        private ObjectInputStream in;
-
-
-        public VFSCommandExecutor(VDisk vDisk, Socket client)
+        public VFSCommandExecutor(VDisk vDisk, Socket client, ObjectInputStream in, ObjectOutputStream out)
         {
             this.client = client;
             this.vDisk = vDisk;
+            this.in = in;
+            this.out = out;
 
             try
             {
-                current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
-                in = new ObjectInputStream(client.getInputStream());
-                out = new ObjectOutputStream(client.getOutputStream());
+                this.current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
             }
-            catch (IOException | ResolveException e)
+            catch (ResolveException e)
             {
                 e.printStackTrace();
             }
@@ -86,16 +108,16 @@ public class VFSServer
             {
                 try
                 {
-                    //System.out.println("waiting for command");
+                    System.out.println("waiting for command");
                     AbstractVFSCommand cmd = (AbstractVFSCommand) in.readObject();
-                    //System.out.println("command received");
+                    System.out.println("command received");
                     history.add(cmd);
 
                     try
                     {
-                        //System.out.println("executing command");
+                        System.out.println("executing command > " + cmd.toString());
                         cmd.execute(this);
-                        //System.out.println("sending acknowledge");
+                        System.out.println("sending acknowledge");
                         out.writeObject(null);
                     }
                     catch (CommandException e)
@@ -109,9 +131,12 @@ public class VFSServer
                 }
             }
 
+            System.out.println("received quit, closing socket");
+
             try
             {
                 client.close();
+                System.out.println("Connection to Client closed");
             }
             catch (IOException e)
             {
@@ -140,7 +165,7 @@ public class VFSServer
         @Override
         public void setCurrent(VDirectory dir)
         {
-            this.current = dir;
+            current = dir;
         }
 
         @Override

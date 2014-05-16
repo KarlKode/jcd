@@ -16,6 +16,11 @@ public class VFSimport extends AbstractVFSCommand
 {
     public static final String COMMAND = "import";
 
+    public VFSimport(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * import - imports a file into VFS

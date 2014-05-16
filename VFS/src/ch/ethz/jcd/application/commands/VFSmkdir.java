@@ -13,6 +13,11 @@ public class VFSmkdir extends AbstractVFSCommand
 {
     public static final String COMMAND = "mkdir";
 
+    public VFSmkdir(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * mkdir - make directories

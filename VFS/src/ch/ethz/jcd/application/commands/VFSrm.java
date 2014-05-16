@@ -15,6 +15,11 @@ public class VFSrm extends AbstractVFSCommand
     protected static final String OPTION_R = "-r";
     protected static final String OPTION_RECURSIVE = "--recursive";
 
+    public VFSrm(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * rm - remove files or directories

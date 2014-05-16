@@ -21,6 +21,11 @@ public class VFSfind extends AbstractVFSCommand
     protected static final String OPTION_I = "-i";
     protected static final String OPTION_CASE_INSENSITIVE = "--case-insensitive";
 
+    public VFSfind(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * find - search for files in a directory hierarchy

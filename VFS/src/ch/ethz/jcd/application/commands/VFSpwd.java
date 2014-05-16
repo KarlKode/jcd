@@ -12,6 +12,11 @@ public class VFSpwd extends AbstractVFSCommand
 {
     public static final String COMMAND = "pwd";
 
+    public VFSpwd(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * pwd - print the name of current/working directory

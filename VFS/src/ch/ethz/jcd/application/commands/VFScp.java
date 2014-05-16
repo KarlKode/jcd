@@ -14,6 +14,11 @@ public class VFScp extends AbstractVFSCommand
 {
     public static final String COMMAND = "cp";
 
+    public VFScp(String[] args)
+    {
+        super(args);
+    }
+
     /**
      * NAME
      * cp - copy files and directories

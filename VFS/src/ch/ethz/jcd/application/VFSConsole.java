@@ -66,20 +66,6 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
      */
     public VFSConsole(VDisk vDisk)
     {
-        commands.put("cd", new VFScd());
-        commands.put("cp", new VFScp());
-        commands.put("export", new VFSexport());
-        commands.put("find", new VFSfind());
-        commands.put("help", new VFShelp());
-        commands.put("import", new VFSimport());
-        commands.put("ls", new VFSls());
-        commands.put("mkdir", new VFSmkdir());
-        commands.put("mv", new VFSmv());
-        commands.put("pwd", new VFSpwd());
-        commands.put("quit", new VFSQuit());
-        commands.put("rm", new VFSrm());
-        commands.put("touch", new VFStouch());
-
         try
         {
             current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
@@ -98,7 +84,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
         while(!quit)
         {
             String[] args = prompt("> ");
-            AbstractVFSCommand cmd = commands.get(args[0]);
+            AbstractVFSCommand cmd = CommandFactory.create(args);
             cmd.setArgs(args);
             execute(cmd);
         }
@@ -203,13 +189,14 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
      */
     private void usage()
     {
+        VFShelp cmd = new VFShelp(null);
         try
         {
-            commands.get("help").execute(this);
+            cmd.execute(this);
         }
         catch (CommandException e)
         {
-            commands.get("help").error(e.getCause().getMessage());
+            cmd.error(e.getCause().getMessage());
         }
     }
 }
