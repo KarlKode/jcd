@@ -65,9 +65,17 @@ public class ObjectBlockTest
         assertEquals(ObjectBlock.TYPE_DIRECTORY, fileManager.readByte(0, ObjectBlock.OFFSET_TYPE));
         block.setType(ObjectBlock.TYPE_FILE);
         assertEquals(ObjectBlock.TYPE_FILE, fileManager.readByte(0, ObjectBlock.OFFSET_TYPE));
+
         try
         {
             block.setType((byte) 0xFF);
+            fail("Exception was expected for invalid type");
+        } catch (IllegalArgumentException e)
+        {
+        }
+        try
+        {
+            block.setType((byte) 0x02);
             fail("Exception was expected for invalid type");
         } catch (IllegalArgumentException e)
         {

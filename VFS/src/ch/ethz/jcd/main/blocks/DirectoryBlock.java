@@ -44,19 +44,11 @@ public class DirectoryBlock extends ObjectBlock
      * @param entry ObjectBlock to remove from the directory
      * @throws IOException
      */
-    public void removeEntry(ObjectBlock entry) throws IOException
+    public void removeEntry(ObjectBlock entry) throws IOException, BlockFullException
     {
-        try
-        {
-            List<ObjectBlock> entries = getEntries();
-            entries.remove(entry);
-            setEntries(entries);
-        }
-        catch (BlockFullException e)
-        {
-            // impossible since the list shrinks
-            throw new RuntimeException();
-        }
+        List<ObjectBlock> entries = getEntries();
+        entries.remove(entry);
+        setEntries(entries);
     }
 
     /**
@@ -92,7 +84,6 @@ public class DirectoryBlock extends ObjectBlock
     }
 
     /**
-     *
      * @return list containing all the entries of the directory
      * @throws IOException
      */
@@ -109,8 +100,7 @@ public class DirectoryBlock extends ObjectBlock
             if (type == ObjectBlock.TYPE_DIRECTORY)
             {
                 entries.add(new DirectoryBlock(fileManager, entryBlockAddress));
-            }
-            else if (type == ObjectBlock.TYPE_FILE)
+            } else
             {
                 entries.add(new FileBlock(fileManager, entryBlockAddress));
             }

@@ -60,7 +60,7 @@ public abstract class ObjectBlock extends Block
     protected void setType(byte type) throws IOException, IllegalArgumentException
     {
         // Check type for validity
-        if (type != TYPE_DIRECTORY && type != TYPE_FILE)
+        if (!(type == TYPE_DIRECTORY || type == TYPE_FILE))
         {
             throw new IllegalArgumentException();
         }

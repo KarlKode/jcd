@@ -32,21 +32,16 @@ public class BitMapBlock extends Block
     private int lastSmallestFreeBlockPosition;
 
 
-    public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException
+    public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException, IOException
     {
         super(fileManager, blockAddress);
 
         //init usedBlocks and lastSmallestFreeBlockPosition
-        try {
-            final byte[] content = fileManager.readBytes(VUtil.getBlockOffset(this.blockAddress), 0, VUtil.BLOCK_SIZE);
-            final BitSet set = BitSet.valueOf(content);
+        final byte[] content = fileManager.readBytes(VUtil.getBlockOffset(this.blockAddress), 0, VUtil.BLOCK_SIZE);
+        final BitSet set = BitSet.valueOf(content);
 
-            this.usedBlocks = set.cardinality();
-            this.lastSmallestFreeBlockPosition = set.nextClearBit(0);
-        } catch (IOException e) {
-            //shouldn't be thrown
-            e.printStackTrace();
-        }
+        this.usedBlocks = set.cardinality();
+        this.lastSmallestFreeBlockPosition = set.nextClearBit(0);
     }
 
     /**
@@ -57,7 +52,7 @@ public class BitMapBlock extends Block
     public int allocateBlock() throws BlockAddressOutOfBoundException, IOException, DiskFullException
     {
         // -1 because we have a pos++ at first argument in the do-while-loop
-        int pos = (this.lastSmallestFreeBlockPosition / 8)-1;
+        int pos = (this.lastSmallestFreeBlockPosition / 8) - 1;
 
         byte[] val = new byte[1];
         do
@@ -130,13 +125,16 @@ public class BitMapBlock extends Block
 
         //since the bitset is empty, if the byte 0x00 is in it, we need this workaround
         byte newValue = 0;
-        if(set.isEmpty()){
+        if (set.isEmpty())
+        {
             newValue = 0;
-        }else{
+        } else
+        {
             newValue = set.toByteArray()[0];
         }
 
-        if(blockAddress < lastSmallestFreeBlockPosition){
+        if (blockAddress < lastSmallestFreeBlockPosition)
+        {
             this.lastSmallestFreeBlockPosition = blockAddress;
         }
 
@@ -173,11 +171,13 @@ public class BitMapBlock extends Block
         return !BitSet.valueOf(new byte[]{value}).get(bit);
     }
 
-    public int getFreeBlocks(){
-        return (VUtil.BLOCK_SIZE*8)-usedBlocks;
+    public int getFreeBlocks()
+    {
+        return (VUtil.BLOCK_SIZE * 8) - usedBlocks;
     }
 
-    public int getUsedBlocks(){
+    public int getUsedBlocks()
+    {
         return this.usedBlocks;
     }
 }

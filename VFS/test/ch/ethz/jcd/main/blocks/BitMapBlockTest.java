@@ -1,8 +1,8 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.BlockAddressOutOfBoundException;
 import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.utils.FileManager;
-import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class BitMapBlockTest
         File tmpFile = File.createTempFile("test", "vfs");
         tmpFile.deleteOnExit();
         RandomAccessFile d = new RandomAccessFile(tmpFile.getAbsoluteFile(), "rw");
-        d.setLength(VUtil.BLOCK_SIZE+VUtil.BLOCK_SIZE+VUtil.BLOCK_SIZE);
+        d.setLength(VUtil.BLOCK_SIZE + VUtil.BLOCK_SIZE + VUtil.BLOCK_SIZE);
         fileManager = new FileManager(tmpFile);
         block = new BitMapBlock(fileManager, BLOCK_ADDRESS);
     }
@@ -66,24 +66,27 @@ public class BitMapBlockTest
     @Test
     public void testInit()
     {
-        try {
+        try
+        {
             this.block.initialize();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
         assertTrue(this.block.getUsedBlocks() == 3);
-        assertTrue(this.block.getFreeBlocks() == VUtil.BLOCK_SIZE*8 - 3);
+        assertTrue(this.block.getFreeBlocks() == VUtil.BLOCK_SIZE * 8 - 3);
     }
 
     @Test
     public void testAllocateBlocks() throws Exception
     {
-        for(int i=0;i<VUtil.BLOCK_SIZE*8;i++){
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+        for (int i = 0; i < VUtil.BLOCK_SIZE * 8; i++)
+        {
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
             assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i+1));
-            assertTrue(block.getUsedBlocks() == (i+1));
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i + 1));
+            assertTrue(block.getUsedBlocks() == (i + 1));
         }
 
         try
@@ -98,19 +101,37 @@ public class BitMapBlockTest
     @Test
     public void testFreeBlocks() throws Exception
     {
-        for(int i=0;i<VUtil.BLOCK_SIZE*8;i++){
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+        for (int i = 0; i < VUtil.BLOCK_SIZE * 8; i++)
+        {
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
             assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i+1));
-            assertTrue(block.getUsedBlocks() == (i+1));
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i + 1));
+            assertTrue(block.getUsedBlocks() == (i + 1));
         }
 
-        for(int i=(VUtil.BLOCK_SIZE*8)-1;i>=0;i--){
+        for (int i = (VUtil.BLOCK_SIZE * 8) - 1; i >= 0; i--)
+        {
             block.setUnused(i);
             assertTrue(block.isUnused(i));
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE*8)-(i));
+            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
             assertTrue(block.getUsedBlocks() == i);
+        }
+
+        try
+        {
+            block.setUnused(-1);
+            fail("Exception was expected for invalid block address.");
+        } catch (BlockAddressOutOfBoundException e)
+        {
+        }
+
+        try
+        {
+            block.isUnused(-1);
+            fail("Exception was expected for invalid block address.");
+        } catch (BlockAddressOutOfBoundException e)
+        {
         }
     }
 
