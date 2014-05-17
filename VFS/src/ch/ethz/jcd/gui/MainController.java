@@ -143,6 +143,7 @@ public class MainController {
     private Stage progressDialogStage;
 
     private ProgressDialogController progressDialogController;
+    private boolean inAppDragOperation;
 
     public MainController() {
 
@@ -461,8 +462,6 @@ public class MainController {
     }
 
     private void pasteSelectedFiles() throws IOException {
-        System.out.println("selectedDirectory: " + selectedDirectory.getPath());
-
         for(VObject vobj : this.selectedFiles){
             try {
                 if(fileOp == FileOperation.COPY){
@@ -478,16 +477,19 @@ public class MainController {
                         vdisk.copy(vobj, selectedDirectory, vobj.getName());
                     }
                 }else{
-                    if(selectedDirectory.getEntries().contains(vobj)) {
-                        DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
+                    //moving the selectedFiles to the same directoy is senseless, thus we doesn't allow it
+                    if(!vobj.getParent().equals(selectedDirectory)){
+                        if(selectedDirectory.getEntries().contains(vobj)) {
+                            DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
-                        if (res == DialogResult.OK) {
-                            showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
-                                vdisk.move(vobj, selectedDirectory, filename);
-                            });
+                            if (res == DialogResult.OK) {
+                                showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
+                                    vdisk.move(vobj, selectedDirectory, filename);
+                                });
+                            }
+                        }else{
+                            vdisk.move(vobj, selectedDirectory, vobj.getName());
                         }
-                    }else{
-                        vdisk.move(vobj, selectedDirectory, vobj.getName());
                     }
                 }
 
@@ -546,25 +548,32 @@ public class MainController {
 
     @FXML
     void onDragDetectedListViewFiles(MouseEvent event) {
+        inAppDragOperation = true;
+
+        //for in Application Move/Copy Operation
+        copySelectedFiles();
+
         ObservableList<VObject> selectedVFiles = listViewFiles.getSelectionModel().getSelectedItems();
         Map<DataFormat, Object> dragDropMap = new HashMap<>();
         List<File> tmpFilesForExport = new ArrayList<File>();
 
+        // export just selected VFiles, our API doesn't support VDirectories
         for(VObject vobject : selectedVFiles){
             if(vobject instanceof VFile){
                 File tempFile = null;
+
                 try {
                     tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + vobject.getName());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 vdisk.exportToHost((VFile)vobject, tempFile);
                 tmpFilesForExport.add(tempFile);
             }
         }
 
         dragDropMap.put(DataFormat.FILES, tmpFilesForExport);
-        //dragDropMap.put(new DataFormat("VFILES"), selectedVFiles);
 
         TransferMode mode;
 
@@ -580,6 +589,7 @@ public class MainController {
 
     @FXML
     void onDragDoneListViewFiles(DragEvent event) {
+        inAppDragOperation = false;
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
@@ -613,6 +623,7 @@ public class MainController {
     @FXML
     void onDragDroppedListViewFiles(DragEvent event) {
         Dragboard db = event.getDragboard();
+        System.out.println("MainController.onDragDroppedListViewFiles");
 
         boolean success = false;
 
@@ -623,7 +634,19 @@ public class MainController {
                 new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        importFiles(db.getFiles());
+                        if(inAppDragOperation){
+                            //dirty, should be removed with Copy Command
+                            if(event.getTransferMode() == TransferMode.COPY){
+                                fileOp = FileOperation.COPY;
+                            }else{
+                                fileOp = FileOperation.MOVE;
+                            }
+
+                            pasteSelectedFiles();
+                        }else{
+                            importFiles(db.getFiles());
+                        }
+
                         return null;
                     }
                 }.call();
@@ -668,6 +691,17 @@ public class MainController {
 
 
     @FXML
+    void onDragOverTreeViewNavigation(DragEvent event) {
+        Dragboard db = event.getDragboard();
+
+        if (db.hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        } else {
+            event.consume();
+        }
+    }
+
+    @FXML
     void onDragOverListViewFiles(DragEvent event) {
         Dragboard db = event.getDragboard();
 
@@ -704,6 +738,91 @@ public class MainController {
         assert menuItemFind != null : "fx:id=\"menuItemFind\" was not injected: check your FXML file 'Main.fxml'.";
         assert labelPath != null : "fx:id=\"labelPath\" was not injected: check your FXML file 'Main.fxml'.";
         assert buttonNewDir != null : "fx:id=\"buttonNewDir\" was not injected: check your FXML file 'Main.fxml'.";
+
+        //i had to implement the drag drop logic in TreeCell, otherwise i'd have no chance to get the target directory
+        treeViewNavigation.setCellFactory(new Callback<TreeView<VDirectory>, TreeCell<VDirectory>>() {
+            @Override
+            public TreeCell<VDirectory> call(TreeView<VDirectory> directoryTreeView) {
+                TreeCell<VDirectory> treeCell = new TreeCell<VDirectory>() {
+                    protected void updateItem(VDirectory item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (!empty && item != null) {
+                            try {
+                                setText(item.getName());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            setGraphic(getTreeItem().getGraphic());
+                        }else{
+                            setText(null);
+                            setGraphic(null);
+                        }
+                    }
+                };
+
+                treeCell.setOnDragOver(new EventHandler<DragEvent>() {
+                    @Override
+                    public void handle(DragEvent event) {
+                        Dragboard db = event.getDragboard();
+
+                        if (db.hasFiles()) {
+                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                        } else {
+                            event.consume();
+                        }
+                    }
+                });
+
+                treeCell.setOnDragDropped(new EventHandler<DragEvent>() {
+
+                    @Override
+                    public void handle(DragEvent event) {
+                        Dragboard db = event.getDragboard();
+
+                        boolean success = false;
+
+                        if (db.hasFiles()) {
+                            success = true;
+
+                            selectedDirectory = treeCell.getItem();
+
+                            try {
+                                new Task<Void>() {
+                                    @Override
+                                    protected Void call() throws Exception {
+                                        if(inAppDragOperation){
+                                            //dirty, should be removed with Copy Command
+                                            if(event.getTransferMode() == TransferMode.COPY){
+                                                fileOp = FileOperation.COPY;
+                                            }else{
+                                                fileOp = FileOperation.MOVE;
+                                            }
+
+                                            pasteSelectedFiles();
+                                        }else{
+                                            importFiles(db.getFiles());
+                                        }
+
+                                        updateUI();
+
+                                        return null;
+                                    }
+                                }.call();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        event.setDropCompleted(success);
+                        event.consume();
+                    }
+                });
+
+                return treeCell;
+            }
+        });
+
 
         treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
             @Override
