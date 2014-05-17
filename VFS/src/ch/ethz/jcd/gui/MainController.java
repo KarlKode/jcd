@@ -38,10 +38,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
@@ -140,6 +137,10 @@ public class MainController {
     private final List<VObject> selectedFiles = new ArrayList<VObject>();
 
     private FileOperation fileOp;
+
+    private Stage progressDialogStage;
+
+    private ProgressDialogController progressDialogController;
 
     public MainController() {
 
@@ -271,6 +272,11 @@ public class MainController {
     @FXML
     void onActionButtonFind(ActionEvent event) {
        openFindDialog();
+    }
+
+    @FXML
+    void onActionButtonRename(ActionEvent event) {
+        renameSelectedFile();
     }
 
 
@@ -428,10 +434,10 @@ public class MainController {
                 protected Void call() throws IOException, ExportException {
                     final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
 
-                    for(VObject d : items){
-                        if(d instanceof VFile){
+                    for(VObject d : items) {
+                        if (d instanceof VFile) {
                             File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
-                            vdisk.exportToHost((VFile)d, f);
+                            vdisk.exportToHost((VFile) d, f);
                         }
                     }
 
@@ -498,11 +504,20 @@ public class MainController {
 
 
     private void updateUI() throws IOException {
-        ignoreSelectionChanged = true;
-        refreshTreeView();
-        ignoreSelectionChanged = false;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                ignoreSelectionChanged = true;
+                try {
+                    refreshTreeView();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ignoreSelectionChanged = false;
 
-        selectVDirectory(selectedDirectory);
+                selectVDirectory(selectedDirectory);
+            }
+        });
     }
 
 
@@ -599,16 +614,16 @@ public class MainController {
             success = true;
 
             try {
-                new Task<Void>(){
+                new Task<Void>() {
+
                     @Override
-                    protected Void call() throws IOException {
+                    protected Void call() throws Exception {
                         importFiles(db.getFiles());
                         return null;
                     }
                 }.call();
-            } catch (IOException e) {
-                throw new ImportException(e);
-
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -723,6 +738,23 @@ public class MainController {
         });
 
         this.menuItemPaste.setDisable(true);
+
+        try{
+            progressDialogStage = new Stage();
+
+            FXMLLoader loader = new FXMLLoader();
+            Parent root = (Parent)loader.load(ProgressDialogController.class.getResource("ProgressDialog.fxml").openStream());
+            loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+            progressDialogController = loader.getController();
+
+            progressDialogStage.setTitle("In Progress .. ");
+            progressDialogStage.initModality(Modality.APPLICATION_MODAL);
+            progressDialogStage.initStyle(StageStyle.UNDECORATED);
+            progressDialogStage.setScene(new Scene(root));
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 
     private void renameSelectedFile() {
@@ -730,7 +762,13 @@ public class MainController {
             showMessageDialog("Information", "Too many files selected", "Please select only one file!");
             return;
         }else{
-            showInputDialog("Rename File... ", "New Filename: ", "new filename", (filename) -> {
+            String objectname = "file";
+
+            if(listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory){
+                objectname = "directory";
+            }
+
+            showInputDialog("Rename " + objectname +  "... ", "New " + objectname +  "name: ", "new " + objectname +  "name", (filename) -> {
                 vdisk.rename(listViewFiles.getSelectionModel().getSelectedItem(), filename);
 
                 try {

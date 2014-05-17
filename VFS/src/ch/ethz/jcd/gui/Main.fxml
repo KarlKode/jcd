@@ -22,11 +22,11 @@
         <MenuItem fx:id="menuItemDelete" mnemonicParsing="true" onAction="#onActionMenuItemDelete" text="_Delete" />
           <MenuItem fx:id="menuItemFind" mnemonicParsing="true" onAction="#onActionMenuItemFind" text="_Find" />
           <SeparatorMenuItem mnemonicParsing="false" />
-          <MenuItem fx:id="menuItemRename" mnemonicParsing="false" text="Rename" onAction="#onActionMenuItemRename"/>
-          <MenuItem fx:id="menuItemMove" mnemonicParsing="false" text="Move" onAction="#onActionMenuItemMove"/>
+          <MenuItem fx:id="menuItemRename" mnemonicParsing="false" onAction="#onActionMenuItemRename" text="Rename" />
+          <MenuItem fx:id="menuItemMove" mnemonicParsing="false" onAction="#onActionMenuItemMove" text="Move" />
 
-          <MenuItem fx:id="menuItemCopy" mnemonicParsing="false" text="Copy" onAction="#onActionMenuItemCopy" />
-          <MenuItem fx:id="menuItemPaste" mnemonicParsing="false" text="Paste" onAction="#onActionMenuItemPaste"/>
+          <MenuItem fx:id="menuItemCopy" mnemonicParsing="false" onAction="#onActionMenuItemCopy" text="Copy" />
+          <MenuItem fx:id="menuItemPaste" mnemonicParsing="false" onAction="#onActionMenuItemPaste" text="Paste" />
 
       </items>
     </Menu>
@@ -74,6 +74,14 @@
 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
 <image>
 <Image url="@/icons/newdir.png" />
+</image>
+</ImageView>
+</graphic>
+</Button><Button fx:id="buttonRename" focusTraversable="false" mnemonicParsing="false" onAction="#onActionButtonRename">
+<graphic>
+<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+<image>
+<Image url="@/icons/rename.png" />
 </image>
 </ImageView>
 </graphic>

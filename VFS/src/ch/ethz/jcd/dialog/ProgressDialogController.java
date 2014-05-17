@@ -49,4 +49,8 @@ public class ProgressDialogController implements Observer{
     public void update(Observable o, Object arg) {
 
     }
+
+    public void setStatus(double status) {
+        this.progressBarStatus.setProgress(status);
+    }
 }
