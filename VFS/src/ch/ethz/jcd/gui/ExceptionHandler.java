@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.dialog.Dialogs;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
  * Created by leo on 10.05.14.
  */
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
+
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         String title = "Error!";
@@ -56,6 +58,17 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             message = e.toString();
         }
 
+
+        //if we are allowed to use 3rd party dialogs
+        Dialogs.create()
+                .owner(new Stage())
+                .title("Exception dialog")
+                .masthead("An exception occured ..")
+                .message(e.getMessage())
+                .showException(e);
+
+        //otherwise we have to use the own created Dialogs
+        /*
         try{
             Stage dialogStage = new Stage();
 
@@ -71,7 +84,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
             dialogStage.showAndWait();
         }catch(IOException ex){
             ex.printStackTrace();
-        }
+        }*/
     }
 
     public static Throwable shortThrowable(Throwable ex) {

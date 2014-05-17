@@ -42,6 +42,8 @@ import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
+import javax.swing.tree.TreeNode;
+
 
 public class MainController {
     private Executor exec;
@@ -507,15 +509,15 @@ public class MainController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                ignoreSelectionChanged = true;
-                try {
-                    refreshTreeView();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ignoreSelectionChanged = false;
+            ignoreSelectionChanged = true;
+            try {
+                refreshTreeView();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ignoreSelectionChanged = false;
 
-                selectVDirectory(selectedDirectory);
+            selectVDirectory(selectedDirectory);
             }
         });
     }
@@ -544,27 +546,36 @@ public class MainController {
 
     @FXML
     void onDragDetectedListViewFiles(MouseEvent event) {
-        ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
-        Map<DataFormat, Object> files = new HashMap<>();
-        List<File> aa = new ArrayList<File>();
+        ObservableList<VObject> selectedVFiles = listViewFiles.getSelectionModel().getSelectedItems();
+        Map<DataFormat, Object> dragDropMap = new HashMap<>();
+        List<File> tmpFilesForExport = new ArrayList<File>();
 
-        for(VObject d : items){
-            if(d instanceof VFile){
-                File f = null;
+        for(VObject vobject : selectedVFiles){
+            if(vobject instanceof VFile){
+                File tempFile = null;
                 try {
-                    f = new File(System.getProperty("java.io.tmpdir") + "/" + d.getName());
+                    tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + vobject.getName());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                vdisk.exportToHost((VFile)d, f);
-                aa.add(f);
+                vdisk.exportToHost((VFile)vobject, tempFile);
+                tmpFilesForExport.add(tempFile);
             }
         }
 
-        files.put(DataFormat.FILES, aa);
+        dragDropMap.put(DataFormat.FILES, tmpFilesForExport);
+        //dragDropMap.put(new DataFormat("VFILES"), selectedVFiles);
 
-        Dragboard d = listViewFiles.startDragAndDrop(TransferMode.MOVE);
-        d.setContent(files);
+        TransferMode mode;
+
+        if(Keys.isCtrlPressed()){
+            mode = TransferMode.COPY;
+        }else{
+            mode = TransferMode.MOVE;
+        }
+
+        Dragboard dragboard = listViewFiles.startDragAndDrop(mode);
+        dragboard.setContent(dragDropMap);
     }
 
     @FXML
@@ -579,29 +590,24 @@ public class MainController {
             items.add(new Pair<File, VDirectory>(file, selectedDirectory));
         }
 
-        //TODO: maybe better if we update the List/TreeView on the fly, and not after the complete operation is finished
         while(!items.isEmpty()){
             Pair<File, VDirectory> tmpItem = items.pop();
             File tmpFile = tmpItem.getKey();
             VDirectory tmpVDir = tmpItem.getValue();
+            TreeItem<VDirectory> treeVDir = getTreeItem(tmpVDir);
 
             if(tmpFile.isDirectory()){
                 VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
+                treeVDir.getChildren().add(new TreeItem<VDirectory>(newVDir));
 
                 for(File file : tmpFile.listFiles()){
                     items.add(new Pair<File, VDirectory>(file, newVDir));
                 }
             }else{
                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-
-                //show progress
-//                if(tmpVDir.equals(selectedDirectory)){
-//                    refreshListView(selectedDirectory);
-//                }
+                listViewFiles.getItems().add(file);
             }
         }
-
-        updateUI();
     }
 
     @FXML
@@ -615,7 +621,6 @@ public class MainController {
 
             try {
                 new Task<Void>() {
-
                     @Override
                     protected Void call() throws Exception {
                         importFiles(db.getFiles());
@@ -631,17 +636,16 @@ public class MainController {
         event.consume();
     }
 
-    private void selectVDirectory(VDirectory selected){
+    private TreeItem<VDirectory> getTreeItem(VDirectory vdir) {
         Stack<VDirectory> path = new Stack<VDirectory>();
-        VDirectory tmp = selected;
+        VDirectory tmp = vdir;
+        TreeItem<VDirectory> dir = treeViewNavigation.getRoot();
 
         path.add(tmp);
         while(tmp.getParent() != null){
             path.add(tmp.getParent());
             tmp = tmp.getParent();
         }
-
-        TreeItem<VDirectory> dir = treeViewNavigation.getRoot();
 
         while(!path.isEmpty()){
             VDirectory t = path.pop();
@@ -654,7 +658,12 @@ public class MainController {
             }
         }
 
-        treeViewNavigation.getSelectionModel().select(dir);
+        return dir;
+    }
+
+
+    private void selectVDirectory(VDirectory selected){
+        treeViewNavigation.getSelectionModel().select(getTreeItem(selected));
     }
 
 
