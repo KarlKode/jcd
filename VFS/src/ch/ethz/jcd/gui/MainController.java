@@ -700,7 +700,9 @@ public class MainController
             } else
             {
                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-                listViewFiles.getItems().add(file);
+                if(tmpVDir.equals(selectedDirectory)){
+                    listViewFiles.getItems().add(file);
+                }
             }
         }
     }
