@@ -1,6 +1,7 @@
 package ch.ethz.jcd.gui;
 
 import ch.ethz.jcd.dialog.*;
+import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.command.ExportException;
 import ch.ethz.jcd.main.exceptions.command.ImportException;
 import ch.ethz.jcd.main.exceptions.command.MkDirException;
@@ -9,7 +10,6 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.main.utils.VStats;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -289,11 +289,9 @@ public class MainController
         showInputDialog("New Directory ... ", "Directory name:", "Directory name", dirname -> {
             this.vdisk.mkdir(selectedDirectory, dirname);
 
-            try
-            {
+            try {
                 updateUI();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -370,7 +368,7 @@ public class MainController
 
             if (controller.getResult() == DialogResult.OK)
             {
-                VDisk.format(controller.getVDiskFile(), controller.getSize(), false);
+                VDisk.format(controller.getVDiskFile(), controller.getSize(), false, false);
                 vdisk = new VDisk(controller.getVDiskFile());
 
                 refreshTreeView();
@@ -574,17 +572,13 @@ public class MainController
 
     private void updateUI() throws IOException
     {
-        Platform.runLater(new Runnable()
-        {
+        Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 ignoreSelectionChanged = true;
-                try
-                {
+                try {
                     refreshTreeView();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ignoreSelectionChanged = false;
@@ -674,8 +668,7 @@ public class MainController
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
-    private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException
-    {
+    private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException, DiskFullException {
         Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
 
         for (File file : files)
@@ -724,8 +717,7 @@ public class MainController
             new Task<Void>()
             {
                 @Override
-                protected Void call()
-                {
+                protected Void call() throws DiskFullException {
                     try{
                         if (inAppDragOperation)
                         {

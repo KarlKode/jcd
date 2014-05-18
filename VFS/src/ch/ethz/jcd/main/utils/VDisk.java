@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.utils;
 
+import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.FormatExcepion;
 import ch.ethz.jcd.main.exceptions.NoSuchFileOrDirectoryException;
 import ch.ethz.jcd.main.exceptions.command.*;
@@ -16,14 +17,16 @@ import java.util.regex.Pattern;
 /**
  * Public high level interface that hides the implementation details of all operations on a virtual disk.
  */
-public class VDisk
-{
+public class VDisk {
     public static final String PATH_SEPARATOR = "/";
 
     private final File diskFile;
     private final VUtil vUtil;
     private VCompressor compressor;
     private boolean compressed;
+    private boolean encrypted;
+    private VCrypter crypter;
+    private String key;
 
     /**
      * Open an existing VDisk file that contains a valid VFS
@@ -31,12 +34,13 @@ public class VDisk
      * @param diskFile path to the VDisk file
      */
     public VDisk(File diskFile)
-            throws FileNotFoundException
-    {
+            throws FileNotFoundException {
         this.diskFile = diskFile;
         vUtil = new VUtil(diskFile);
         compressed = vUtil.isCompressed();
         compressor = new VCompressor();
+        encrypted = vUtil.isEncrypted();
+        crypter = new VCrypter();
     }
 
     /**
@@ -47,14 +51,17 @@ public class VDisk
      *                 of blockSize and have space for at least 16 blocks
      *                 (size >= blockSize * 16)
      */
-    public static void format(File diskFile, long size, boolean compressed)
-    {
-        int state = compressed ? 1 : 0;
-        try
-        {
-            VUtil.format(diskFile, size, state);
-        } catch (Exception e)
-        {
+    public static void format(File diskFile, long size, boolean compressed, boolean encrypted) {
+        int flags = 0;
+        if (compressed) {
+            flags |= VUtil.FLAG_COMPRESSED;
+        }
+        if (encrypted) {
+            flags |= VUtil.FLAG_ENCRYPTED;
+        }
+        try {
+            VUtil.format(diskFile, size, flags);
+        } catch (Exception e) {
             throw new FormatExcepion(e);
         }
 
@@ -63,10 +70,8 @@ public class VDisk
     /**
      * This method deletes the virtual file system.
      */
-    public void dispose()
-    {
-        if (!diskFile.delete())
-        {
+    public void dispose() {
+        if (!diskFile.delete()) {
             //TODO do sth
         }
     }
@@ -78,18 +83,14 @@ public class VDisk
      * @return list of the content as a HashMap using the object's name as key
      */
     public HashMap<String, VObject> list(VDirectory destination)
-            throws ListException
-    {
+            throws ListException {
         HashMap<String, VObject> list = new HashMap<>();
 
-        try
-        {
-            for (VObject object : destination.getEntries())
-            {
+        try {
+            for (VObject object : destination.getEntries()) {
                 list.put(object.getName(), object);
             }
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ListException(e);
         }
 
@@ -104,16 +105,13 @@ public class VDisk
      * @return the created directory
      */
     public VDirectory mkdir(VDirectory destination, String name)
-            throws MkDirException
-    {// directory is created unlinked and then is named and linked
-        try
-        {
+            throws MkDirException {// directory is created unlinked and then is named and linked
+        try {
             VDirectory directory = new VDirectory(vUtil.allocateDirectoryBlock(), destination);
             directory.setName(name);
             directory.move(destination);
             return directory;
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new MkDirException(ex);
         }
     }
@@ -126,17 +124,14 @@ public class VDisk
      * @return the created file
      */
     public VFile touch(VDirectory destination, String name)
-            throws TouchException
-    {
-        try
-        {
+            throws TouchException {
+        try {
             // file is created unlinked and then is named and linked
             VFile file = new VFile(vUtil.allocateFileBlock(), destination);
             file.setName(name);
             file.move(destination);
             return file;
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new TouchException(ex);
         }
     }
@@ -149,13 +144,10 @@ public class VDisk
      * @param name   to set
      */
     public void rename(VObject object, String name)
-            throws RenameException
-    {
-        try
-        {
+            throws RenameException {
+        try {
             object.setName(name);
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new RenameException(ex);
         }
     }
@@ -169,17 +161,13 @@ public class VDisk
      * @param name        to set
      */
     public void move(VObject object, VDirectory destination, String name)
-            throws MoveException
-    {
-        try
-        {
+            throws MoveException {
+        try {
             object.move(destination);
-            if (name != null)
-            {
+            if (name != null) {
                 this.rename(object, name);
             }
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new MoveException(ex);
         }
     }
@@ -193,18 +181,14 @@ public class VDisk
      * @param name        of copied VObject
      */
     public <T extends VObject> T copy(T object, VDirectory destination, String name)
-            throws CopyException
-    {
-        try
-        {
-            if (name == null)
-            {
+            throws CopyException {
+        try {
+            if (name == null) {
                 name = object.getName();
             }
             T copy = (T) object.copy(vUtil, destination, name);
             return copy;
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             //TODO free block if sth got wrong
             throw new CopyException(ex);
         }
@@ -247,11 +231,9 @@ public class VDisk
             VFile file = this.touch(destination, source.getName());
             FileInputStream stream = new FileInputStream(source);
             VFileInputStream vfile = file.inputStream(vUtil, compressed);
-            long remaining = stream.available();
+            long remaining;
 
-            while (0 < (remaining = stream.available()))
-            {
-            while (0 < remaining) {
+            while (0 < (remaining = stream.available())) {
                 int len = remaining < VUtil.BLOCK_SIZE ? (int) remaining : VUtil.BLOCK_SIZE;
                 byte[] bytes = new byte[len];
                 remaining -= stream.read(bytes);
@@ -354,13 +336,10 @@ public class VDisk
      * @return HashMap filled with all search results
      */
     public HashMap<VObject, String> find(Pattern regex, VDirectory folder, boolean recursive)
-            throws FindException
-    {
-        try
-        {
+            throws FindException {
+        try {
             return folder.find(regex, recursive);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new FindException(e);
         }
     }
