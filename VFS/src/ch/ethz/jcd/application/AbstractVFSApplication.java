@@ -4,8 +4,6 @@ import ch.ethz.jcd.application.commands.AbstractVFSCommand;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
 
-import java.util.HashMap;
-import java.util.Observer;
 import java.util.Queue;
 
 public interface AbstractVFSApplication

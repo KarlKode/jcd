@@ -157,6 +157,20 @@ public class VFile extends VObject<FileBlock>
     }
 
     /**
+     * This method instantiate an iterator to buffered read this file.
+     *
+     * @return the iterator
+     */
+    public VFileOutputStream iterator(boolean compressed)
+    {
+        if (compressed)
+        {
+            return new CompressedVFileOutputStream(this);
+        }
+        return new VFileOutputStream(this);
+    }
+
+    /**
      * The VFileOutputStream is used to buffered write into a file stored in
      * the virtual file system. Useful when doing imports to avoid loading big
      * files completely into memory.
@@ -210,7 +224,6 @@ public class VFile extends VObject<FileBlock>
             }
         }
     }
-
 
     /**
      * The VFileOutputStream is used to buffered write into a file stored in
@@ -274,21 +287,6 @@ public class VFile extends VObject<FileBlock>
                 index += len;
             }
         }
-    }
-
-
-    /**
-     * This method instantiate an iterator to buffered read this file.
-     *
-     * @return the iterator
-     */
-    public VFileOutputStream iterator(boolean compressed)
-    {
-        if (compressed)
-        {
-            return new CompressedVFileOutputStream(this);
-        }
-        return new VFileOutputStream(this);
     }
 
     /**

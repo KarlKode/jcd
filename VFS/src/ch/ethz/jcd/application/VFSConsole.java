@@ -1,39 +1,40 @@
 package ch.ethz.jcd.application;
 
+import ch.ethz.jcd.application.commands.AbstractVFSCommand;
+import ch.ethz.jcd.application.commands.CommandFactory;
+import ch.ethz.jcd.application.commands.VFShelp;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.application.commands.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Queue;
 
 /**
  * Console application to operate on the VFS.
- *
+ * <p>
  * To easily see the VFS in action, it comes with a simple console application.
  * The usage of this command line tool is simple:
- *
- *      1) open a terminal
- *      2) navigate to the VFS root directory
- *      3) launch the console by typing the following command into your prompt
- *
- *          > java -jar VFS.jar data/console.vdisk
- *
+ * <p>
+ * 1) open a terminal
+ * 2) navigate to the VFS root directory
+ * 3) launch the console by typing the following command into your prompt
+ * <p>
+ * > java -jar VFS.jar data/console.vdisk
+ * <p>
  * The command above make the console loading an existing VDisk. If you want to
  * create a new one, you have to pass the number of blocks to trigger the
  * console to create a new VDisk. The command therefore is
- *
- *          > java -jar VFS.jar data/console.vdisk <number of block to allocate>
- *
+ * <p>
+ * > java -jar VFS.jar data/console.vdisk <number of block to allocate>
  */
 public class VFSConsole extends Observable implements AbstractVFSApplication, Runnable
 {
-    private boolean quit = false;
-
     /**
      * The VDisk is the receiver in the command pattern, while the VFSConsole
      * is the invoker that holds the command history
@@ -41,22 +42,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
     private final VDisk vDisk;
     private final Queue<AbstractVFSCommand> history = new LinkedList<>();
     protected VDirectory current;
-
-    /**
-     * Start the console and open an existing VDisk
-     *
-     *  > java -jar VFS.jar data/console.vdisk
-     *
-     *  Start the console and create a new VDisk
-     *
-     *  > java -jar VFS.jar data/console.vdisk <number of block to allocate>
-     *
-     * @param args passed to the console to behave in different ways
-     */
-    public static void main(String[] args)
-    {
-        new VFSConsole(VFSApplicationPreProcessor.prepareDisk(args));
-    }
+    private boolean quit = false;
 
     /**
      * Instantiate a new console application to operate on the loaded VDisk
@@ -69,8 +55,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
         try
         {
             current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
-        }
-        catch (ResolveException e)
+        } catch (ResolveException e)
         {
             e.printStackTrace();
         }
@@ -78,10 +63,26 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
         new Thread(this).start();
     }
 
+    /**
+     * Start the console and open an existing VDisk
+     * <p>
+     * > java -jar VFS.jar data/console.vdisk
+     * <p>
+     * Start the console and create a new VDisk
+     * <p>
+     * > java -jar VFS.jar data/console.vdisk <number of block to allocate>
+     *
+     * @param args passed to the console to behave in different ways
+     */
+    public static void main(String[] args)
+    {
+        new VFSConsole(VFSApplicationPreProcessor.prepareDisk(args));
+    }
+
     @Override
     public void run()
     {
-        while(!quit)
+        while (!quit)
         {
             String[] args = prompt("> ");
             AbstractVFSCommand cmd = CommandFactory.create(args);
@@ -97,21 +98,19 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
     }
 
     /**
-     *
      * @return the vDisk
      */
     @Override
-    public VDisk getVDisk( )
+    public VDisk getVDisk()
     {
         return vDisk;
     }
 
     /**
-     *
      * @return the current/working directory
      */
     @Override
-    public VDirectory getCurrent( )
+    public VDirectory getCurrent()
     {
         return current;
     }
@@ -128,7 +127,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
     }
 
     @Override
-    public void quit( )
+    public void quit()
     {
         this.quit = true;
     }
@@ -136,7 +135,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
     /**
      * Prints the prompt of the console application and reads the command
      * entered by the user.
-     *
+     * <p>
      * TODO make fancy
      *
      * @param prompt to output
@@ -149,8 +148,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
             System.out.print(prompt);
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
             return bufferRead.readLine().split("\\s+");
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             return null;
         }
@@ -167,18 +165,16 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
         this.notifyObservers(cmd);
         history.add(cmd);
 
-        if(cmd != null)
+        if (cmd != null)
         {
             try
             {
                 cmd.execute(this);
-            }
-            catch (CommandException e)
+            } catch (CommandException e)
             {
                 cmd.error(e.getCause().getMessage());
             }
-        }
-        else
+        } else
         {
             usage();
         }
@@ -193,8 +189,7 @@ public class VFSConsole extends Observable implements AbstractVFSApplication, Ru
         try
         {
             cmd.execute(this);
-        }
-        catch (CommandException e)
+        } catch (CommandException e)
         {
             cmd.error(e.getCause().getMessage());
         }

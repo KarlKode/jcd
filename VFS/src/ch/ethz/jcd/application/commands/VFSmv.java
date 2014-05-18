@@ -29,6 +29,7 @@ public class VFSmv extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -50,8 +51,7 @@ public class VFSmv extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         src = Math.min(i, src);
                         dest = Math.max(i, dest);
@@ -82,8 +82,7 @@ public class VFSmv extends AbstractVFSCommand
                                 name = args[src].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
                             }
                         }
-                    }
-                    catch (ResolveException ignored)
+                    } catch (ResolveException ignored)
                     {
                         /**
                          * moving into directory doing the renaming of the object

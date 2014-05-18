@@ -35,7 +35,6 @@ public abstract class VObject<T extends ObjectBlock>
      * the given directory. Short this object is moved to another location.
      *
      * @param parent VDirectory to set
-     *
      * @throws BlockFullException
      */
     public void move(VDirectory parent)
@@ -54,9 +53,7 @@ public abstract class VObject<T extends ObjectBlock>
      *
      * @param vUtil       used to allocate Blocks
      * @param destination where to put the copied VObject
-     *
      * @return the root object of the copied structure
-     *
      * @throws BlockFullException
      * @throws IOException
      * @throws InvalidBlockAddressException
@@ -70,9 +67,7 @@ public abstract class VObject<T extends ObjectBlock>
      * This method recursively resolves the given path.
      *
      * @param path to resolveDirectory
-     *
      * @return the resolved object, null if no object found
-     *
      * @throws IOException
      */
     public abstract VObject resolve(String path)
@@ -82,7 +77,6 @@ public abstract class VObject<T extends ObjectBlock>
      * This Method recursively deletes the VObject
      *
      * @param vUtil used to free the corresponding Blocks
-     *
      * @throws IOException
      */
     public abstract void delete(VUtil vUtil)
@@ -113,7 +107,6 @@ public abstract class VObject<T extends ObjectBlock>
 
     /**
      * @return block name of the VObject
-     *
      * @throws IOException
      */
     public String getName()
@@ -147,8 +140,7 @@ public abstract class VObject<T extends ObjectBlock>
             {
                 path += VDisk.PATH_SEPARATOR;
             }
-        }
-        else
+        } else
         {
             path = getName();
         }
@@ -175,8 +167,7 @@ public abstract class VObject<T extends ObjectBlock>
         try
         {
             return this.getName();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
             return null;

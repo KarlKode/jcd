@@ -32,6 +32,7 @@ public class VFSimport extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -64,8 +65,7 @@ public class VFSimport extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         src = Math.min(i, src);
                         dest = Math.max(i, dest);

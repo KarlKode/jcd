@@ -32,7 +32,6 @@ public class SuperBlock extends Block
      * the virtual file system.
      *
      * @return block count
-     *
      * @throws IOException
      */
     public int getBlockCount()
@@ -43,7 +42,6 @@ public class SuperBlock extends Block
 
     /**
      * @param blockCount new block count
-     *
      * @throws IOException
      * @throws IllegalArgumentException if new block count is invalid
      */
@@ -65,7 +63,6 @@ public class SuperBlock extends Block
      * the virtual file system.
      *
      * @return block count
-     *
      * @throws IOException
      */
     public int getVDiskState()
@@ -76,16 +73,16 @@ public class SuperBlock extends Block
 
     /**
      * Sets the properties of the loaded VDisk computed by interpreting the given state as follows
-     *
-     *  States
-     *  ------
-     *
-     *  0       file system does not have any properties
-     *  1       file system is compressed
-     *  2       file system is encrypted
-     *  4       file system is indexed
-     *
-     *  eg. given state = 5  =>  5 = 2^2 + 2^1 means that the file system is compressed and indexed
+     * <p>
+     * States
+     * ------
+     * <p>
+     * 0       file system does not have any properties
+     * 1       file system is compressed
+     * 2       file system is encrypted
+     * 4       file system is indexed
+     * <p>
+     * eg. given state = 5  =>  5 = 2^2 + 2^1 means that the file system is compressed and indexed
      *
      * @param state to set
      * @throws IOException
@@ -104,7 +101,6 @@ public class SuperBlock extends Block
 
     /**
      * @return block address of root directory block
-     *
      * @throws IOException
      */
     public int getRootDirectoryBlock()
@@ -116,7 +112,6 @@ public class SuperBlock extends Block
 
     /**
      * @param rootDirectoryBlockAddress new root directory block
-     *
      * @throws IOException
      */
     public void setRootDirectoryBlock(int rootDirectoryBlockAddress)

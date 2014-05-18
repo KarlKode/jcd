@@ -34,6 +34,7 @@ public abstract class AbstractVFSCommand implements Serializable
 
     /**
      * Executes the concrete command according to the passed arguments.
+     *
      * @param application to execute on
      */
     public abstract void execute(AbstractVFSApplication application)
@@ -56,8 +57,7 @@ public abstract class AbstractVFSCommand implements Serializable
     /**
      * Resolves the given path of a object.
      *
-     * @param path    to resolve
-     *
+     * @param path        to resolve
      * @param application to execute on
      * @return the object if found, otherwise null
      */
@@ -71,8 +71,7 @@ public abstract class AbstractVFSCommand implements Serializable
                 String pwd = application.getCurrent().getPath();
                 path = pwd.endsWith(VDisk.PATH_SEPARATOR) ? pwd + path : pwd + VDisk.PATH_SEPARATOR + path;
             }
-        }
-        catch (IOException ignored)
+        } catch (IOException ignored)
         {
 
         }
@@ -98,10 +97,10 @@ public abstract class AbstractVFSCommand implements Serializable
     public String toString()
     {
         String s = command();
-        for(int i = 1; i < args.length; i++)
+        for (int i = 1; i < args.length; i++)
         {
             s += " " + args[i];
         }
-        return  s;
+        return s;
     }
 }

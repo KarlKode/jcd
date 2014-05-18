@@ -4,7 +4,9 @@ import ch.ethz.jcd.application.commands.VFSquit;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.utils.VDisk;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
@@ -15,11 +17,6 @@ public class VFSClient implements Observer
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-
-    public static void main(String args[]) throws Exception
-    {
-        new VFSClient(VFSApplicationPreProcessor.prepareDisk(args), args);
-    }
 
     public VFSClient(VDisk vDisk, String args[])
     {
@@ -41,14 +38,18 @@ public class VFSClient implements Observer
             {
                 System.exit(1);
             }
-        }
-        catch (IOException | ClassNotFoundException e)
+        } catch (IOException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }
 
         console = new VFSConsole(vDisk);
         console.addObserver(this);
+    }
+
+    public static void main(String args[]) throws Exception
+    {
+        new VFSClient(VFSApplicationPreProcessor.prepareDisk(args), args);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class VFSClient implements Observer
             // receive
             System.out.println("waiting for acknowledge");
             Object ack = in.readObject();
-            if(ack instanceof CommandException)
+            if (ack instanceof CommandException)
             {
                 System.out.print("NAK received > ");
                 System.out.println(((CommandException) ack).getCause());
@@ -71,14 +72,13 @@ public class VFSClient implements Observer
             }
             System.out.println("acknowledge received");
 
-            if(arg instanceof VFSquit)
+            if (arg instanceof VFSquit)
             {
                 System.out.println("Closing connection");
                 socket.close();
                 System.out.println("Quitting the application");
             }
-        }
-        catch (IOException | ClassNotFoundException e)
+        } catch (IOException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }

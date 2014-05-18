@@ -29,6 +29,7 @@ public class VFScp extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -51,8 +52,7 @@ public class VFScp extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         src = Math.min(i, src);
                         dest = Math.max(i, dest);
@@ -83,8 +83,7 @@ public class VFScp extends AbstractVFSCommand
                                 name = args[src].substring(args[dest].lastIndexOf(VDisk.PATH_SEPARATOR) + 1);
                             }
                         }
-                    }
-                    catch (ResolveException ignored)
+                    } catch (ResolveException ignored)
                     {
                         /**
                          * copying into directory doing the renaming of the object

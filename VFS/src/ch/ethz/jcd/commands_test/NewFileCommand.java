@@ -10,13 +10,15 @@ import java.util.Observer;
 /**
  * Created by leo on 10.05.14.
  */
-public class NewFileCommand extends AbstractObservableCommand implements Serializable{
+public class NewFileCommand extends AbstractObservableCommand implements Serializable
+{
     private final VDisk vdisk;
     private final String workingDir;
     private final String newFileName;
     private final File file;
 
-    public NewFileCommand(Observer observer, VDisk vdisk, String workingDir, String newFileName, File file){
+    public NewFileCommand(Observer observer, VDisk vdisk, String workingDir, String newFileName, File file)
+    {
         super(observer);
 
         this.vdisk = vdisk;
@@ -25,15 +27,17 @@ public class NewFileCommand extends AbstractObservableCommand implements Seriali
         this.file = file;
     }
 
-    public void execute(){
+    public void execute()
+    {
         super.preExecution();
 
-        vdisk.importFromHost(file, (VDirectory)vdisk.resolve(workingDir));
+        vdisk.importFromHost(file, (VDirectory) vdisk.resolve(workingDir));
 
         super.postExecution();
     }
 
-    private void writeObject(ObjectOutputStream os) throws IOException {
+    private void writeObject(ObjectOutputStream os) throws IOException
+    {
         os.writeChars(workingDir);
         os.writeChars(newFileName);
 

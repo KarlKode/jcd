@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2014.4.6)  7 APR 2014 18:08
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2014.4.6)  29 APR 2014 23:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -213,38 +213,46 @@ e pdfs with page group included in a single page
 pdfTeX warning: pdflatex (file ./images/Blocks.pdf): PDF inclusion: multiple pd
 fs with page group included in a single page
 >]
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 250.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 250.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 250.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 180.
 
-Overfull \hbox (29.9002pt too wide) detected at line 255
+ (/usr/share/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 180.
+ [7]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 256.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 256.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 256.
+
+Overfull \hbox (29.9002pt too wide) detected at line 261
 []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 260--261
+Underfull \hbox (badness 10000) in paragraph at lines 266--267
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 260--261
+Underfull \hbox (badness 10000) in paragraph at lines 266--267
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 260--261
+Underfull \hbox (badness 10000) in paragraph at lines 266--267
 
  []
 
-[7] (./report.aux) ) 
+[8] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 1557 strings out of 493308
- 22111 string characters out of 6143617
+ 1574 strings out of 493308
+ 22387 string characters out of 6143617
  81989 words of memory out of 5000000
- 5015 multiletter control sequences out of 15000+600000
+ 5029 multiletter control sequences out of 15000+600000
  9683 words of font info for 34 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  37i,7n,23p,531b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -252,12 +260,13 @@ Here is how much of TeX's memory you used:
 2.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/
 share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmtt12.pfb>
-Output written on report.pdf (7 pages, 233042 bytes).
+ublic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb
+>
+Output written on report.pdf (8 pages, 244868 bytes).
 PDF statistics:
- 127 PDF objects out of 1000 (max. 8388607)
- 90 compressed objects within 1 object stream
+ 134 PDF objects out of 1000 (max. 8388607)
+ 95 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

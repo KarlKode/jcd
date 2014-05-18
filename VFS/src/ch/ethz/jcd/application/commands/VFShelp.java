@@ -10,7 +10,8 @@ public class VFShelp extends AbstractVFSCommand
 {
     public static final String COMMAND = "help";
 
-    public VFShelp(String[] args) {
+    public VFShelp(String[] args)
+    {
         super(args);
     }
 
@@ -21,6 +22,7 @@ public class VFShelp extends AbstractVFSCommand
      * help
      * DESCRIPTION
      * print how to use VFS and what commands are provided
+     *
      * @param application
      */
     @Override

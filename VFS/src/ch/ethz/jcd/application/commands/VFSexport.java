@@ -32,6 +32,7 @@ public class VFSexport extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -53,8 +54,7 @@ public class VFSexport extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         host = Math.min(i, host);
                         dest = Math.max(i, dest);

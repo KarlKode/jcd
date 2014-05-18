@@ -35,7 +35,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      *
      * @param vUtil       used to allocate Blocks
      * @param destination where to put the copied VDirectory
-     *
      * @throws BlockFullException
      * @throws IOException
      * @throws InvalidBlockAddressException
@@ -63,9 +62,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      * This method recursively resolves the given path.
      *
      * @param path to resolveDirectory
-     *
      * @return the resolved object, null if no object found
-     *
      * @throws IOException
      */
     @Override
@@ -104,9 +101,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      *
      * @param regex     compiled regular expression Pattern
      * @param recursive indicates whether including sub folders or not
-     *
      * @return HashMap filled with all search results
-     *
      * @throws IOException
      */
     public HashMap<VFile, String> find(Pattern regex, boolean recursive)
@@ -119,8 +114,7 @@ public class VDirectory extends VObject<DirectoryBlock>
             if (entry instanceof VDirectory && recursive)
             {
                 map.putAll(((VDirectory) entry).find(regex, recursive));
-            }
-            else if (entry instanceof VFile)
+            } else if (entry instanceof VFile)
             {
                 Matcher matcher = regex.matcher(entry.getName());
                 if (matcher.find())
@@ -137,7 +131,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * This Method recursively deletes the VDirectory
      *
      * @param vUtil used to free the corresponding Blocks
-     *
      * @throws IOException
      */
     @Override
@@ -172,7 +165,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * directory.
      *
      * @param entry to add
-     *
      * @throws BlockFullException
      * @throws IOException
      */
@@ -198,7 +190,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * when using this method.
      *
      * @param entry to remove
-     *
      * @throws IOException
      */
     public void removeEntry(VObject entry)
@@ -211,9 +202,7 @@ public class VDirectory extends VObject<DirectoryBlock>
      * This method searches for an entry by name.
      *
      * @param name of object to return
-     *
      * @return either the object or null if not found
-     *
      * @throws IOException
      */
     public VObject getEntry(String name)
@@ -250,7 +239,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * This method returns all the object which this directory contains
      *
      * @return a list of all objects
-     *
      * @throws IOException
      */
     public List<VObject> getEntries()
@@ -272,7 +260,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * a file named equal the given key.
      *
      * @param key to check for duplicates
-     *
      * @return true if the key is already in use, false otherwise
      */
     public boolean containsKey(String key)
@@ -287,8 +274,7 @@ public class VDirectory extends VObject<DirectoryBlock>
                 }
             }
             return false;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             return false;
         }
@@ -304,7 +290,6 @@ public class VDirectory extends VObject<DirectoryBlock>
      * of its equality is skipped
      *
      * @param obj to compare with
-     *
      * @return true if the given object ist equal to this, false otherwise
      */
     @Override
@@ -319,8 +304,7 @@ public class VDirectory extends VObject<DirectoryBlock>
                 equal = this.getPath().equals(((VDirectory) obj).getPath());
                 equal = equal && this.getEntries().size() == ((VDirectory) obj).getEntries().size();
                 equal = equal && this.getName().equals(((VDirectory) obj).getName());
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 equal = false;
             }

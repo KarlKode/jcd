@@ -30,6 +30,7 @@ public class VFSrm extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -52,12 +53,10 @@ public class VFSrm extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else if (args[i].equals(OPTION_R) || args[i].equals(OPTION_RECURSIVE))
+                    } else if (args[i].equals(OPTION_R) || args[i].equals(OPTION_RECURSIVE))
                     {
                         recursive = true;
-                    }
-                    else
+                    } else
                     {
                         expr = Math.min(i, expr);
                     }

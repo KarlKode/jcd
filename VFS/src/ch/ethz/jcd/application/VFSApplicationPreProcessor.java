@@ -1,9 +1,5 @@
 package ch.ethz.jcd.application;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.utils.VDisk;
 import ch.ethz.jcd.main.utils.VUtil;
 
@@ -34,33 +30,29 @@ public class VFSApplicationPreProcessor
             int size = DEFAULT_SIZE;
             int i = 0;
 
-            while(i < args.length)
+            while (i < args.length)
             {
-                if(args[i].equals(OPTION_H) || args[i].equals(OPTION_HELP))
+                if (args[i].equals(OPTION_H) || args[i].equals(OPTION_HELP))
                 {
                     usage();
                     System.exit(1);
-                }
-                else if(args[i].equals(OPTION_C) || args[i].equals(OPTION_COMPRESSED))
+                } else if (args[i].equals(OPTION_C) || args[i].equals(OPTION_COMPRESSED))
                 {
                     compressed = true;
-                }
-                else if(args[i].equals(OPTION_N) || args[i].equals(OPTION_NEW_DISK))
+                } else if (args[i].equals(OPTION_N) || args[i].equals(OPTION_NEW_DISK))
                 {
                     newDisk = true;
-                }
-                else if(args[i].equals(OPTION_S) || args[i].equals(OPTION_SIZE))
+                } else if (args[i].equals(OPTION_S) || args[i].equals(OPTION_SIZE))
                 {
                     i++;
 
-                    if(i >= args.length)
+                    if (i >= args.length)
                     {
                         usage();
                         System.exit(1);
                     }
                     size = Integer.parseInt(args[i]);
-                }
-                else
+                } else
                 {
                     file = Math.min(i, file);
                 }
@@ -69,14 +61,13 @@ public class VFSApplicationPreProcessor
 
             File vdiskFile = new File(args[file]);
 
-            if(newDisk)
+            if (newDisk)
             {
                 VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed);
             }
 
             return new VDisk(vdiskFile);
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
             System.exit(1);
@@ -87,7 +78,7 @@ public class VFSApplicationPreProcessor
     /**
      * Checks if the minimum required arguments are passed, quit otherwise.
      *
-     * @param arguments to check
+     * @param arguments         to check
      * @param minArgumentLength required
      */
     private static void quitWithUsageIfLessThan(String[] arguments, int minArgumentLength)

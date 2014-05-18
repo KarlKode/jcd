@@ -8,12 +8,14 @@ import java.util.Observer;
 /**
  * Created by leo on 10.05.14.
  */
-public class NewDirectoryCommand extends AbstractObservableCommand {
+public class NewDirectoryCommand extends AbstractObservableCommand
+{
     private final VDisk vdisk;
     private final String workingDir;
     private final String newDirName;
 
-    public NewDirectoryCommand(Observer observer, VDisk vdisk, String workingDir, String newDirName){
+    public NewDirectoryCommand(Observer observer, VDisk vdisk, String workingDir, String newDirName)
+    {
         super(observer);
 
         this.vdisk = vdisk;
@@ -21,7 +23,8 @@ public class NewDirectoryCommand extends AbstractObservableCommand {
         this.newDirName = newDirName;
     }
 
-    public void execute(){
+    public void execute()
+    {
         super.preExecution();
 
         vdisk.mkdir((VDirectory) vdisk.resolve(workingDir), newDirName);

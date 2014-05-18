@@ -28,6 +28,7 @@ public class VFScd extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application to execute on
      */
     @Override
@@ -51,8 +52,7 @@ public class VFScd extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         expr = Math.min(i, expr);
                     }

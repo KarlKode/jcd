@@ -92,6 +92,17 @@ public class VUtil
         vUtil.close();
     }
 
+    public static void copyStream(InputStream input, OutputStream output)
+            throws IOException
+    {
+        byte[] buffer = new byte[1024]; // Adjust if you want
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1)
+        {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+
     public void close()
             throws IOException
     {
@@ -217,17 +228,6 @@ public class VUtil
         } catch (IOException e)
         {
             return false;
-        }
-    }
-
-    public static void copyStream(InputStream input, OutputStream output)
-            throws IOException
-    {
-        byte[] buffer = new byte[1024]; // Adjust if you want
-        int bytesRead;
-        while ((bytesRead = input.read(buffer)) != -1)
-        {
-            output.write(buffer, 0, bytesRead);
         }
     }
 

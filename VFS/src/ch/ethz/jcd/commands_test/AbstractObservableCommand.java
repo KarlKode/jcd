@@ -8,20 +8,24 @@ import java.util.Observer;
 /**
  * Created by leo on 10.05.14.
  */
-public abstract class AbstractObservableCommand<T> extends Observable{
+public abstract class AbstractObservableCommand<T> extends Observable
+{
     private List<Observer> observers = new ArrayList<Observer>();
 
-    public AbstractObservableCommand(Observer observer){
+    public AbstractObservableCommand(Observer observer)
+    {
         addObserver(observer);
     }
 
-    public void preExecution(){
+    public void preExecution()
+    {
         this.notifyObservers();
     }
 
     public abstract void execute();
 
-    public void postExecution(){
+    public void postExecution()
+    {
         this.notifyObservers();
     }
 }

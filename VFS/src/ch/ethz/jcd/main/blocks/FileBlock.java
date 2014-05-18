@@ -95,6 +95,11 @@ public class FileBlock extends ObjectBlock
         return fileManager.readInt(getBlockOffset(), OFFSET_DATA_BLOCK_LIST);
     }
 
+    private void setDataBlockListBlocks(int dataBlockListBlocks) throws IOException
+    {
+        fileManager.writeInt(getBlockOffset(), OFFSET_DATA_BLOCK_LIST, dataBlockListBlocks);
+    }
+
     /**
      * This method removes and unlink the last DataBlock from the FileBlock.
      *
@@ -153,12 +158,12 @@ public class FileBlock extends ObjectBlock
      *
      * @return list of all DataBlocks
      */
-    public List<DataBlock> getDataBlockList( ) throws IOException
+    public List<DataBlock> getDataBlockList() throws IOException
     {
         int dataBlockCount = getUsedDataBlocks(size());
         List<DataBlock> list = new ArrayList<>(dataBlockCount);
 
-        for(int i = 0; i < dataBlockCount; i++)
+        for (int i = 0; i < dataBlockCount; i++)
         {
             list.add(this.getDataBlock(i));
         }
@@ -258,7 +263,6 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
-     *
      * @param dataBlockIndex to check
      * @return true if the given dataBlockIndex is valid
      */
@@ -269,10 +273,9 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
-     *
      * @return whether the file is empty or not
      */
-    public boolean isEmpty( ) throws IOException
+    public boolean isEmpty() throws IOException
     {
         return !(size() > 0);
     }
@@ -290,7 +293,6 @@ public class FileBlock extends ObjectBlock
     }
 
     /**
-     *
      * @return the maximum number of DataBlocks fitting into a FileBlock
      */
     private int getMaxDataBlocks() throws IOException
@@ -324,11 +326,6 @@ public class FileBlock extends ObjectBlock
 
         // Update count of the dataBlockListBlocks
         setDataBlockListBlocks(getDataBlockListBlocks() + 1);
-    }
-
-    private void setDataBlockListBlocks(int dataBlockListBlocks) throws IOException
-    {
-        fileManager.writeInt(getBlockOffset(), OFFSET_DATA_BLOCK_LIST, dataBlockListBlocks);
     }
 
     public boolean equals(Object other)

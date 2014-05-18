@@ -28,6 +28,7 @@ public class VFStouch extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application to execute on
      */
     @Override
@@ -48,8 +49,7 @@ public class VFStouch extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         expr = Math.min(i, expr);
                     }

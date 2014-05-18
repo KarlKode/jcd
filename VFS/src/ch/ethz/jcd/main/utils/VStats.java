@@ -21,47 +21,42 @@ public class VStats
     }
 
     /**
-     *
      * @return the disk size
      * @throws IOException
      */
-    public int diskSize( )
+    public int diskSize()
             throws IOException
     {
         return VUtil.BLOCK_SIZE * superBlock.getBlockCount();
     }
 
     /**
-     *
      * @return the amount of free space available on disk
      */
-    public long freeSpace( )
+    public long freeSpace()
             throws IOException
     {
         return freeBlocks() * VUtil.BLOCK_SIZE;
     }
 
     /**
-     *
      * @return the amount of used space on disk
      */
-    public long usedSpace( )
+    public long usedSpace()
     {
         return usedBlocks() * VUtil.BLOCK_SIZE;
     }
 
     /**
-     *
      * @return the number of free blocks available on disk
      */
-    public int freeBlocks( )
+    public int freeBlocks()
             throws IOException
     {
         return diskSize() / VUtil.BLOCK_SIZE - usedBlocks();
     }
 
     /**
-     *
      * @return the number of used blocks on disk
      */
     public int usedBlocks()

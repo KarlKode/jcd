@@ -1,22 +1,17 @@
 package ch.ethz.jcd.application;
 
 import ch.ethz.jcd.application.commands.AbstractVFSCommand;
-import ch.ethz.jcd.main.exceptions.InvalidBlockAddressException;
-import ch.ethz.jcd.main.exceptions.InvalidBlockCountException;
-import ch.ethz.jcd.main.exceptions.InvalidSizeException;
-import ch.ethz.jcd.main.exceptions.VDiskCreationException;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.main.utils.VUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Queue;
 
 
@@ -24,18 +19,13 @@ public class VFSServer
 {
     private ServerSocket socket;
 
-    public static void main(String[] args)
-    {
-        new VFSServer();
-    }
-
     public VFSServer()
     {
         try
         {
             this.socket = new ServerSocket(2000);
 
-            while(true)
+            while (true)
             {
                 System.out.println("Waiting for clients to accept");
                 Socket client = this.socket.accept();
@@ -55,19 +45,22 @@ public class VFSServer
                     System.out.println("Acknowledge sent");
                     System.out.println("running executor");
                     new VFSCommandExecutor(vDisk, client, in, out);
-                }
-                catch (ClassNotFoundException e)
+                } catch (ClassNotFoundException e)
                 {
                     // send NAK
                     System.out.println("Sending NAK");
                     out.writeObject(false);
                 }
             }
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args)
+    {
+        new VFSServer();
     }
 
     private class VFSCommandExecutor implements AbstractVFSApplication, Runnable
@@ -92,8 +85,7 @@ public class VFSServer
             try
             {
                 this.current = (VDirectory) vDisk.resolve(VDisk.PATH_SEPARATOR);
-            }
-            catch (ResolveException e)
+            } catch (ResolveException e)
             {
                 e.printStackTrace();
             }
@@ -104,7 +96,7 @@ public class VFSServer
         @Override
         public void run()
         {
-            while(!quit)
+            while (!quit)
             {
                 try
                 {
@@ -119,13 +111,11 @@ public class VFSServer
                         cmd.execute(this);
                         System.out.println("sending acknowledge");
                         out.writeObject(null);
-                    }
-                    catch (CommandException e)
+                    } catch (CommandException e)
                     {
                         out.writeObject(e);
                     }
-                }
-                catch (IOException | ClassNotFoundException e)
+                } catch (IOException | ClassNotFoundException e)
                 {
                     e.printStackTrace();
                 }
@@ -137,8 +127,7 @@ public class VFSServer
             {
                 client.close();
                 System.out.println("Connection to Client closed");
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 e.printStackTrace();
             }

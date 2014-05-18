@@ -27,6 +27,7 @@ public class VFSpwd extends AbstractVFSCommand
      * <p>
      * -h, --help
      * prints information about usage
+     *
      * @param application
      */
     @Override
@@ -46,8 +47,7 @@ public class VFSpwd extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else
+                    } else
                     {
                         expr = Math.min(i, expr);
                     }
@@ -55,8 +55,7 @@ public class VFSpwd extends AbstractVFSCommand
                 try
                 {
                     System.out.println(application.getCurrent().getPath());
-                }
-                catch (IOException ignored)
+                } catch (IOException ignored)
                 {
                 }
                 break;

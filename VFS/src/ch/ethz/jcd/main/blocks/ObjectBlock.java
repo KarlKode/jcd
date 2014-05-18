@@ -28,16 +28,6 @@ public abstract class ObjectBlock extends Block
     }
 
     /**
-     * @return TYPE_DIRECTORY if this block contains a directory, TYPE_FILE otherwise
-     * @throws IOException
-     */
-    public byte getType() throws IOException
-    {
-        return fileManager.readByte(getBlockOffset(), OFFSET_TYPE);
-    }
-
-
-    /**
      * @param manager      used to read the Bloc
      * @param blockAddress of the ObjectBlock to inspect
      * @return TYPE_DIRECTORY if this block contains a directory, TYPE_FILE otherwise
@@ -46,6 +36,15 @@ public abstract class ObjectBlock extends Block
     public static byte getType(FileManager manager, int blockAddress) throws IOException
     {
         return manager.readByte(VUtil.getBlockOffset(blockAddress), OFFSET_TYPE);
+    }
+
+    /**
+     * @return TYPE_DIRECTORY if this block contains a directory, TYPE_FILE otherwise
+     * @throws IOException
+     */
+    public byte getType() throws IOException
+    {
+        return fileManager.readByte(getBlockOffset(), OFFSET_TYPE);
     }
 
     /**

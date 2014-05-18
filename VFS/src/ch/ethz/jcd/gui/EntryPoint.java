@@ -7,7 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -17,18 +16,27 @@ import java.io.IOException;
 /**
  * Created by leo on 15/04/14.
  */
-public class EntryPoint extends Application {
+public class EntryPoint extends Application
+{
 
+
+    public static void main(String[] args)
+    {
+        launch(args);
+    }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         primaryStage.setTitle("VFS Explorer");
 
         FXMLLoader loader = new FXMLLoader();
         Parent root = null;
-        try {
-            root = (Parent)loader.load(EntryPoint.class.getResource("Main.fxml").openStream());
-        } catch (IOException e) {
+        try
+        {
+            root = (Parent) loader.load(EntryPoint.class.getResource("Main.fxml").openStream());
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
         loader.setBuilderFactory(new JavaFXBuilderFactory());
@@ -52,9 +60,11 @@ public class EntryPoint extends Application {
 
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+        {
             @Override
-            public void handle(WindowEvent t) {
+            public void handle(WindowEvent t)
+            {
                 Platform.exit();
                 System.exit(0);
             }
@@ -62,12 +72,9 @@ public class EntryPoint extends Application {
     }
 
     @Override
-    public void stop(){
+    public void stop()
+    {
         Platform.exit();
         System.exit(0);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

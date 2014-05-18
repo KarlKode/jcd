@@ -14,16 +14,16 @@ public class VCompressor
     /**
      * Code values used according to the occurrence probability
      * e.g.
-     *                              0
+     * 0
      * 00 - 0.4 ------------------------+------+
-     *                                  |
-     *                      10      1   |
+     * |
+     * 10      1   |
      * 11 - 0.3 ----------------+-------+
-     *                          |
-     *              110     11  |
+     * |
+     * 110     11  |
      * 01 - 0.2 --------+-------+
-     *                  |
-     *              111 |
+     * |
+     * 111 |
      * 10 - 0.1 --------+
      */
     public static final int[] CODE_BOOK = {0, 2, 6, 7};
@@ -32,7 +32,6 @@ public class VCompressor
      * Compresses the given byte array
      *
      * @param bytes to compress
-     *
      * @return compressed bytes
      */
     public byte[] compress(byte[] bytes)
@@ -65,7 +64,6 @@ public class VCompressor
      * Decompresses the given byte array
      *
      * @param bytes to decompress
-     *
      * @return decompressed bytes
      */
     public byte[] decompress(byte[] bytes)
@@ -285,7 +283,6 @@ public class VCompressor
 
         /**
          * @param word to encode
-         *
          * @return code that maps to the given word
          */
         public int encode(int word)
@@ -295,7 +292,6 @@ public class VCompressor
 
         /**
          * @param code to decode
-         *
          * @return word decoded from the given code
          */
         public int decode(int code)
@@ -312,7 +308,6 @@ public class VCompressor
 
         /**
          * @param code to check
-         *
          * @return true if the given code was found in the dictionary, false otherwise
          */
         public boolean isCode(int code)

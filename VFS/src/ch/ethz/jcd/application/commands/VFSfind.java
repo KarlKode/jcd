@@ -41,6 +41,7 @@ public class VFSfind extends AbstractVFSCommand
      * enables case insensitive search
      * -r, --recursive
      * enables recursive search
+     *
      * @param application
      */
     @Override
@@ -65,16 +66,13 @@ public class VFSfind extends AbstractVFSCommand
                     {
                         help();
                         break;
-                    }
-                    else if (args[i].equals(OPTION_R) || args[i].equals(OPTION_RECURSIVE))
+                    } else if (args[i].equals(OPTION_R) || args[i].equals(OPTION_RECURSIVE))
                     {
                         recursive = true;
-                    }
-                    else if (args[i].equals(OPTION_I) || args[i].equals(OPTION_CASE_INSENSITIVE))
+                    } else if (args[i].equals(OPTION_I) || args[i].equals(OPTION_CASE_INSENSITIVE))
                     {
                         insensitive = true;
-                    }
-                    else
+                    } else
                     {
                         expr = Math.min(i, expr);
                     }
