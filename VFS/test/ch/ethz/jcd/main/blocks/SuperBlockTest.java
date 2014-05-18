@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -107,7 +108,8 @@ public class SuperBlockTest
     @Test
     public void testGetFirstDataBlock() throws Exception
     {
-        assertEquals(SuperBlock.DATA_BLOCK_BEGIN_ADDRESS, block.getFirstDataBlock());
+        assertEquals(SuperBlock.BIT_MAP_BLOCK_ADDRESS + (int)(Math.ceil((double)block.getBlockCount() / VUtil.BLOCK_SIZE * 8)), block.getFirstDataBlock());
+        //assertEquals(SuperBlock.DATA_BLOCK_BEGIN_ADDRESS == block.getFirstDataBlock(), block.getBlockCount() < VUtil.BLOCK_SIZE);
     }
 
     @Test

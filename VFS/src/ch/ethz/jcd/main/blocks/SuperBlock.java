@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.blocks;
 
 import ch.ethz.jcd.main.utils.FileManager;
+import ch.ethz.jcd.main.utils.VUtil;
 
 import java.io.IOException;
 
@@ -140,8 +141,7 @@ public class SuperBlock extends Block
     /**
      * @return block address of first block that does not store any filesystem metadata and stores actual content
      */
-    public int getFirstDataBlock()
-    {
-        return DATA_BLOCK_BEGIN_ADDRESS;
+    public int getFirstDataBlock() throws IOException {
+        return BIT_MAP_BLOCK_ADDRESS + (int)(Math.ceil((double)getBlockCount() / (VUtil.BLOCK_SIZE*8)));
     }
 }

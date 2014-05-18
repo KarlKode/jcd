@@ -25,9 +25,35 @@ public class VUtil
         // Load bitmap block
         try
         {
-            bitMapBlock = new BitMapBlock(fileManager, superBlock.getFirstBitMapBlock());
+            bitMapBlock = new BitMapBlock(fileManager, superBlock.getFirstBitMapBlock(), superBlock.getBlockCount());
             rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
-            //hope that's ok..
+
+            //set name for rootblock - hope that's ok.. (leo)
+            rootBlock.setName(VDisk.PATH_SEPARATOR);
+            rootDirectory = new VDirectory(rootBlock, null);
+        } catch (InvalidBlockAddressException e)
+        {
+            // This should never happen
+            throw new InternalError();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public VUtil(File vDiskFile, int blockCount)
+            throws FileNotFoundException
+    {
+        fileManager = new FileManager(vDiskFile);
+        // Load super block
+        superBlock = new SuperBlock(fileManager, SuperBlock.SUPER_BLOCK_ADDRESS);
+        // Load bitmap block
+        try
+        {
+            bitMapBlock = new BitMapBlock(fileManager, superBlock.getFirstBitMapBlock(), blockCount);
+            rootBlock = new DirectoryBlock(fileManager, superBlock.getRootDirectoryBlock());
+
+            //set name for rootblock - hope that's ok.. (leo)
             rootBlock.setName(VDisk.PATH_SEPARATOR);
             rootDirectory = new VDirectory(rootBlock, null);
         } catch (InvalidBlockAddressException e)
@@ -76,7 +102,7 @@ public class VUtil
         file.write((byte) 0x00);
         file.close();
 
-        VUtil vUtil = new VUtil(diskFile);
+        VUtil vUtil = new VUtil(diskFile, blockCount);
 
         // Initialize super block
         vUtil.getSuperBlock().setBlockCount(blockCount);

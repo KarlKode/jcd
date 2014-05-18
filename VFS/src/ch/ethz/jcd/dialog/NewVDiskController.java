@@ -100,7 +100,7 @@ public class NewVDiskController
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
             {
-                labelSize.setText(new Double((newValue.doubleValue() * 1e3 * VUtil.BLOCK_SIZE) / 1e6d).toString());
+                labelSize.setText(new Double(Math.round((newValue.doubleValue()) * 1e3 * VUtil.BLOCK_SIZE) / 1e6d).intValue() + "");
             }
         });
 
@@ -111,7 +111,7 @@ public class NewVDiskController
     {
         if (new File(textFieldFile.getText()).isDirectory())
         {
-            return new File(textFieldFile.getText() + "unnamed.vdisk");
+            return new File(textFieldFile.getText() + "/unnamed.vdisk");
         }
         return new File(textFieldFile.getText());
     }
@@ -123,6 +123,6 @@ public class NewVDiskController
 
     public long getSize()
     {
-        return Math.round(sliderFileSize.getValue() * 1e3 * VUtil.BLOCK_SIZE);
+        return (long)(Math.round(sliderFileSize.getValue()) * 1e3 * VUtil.BLOCK_SIZE);
     }
 }

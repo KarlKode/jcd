@@ -13,12 +13,14 @@ import java.io.RandomAccessFile;
 
 import static org.junit.Assert.*;
 
-public class BitMapBlockTest
+public class MutliBitMapBlockTest
 {
     private static final int BLOCK_ADDRESS = 1;
     private FileManager fileManager;
     private BitMapBlock block;
-    private int blockCount = 8*VUtil.BLOCK_SIZE;
+    private int blockCount = 2*8*VUtil.BLOCK_SIZE;
+
+    private int SUPERBLOCK_AND_ROOTBLOCK = 2;
 
     @Before
     public void setUp() throws Exception
@@ -74,19 +76,19 @@ public class BitMapBlockTest
         {
             e.printStackTrace();
         }
-        assertTrue(this.block.getUsedBlocks() == 3);
-        assertTrue(this.block.getFreeBlocks() == VUtil.BLOCK_SIZE * 8 - 3);
+        assertTrue(this.block.getUsedBlocks() == block.getBitMapBlockCount() + SUPERBLOCK_AND_ROOTBLOCK);
+        assertTrue(this.block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8) - (block.getBitMapBlockCount() + SUPERBLOCK_AND_ROOTBLOCK));
     }
 
     @Test
     public void testAllocateBlocks() throws Exception
     {
-        for (int i = 0; i < VUtil.BLOCK_SIZE * 8; i++)
+        for (int i = 0; i < (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8); i++)
         {
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
+            assertTrue(block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8) - (i));
             assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i + 1));
+            assertTrue(block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8)  - (i + 1));
             assertTrue(block.getUsedBlocks() == (i + 1));
         }
 
@@ -102,20 +104,20 @@ public class BitMapBlockTest
     @Test
     public void testFreeBlocks() throws Exception
     {
-        for (int i = 0; i < VUtil.BLOCK_SIZE * 8; i++)
+        for (int i = 0; i < (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8); i++)
         {
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
+            assertTrue(block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8)  - (i));
             assertTrue(block.getUsedBlocks() == (i));
             assertTrue(block.allocateBlock() == i);
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i + 1));
+            assertTrue(block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8)  - (i + 1));
             assertTrue(block.getUsedBlocks() == (i + 1));
         }
 
-        for (int i = (VUtil.BLOCK_SIZE * 8) - 1; i >= 0; i--)
+        for (int i = (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8)  - 1; i >= 0; i--)
         {
             block.setUnused(i);
             assertTrue(block.isUnused(i));
-            assertTrue(block.getFreeBlocks() == (VUtil.BLOCK_SIZE * 8) - (i));
+            assertTrue(block.getFreeBlocks() == (block.getBitMapBlockCount()*VUtil.BLOCK_SIZE * 8)  - (i));
             assertTrue(block.getUsedBlocks() == i);
         }
 

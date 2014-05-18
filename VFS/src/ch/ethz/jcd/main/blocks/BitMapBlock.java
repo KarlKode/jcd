@@ -17,27 +17,22 @@ import java.util.BitSet;
  */
 public class BitMapBlock extends Block
 {
-    private static final byte ZERO_BYTE = 0x00;
     private static final byte FULL_BYTE = (byte) 0xFF;
 
-    private static final byte USED_SUPERBLOCK_MASK = (byte) 0b00000001;
-    private static final byte USED_BITMAPBLOCK_MASK = (byte) 0b00000010;
-    private static final byte USED_ROOTBLOCK_MASK = (byte) 0b00000100;
-
-    private static final byte USED_MASK = (byte) 0b00000001;
-
-    private Object sync = new Object();
     private int usedBlocks;
 
     private int lastSmallestFreeBlockPosition;
 
+    private int bitMapBlockCount;
 
-    public BitMapBlock(FileManager fileManager, int blockAddress) throws InvalidBlockAddressException, IOException
+    public BitMapBlock(FileManager fileManager, int blockAddress, long blockCount) throws InvalidBlockAddressException, IOException
     {
         super(fileManager, blockAddress);
 
+        bitMapBlockCount = (int)Math.ceil((double)blockCount/(VUtil.BLOCK_SIZE*8));
+
         //init usedBlocks and lastSmallestFreeBlockPosition
-        final byte[] content = fileManager.readBytes(VUtil.getBlockOffset(this.blockAddress), 0, VUtil.BLOCK_SIZE);
+        final byte[] content = fileManager.readBytes(VUtil.getBlockOffset(this.blockAddress), 0, bitMapBlockCount*VUtil.BLOCK_SIZE);
         final BitSet set = BitSet.valueOf(content);
 
         this.usedBlocks = set.cardinality();
@@ -60,7 +55,7 @@ public class BitMapBlock extends Block
             pos++;
             val[0] = fileManager.readByte(VUtil.getBlockOffset(this.blockAddress), pos);
 
-            if (pos >= VUtil.BLOCK_SIZE)
+            if (pos >= bitMapBlockCount*VUtil.BLOCK_SIZE)
             {
                 throw new DiskFullException();
             }
@@ -87,21 +82,26 @@ public class BitMapBlock extends Block
 
     public void initialize() throws IOException
     {
-        byte[] freeVDisk = new byte[VUtil.BLOCK_SIZE];
-        byte firstBlock = ZERO_BYTE;
 
-        //initialize superblock
-        firstBlock |= USED_SUPERBLOCK_MASK;
-        //initialize bitmapblock
-        firstBlock |= USED_BITMAPBLOCK_MASK;
-        //initialize root directoryblock
-        firstBlock |= USED_ROOTBLOCK_MASK;
+        BitSet firstBlockSet = new BitSet(VUtil.BLOCK_SIZE * bitMapBlockCount);
+        int i = 0;
 
-        freeVDisk[0] = firstBlock;
+        //set Superblock as used
+        firstBlockSet.set(i);
+        i++;
 
-        fileManager.writeBytes(VUtil.getBlockOffset(this.blockAddress), 0, freeVDisk);
-        usedBlocks = 3;
-        lastSmallestFreeBlockPosition = 3;
+        //set BitmapBlocks as used
+        for(int j=0;j<bitMapBlockCount;i++,j++){
+            firstBlockSet.set(i);
+        }
+
+        //set Rootblock
+        firstBlockSet.set(i);
+        i++;
+
+        fileManager.writeBytes(VUtil.getBlockOffset(this.blockAddress), 0, firstBlockSet.toByteArray());
+        usedBlocks = i;
+        lastSmallestFreeBlockPosition = i;
     }
 
     /**
@@ -165,11 +165,15 @@ public class BitMapBlock extends Block
 
     public int getFreeBlocks()
     {
-        return (VUtil.BLOCK_SIZE * 8) - usedBlocks;
+        return (bitMapBlockCount * VUtil.BLOCK_SIZE * 8) - usedBlocks;
     }
 
     public int getUsedBlocks()
     {
         return this.usedBlocks;
+    }
+
+    public int getBitMapBlockCount(){
+        return bitMapBlockCount;
     }
 }

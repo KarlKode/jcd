@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class VDiskTest
 {
     public static long VDISK_BLOCK_COUNT = 256000;
-    public final File vdiskFile = new File("data/vdisk.vdisk");
+    public final File vdiskFile = new File("/tmp/vdisk.vdisk");
 
     @Before
     public void setUp()
