@@ -63,4 +63,25 @@ public class VStats
     {
         return bitMapBlock.getUsedBlocks();
     }
+
+
+    @Override
+    public String toString(){
+        final StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("disk size: ");
+            sb.append(this.diskSize());
+            sb.append(", free space: ");
+            sb.append(this.freeSpace());
+            sb.append(", used space: ");
+            sb.append(this.usedSpace());
+            sb.append(", free blocks: ");
+            sb.append(this.freeBlocks());
+            sb.append(", used blocks: ");
+            sb.append(this.usedBlocks());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
 }

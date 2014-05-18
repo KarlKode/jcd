@@ -9,6 +9,7 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
+import ch.ethz.jcd.main.utils.VStats;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -100,6 +101,10 @@ public class MainController
     private Label labelPath;
     @FXML
     private Button buttonNewDir;
+
+    @FXML
+    private Label labelVStats;
+
     private VDisk vdisk;
     private VDirectory selectedDirectory;
     private boolean ignoreSelectionChanged = false;
@@ -270,6 +275,13 @@ public class MainController
     }
 
     @FXML
+    void OnMouseClickedlabelVStats(MouseEvent event) {
+        if(vdisk != null) {
+            this.labelVStats.setText(this.vdisk.stats().toString());
+        }
+    }
+
+    @FXML
     void onActionButtonNewDir(ActionEvent event)
     {
         showInputDialog("New Directory ... ", "Directory name:", "Directory name", dirname -> {
@@ -362,6 +374,8 @@ public class MainController
                 refreshTreeView();
                 this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
                 this.toolBarInterface.setDisable(false);
+
+                labelVStats.setText(this.vdisk.stats().toString());
             }
         } catch (IOException ex)
         {
@@ -383,6 +397,8 @@ public class MainController
                 refreshTreeView();
                 this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
                 this.toolBarInterface.setDisable(false);
+
+                labelVStats.setText(this.vdisk.stats().toString());
             } catch (FileNotFoundException e)
             {
                 e.printStackTrace();

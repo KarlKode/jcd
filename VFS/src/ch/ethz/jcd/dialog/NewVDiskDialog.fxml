@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity"
-      prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ch.ethz.jcd.dialog.NewVDiskController">
     <children>
         <GridPane hgap="4.0" vgap="10.0">
@@ -25,8 +26,8 @@
                 <TextField fx:id="textFieldFile" GridPane.columnIndex="1"/>
                 <Button fx:id="buttonChoose" mnemonicParsing="false" onAction="#onActionButtonChoose" text="Choose ... "
                         GridPane.columnIndex="2"/>
-                <Slider fx:id="sliderFileSize" blockIncrement="16.0" majorTickUnit="3.0" max="16.0" min="1.0"
-                        minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"
+                <Slider fx:id="sliderFileSize" blockIncrement="10.0" majorTickUnit="10.0" max="40.0" min="10.0"
+                        minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="200.0"
                         GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <HBox alignment="CENTER" prefHeight="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <children>
