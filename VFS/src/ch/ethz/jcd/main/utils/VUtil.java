@@ -8,7 +8,7 @@ import java.io.*;
 
 public class VUtil
 {
-    public static final int BLOCK_SIZE = 4096;
+    public static final int BLOCK_SIZE = 8192;
 
     private final FileManager fileManager;
     private final SuperBlock superBlock;

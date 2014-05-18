@@ -245,7 +245,7 @@ public class VDisk
             VFileInputStream vfile = file.inputStream(vUtil, compressed);
             long remaining = stream.available();
 
-            while (0 < remaining)
+            while (0 < (remaining = stream.available()))
             {
                 int len = remaining < VUtil.BLOCK_SIZE ? (int) remaining : VUtil.BLOCK_SIZE;
                 byte[] bytes = new byte[len];
