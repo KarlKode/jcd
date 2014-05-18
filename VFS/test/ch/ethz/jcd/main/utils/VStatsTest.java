@@ -51,7 +51,7 @@ public class VStatsTest
         assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3), vStats.freeSpace());
 
         vDisk.importFromHost(new File("data/simons_cat.jpg"), user);
-        assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 80 - 3), vStats.freeSpace());
+        assertEquals(VUtil.BLOCK_SIZE * (VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 80 - 3 - 1), vStats.freeSpace());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class VStatsTest
         assertEquals(VUtil.BLOCK_SIZE * (USED_BLOCKS_WHEN_EMPTY + 3), vStats.usedSpace());
 
         vDisk.importFromHost(new File("data/simons_cat.jpg"), user);
-        assertEquals(VUtil.BLOCK_SIZE * (USED_BLOCKS_WHEN_EMPTY + 3 + 80), vStats.usedSpace());
+        assertEquals(VUtil.BLOCK_SIZE * (USED_BLOCKS_WHEN_EMPTY + 3 + 80 + 1), vStats.usedSpace());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class VStatsTest
         assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3, vStats.freeBlocks());
 
         vDisk.importFromHost(new File("data/simons_cat.jpg"), user);
-        assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3 - 80, vStats.freeBlocks());
+        assertEquals(VDISK_BLOCK_COUNT - USED_BLOCKS_WHEN_EMPTY - 3 - 80 - 1, vStats.freeBlocks());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class VStatsTest
         assertEquals(USED_BLOCKS_WHEN_EMPTY + 3, vStats.usedBlocks());
 
         vDisk.importFromHost(new File("data/simons_cat.jpg"), user);
-        assertEquals(USED_BLOCKS_WHEN_EMPTY + 3 + 80, vStats.usedBlocks());
+        assertEquals(USED_BLOCKS_WHEN_EMPTY + 3 + 80 + 1, vStats.usedBlocks());
     }
 }
 

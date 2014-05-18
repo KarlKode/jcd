@@ -56,6 +56,7 @@ public class SuperBlockTest
         {
         }
     }
+
     @Test
     public void testGetBlockCount() throws Exception
     {
@@ -68,10 +69,12 @@ public class SuperBlockTest
         int newBlockCount = BLOCK_COUNT + 1;
         block.setBlockCount(newBlockCount);
         assertEquals(newBlockCount, block.getBlockCount());
-        try {
+        try
+        {
             block.setBlockCount(-1);
             fail("Exception was expected for invalid block count");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
         }
     }
 
@@ -105,5 +108,22 @@ public class SuperBlockTest
     public void testGetFirstDataBlock() throws Exception
     {
         assertEquals(SuperBlock.DATA_BLOCK_BEGIN_ADDRESS, block.getFirstDataBlock());
+    }
+
+    @Test
+    public void testSetState() throws Exception
+    {
+        block.setVDiskState(0);
+        assertEquals(0, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_STATE));
+        block.setVDiskState(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_STATE));
+
+        try
+        {
+            block.setVDiskState(-1);
+            fail("Exception was expected for invalid VDisk state");
+        } catch (IllegalArgumentException e)
+        {
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.io.IOException;
 public abstract class ObjectBlock extends Block
 {
     public static final int LENGTH_TYPE = 1;
-    public static final int LENGTH_NAME = 63;
+    public static final int LENGTH_NAME = 64;
     public static final int LENGTH_PARENT_BLOCK_ADDRESS = 4;
     public static final int OFFSET_TYPE = 0;
     public static final int OFFSET_NAME = OFFSET_TYPE + LENGTH_TYPE;
@@ -38,8 +38,7 @@ public abstract class ObjectBlock extends Block
 
 
     /**
-     *
-     * @param manager used to read the Bloc
+     * @param manager      used to read the Bloc
      * @param blockAddress of the ObjectBlock to inspect
      * @return TYPE_DIRECTORY if this block contains a directory, TYPE_FILE otherwise
      * @throws IOException

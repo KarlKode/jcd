@@ -1,6 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
-import ch.ethz.jcd.main.exceptions.InvalidBlockSizeException;
+import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 
@@ -23,9 +23,7 @@ public class DataBlock extends Block
      *
      * @param contentOffset offset of first byte
      * @param length        number of bytes in total
-     *
      * @return new byte array that contains the read content
-     *
      * @throws IOException
      */
     public byte[] getContent(int contentOffset, int length)
@@ -38,7 +36,6 @@ public class DataBlock extends Block
      * Reads the whole content.
      *
      * @return new byte array that contains the read content
-     *
      * @throws IOException
      */
     public byte[] getContent()
@@ -51,12 +48,10 @@ public class DataBlock extends Block
      * Writes the whole content.
      *
      * @param content new content
-     *
      * @throws IOException
-     * @throws InvalidBlockSizeException
      */
     public void setContent(byte[] content)
-            throws IOException, InvalidBlockSizeException
+            throws IOException, BlockFullException
     {
         setContent(content, 0);
     }
@@ -66,17 +61,21 @@ public class DataBlock extends Block
      *
      * @param content new content
      * @param offset  offset of first byte
-     *
      * @throws IOException
-     * @throws InvalidBlockSizeException
      */
     public void setContent(byte[] content, int offset)
-            throws IOException, InvalidBlockSizeException
+            throws IOException, BlockFullException
     {
+        if (content == null || offset < 0 || offset >= VUtil.BLOCK_SIZE)
+        {
+            throw new IllegalArgumentException();
+        }
+
         if (content.length > VUtil.BLOCK_SIZE - offset)
         {
-            throw new InvalidBlockSizeException();
+            throw new BlockFullException();
         }
+
         fileManager.writeBytes(getBlockOffset(), offset, content);
     }
 }

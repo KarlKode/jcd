@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.BlockFullException;
 import ch.ethz.jcd.main.utils.FileManager;
 import ch.ethz.jcd.main.utils.VUtil;
 import org.junit.Before;
@@ -93,6 +94,22 @@ public class DataBlockTest
         }
         block.setContent(newBytes);
         assertArrayEquals(fileManager.readBytes(0, 0, VUtil.BLOCK_SIZE), newBytes);
+
+        try
+        {
+            block.setContent(null);
+            fail("Exception was expected for invalid content");
+        } catch (IllegalArgumentException e)
+        {
+        }
+
+        try
+        {
+            block.setContent(new byte[VUtil.BLOCK_SIZE + 1]);
+            fail("Exception was expected for invalid content");
+        } catch (BlockFullException e)
+        {
+        }
     }
 
     @Test
@@ -108,5 +125,45 @@ public class DataBlockTest
         }
         block.setContent(newBytes, offset);
         assertArrayEquals(fileManager.readBytes(0, offset, length), newBytes);
+
+        try
+        {
+            block.setContent(null, 1);
+            fail("Exception was expected for invalid content");
+        } catch (IllegalArgumentException e)
+        {
+        }
+
+        try
+        {
+            block.setContent(new byte[1], -1);
+            fail("Exception was expected for invalid offset");
+        } catch (IllegalArgumentException e)
+        {
+        }
+
+        try
+        {
+            block.setContent(new byte[1], VUtil.BLOCK_SIZE);
+            fail("Exception was expected for invalid offset");
+        } catch (IllegalArgumentException e)
+        {
+        }
+
+        try
+        {
+            block.setContent(new byte[VUtil.BLOCK_SIZE + 1], 0);
+            fail("Exception was expected for invalid content size and offset");
+        } catch (BlockFullException e)
+        {
+        }
+
+        try
+        {
+            block.setContent(new byte[VUtil.BLOCK_SIZE], 1);
+            fail("Exception was expected for invalid content size and offset");
+        } catch (BlockFullException e)
+        {
+        }
     }
 }

@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
-import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.FormatExcepion;
+import ch.ethz.jcd.main.exceptions.NoSuchFileOrDirectoryException;
 import ch.ethz.jcd.main.exceptions.command.*;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
@@ -9,7 +10,6 @@ import ch.ethz.jcd.main.layer.VFile.VFileOutputStream;
 import ch.ethz.jcd.main.layer.VObject;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -50,9 +50,11 @@ public class VDisk
     public static void format(File diskFile, long size, boolean compressed)
     {
         int state = compressed ? 1 : 0;
-        try {
+        try
+        {
             VUtil.format(diskFile, size, state);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             throw new FormatExcepion(e);
         }
 
@@ -73,7 +75,6 @@ public class VDisk
      * This method lists the content of the given folder.
      *
      * @param destination given
-     *
      * @return list of the content as a HashMap using the object's name as key
      */
     public HashMap<String, VObject> list(VDirectory destination)
@@ -87,8 +88,7 @@ public class VDisk
             {
                 list.put(object.getName(), object);
             }
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             throw new ListException(e);
         }
@@ -101,7 +101,6 @@ public class VDisk
      *
      * @param destination where to create a new directory
      * @param name        to set
-     *
      * @return the created directory
      */
     public VDirectory mkdir(VDirectory destination, String name)
@@ -113,8 +112,7 @@ public class VDisk
             directory.setName(name);
             directory.move(destination);
             return directory;
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             throw new MkDirException(ex);
         }
@@ -125,7 +123,6 @@ public class VDisk
      *
      * @param destination where to create a new file
      * @param name        to set
-     *
      * @return the created file
      */
     public VFile touch(VDirectory destination, String name)
@@ -138,8 +135,7 @@ public class VDisk
             file.setName(name);
             file.move(destination);
             return file;
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             throw new TouchException(ex);
         }
@@ -158,8 +154,7 @@ public class VDisk
         try
         {
             object.setName(name);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             throw new RenameException(ex);
         }
@@ -183,8 +178,7 @@ public class VDisk
             {
                 this.rename(object, name);
             }
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             throw new MoveException(ex);
         }
@@ -203,10 +197,13 @@ public class VDisk
     {
         try
         {
+            if (name == null)
+            {
+                name = object.getName();
+            }
             T copy = (T) object.copy(vUtil, destination, name);
             return copy;
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             //TODO free block if sth got wrong
             throw new CopyException(ex);
@@ -225,8 +222,7 @@ public class VDisk
         try
         {
             object.delete(vUtil);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new DeleteException(e);
         }
@@ -258,8 +254,7 @@ public class VDisk
                 if (compressed)
                 {
                     vfile.put(compressor.compress(bytes));
-                }
-                else
+                } else
                 {
                     vfile.put(bytes);
                 }
@@ -267,8 +262,7 @@ public class VDisk
 
             stream.close();
             return file;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new ImportException(e);
         }
@@ -294,15 +288,13 @@ public class VDisk
                 if (compressed)
                 {
                     stream.write(compressor.decompress(iterator.next().array()));
-                }
-                else
+                } else
                 {
                     stream.write(iterator.next().array());
                 }
             }
             stream.close();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new ExportException(e);
         }
@@ -323,7 +315,6 @@ public class VDisk
      * This methods resolves a given path and returns the VObject.
      *
      * @param path given
-     *
      * @return VObject to the given path
      */
     public VObject resolve(String path)
@@ -344,14 +335,13 @@ public class VDisk
             path = path.substring(path.indexOf(VDisk.PATH_SEPARATOR) + 1);
             VObject object = vUtil.getRootDirectory().resolve(path);
 
-            if(object == null)
+            if (object == null)
             {
                 throw new NoSuchFileOrDirectoryException();
             }
 
             return object;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new ResolveException(e);
         }
@@ -363,7 +353,6 @@ public class VDisk
      * @param regex     compiled regular expression Patttern
      * @param folder    where to start searching
      * @param recursive indicates whether including sub folders or not
-     *
      * @return HashMap filled with all search results
      */
     public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive)
@@ -372,15 +361,15 @@ public class VDisk
         try
         {
             return folder.find(regex, recursive);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new FindException(e);
         }
     }
 
 
-    public boolean exists(String path) throws IOException {
+    public boolean exists(String path) throws IOException
+    {
         return vUtil.getRootDirectory().resolve(path) != null;
 
     }

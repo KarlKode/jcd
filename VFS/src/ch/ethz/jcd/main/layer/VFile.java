@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.layer;
 
 import ch.ethz.jcd.main.blocks.DataBlock;
+import ch.ethz.jcd.main.blocks.DataBlockListBlock;
 import ch.ethz.jcd.main.blocks.FileBlock;
 import ch.ethz.jcd.main.exceptions.*;
 import ch.ethz.jcd.main.utils.VDisk;
@@ -33,7 +34,6 @@ public class VFile extends VObject<FileBlock>
      *
      * @param vUtil       used to allocate Blocks
      * @param destination where to put the copied VObject
-     *
      * @throws BlockFullException
      * @throws IOException
      * @throws InvalidBlockAddressException
@@ -49,7 +49,14 @@ public class VFile extends VObject<FileBlock>
         {
             DataBlock dest = vUtil.allocateDataBlock();
             dest.setContent(src.getContent());
-            fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
+            try
+            {
+                fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
+            } catch (BlockFullException e)
+            {
+                fileBlock.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
+                fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
+            }
         }
 
         fileBlock.setSize(block.size());
@@ -63,7 +70,6 @@ public class VFile extends VObject<FileBlock>
      * This Method deletes the VFile
      *
      * @param vUtil used to free the corresponding Blocks
-     *
      * @throws IOException
      */
     @Override
@@ -74,6 +80,10 @@ public class VFile extends VObject<FileBlock>
         {
             vUtil.free(b);
         }
+        for (DataBlockListBlock dataBlockListBlock : block.getDataBlockListBlockList())
+        {
+            vUtil.free(dataBlockListBlock);
+        }
         this.parent.removeEntry(this);
         vUtil.free(block);
     }
@@ -82,9 +92,7 @@ public class VFile extends VObject<FileBlock>
      * This method recursively resolves the given path.
      *
      * @param path to resolveDirectory
-     *
      * @return the resolved object, null if no object found
-     *
      * @throws IOException
      */
     @Override
@@ -110,7 +118,6 @@ public class VFile extends VObject<FileBlock>
      * of its equality is skipped
      *
      * @param obj to compare with
-     *
      * @return true if the given object ist equal to this, false otherwise
      */
     @Override
@@ -125,8 +132,7 @@ public class VFile extends VObject<FileBlock>
                 equal = this.getPath().equals(((VFile) obj).getPath());
                 equal = equal && this.block.size() == ((VFile) obj).block.size();
                 equal = equal && this.getName().equals(((VFile) obj).getName());
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 equal = false;
             }
@@ -182,7 +188,6 @@ public class VFile extends VObject<FileBlock>
 
         /**
          * @param bytes to put into dataBlock
-         *
          * @throws DiskFullException
          * @throws IOException
          * @throws InvalidBlockAddressException
@@ -195,7 +200,14 @@ public class VFile extends VObject<FileBlock>
             // adding a new DataBlock
             DataBlock dataBlock = vUtil.allocateDataBlock();
             dataBlock.setContent(bytes);
-            vFile.block.addDataBlock(dataBlock, bytes.length);
+            try
+            {
+                vFile.block.addDataBlock(dataBlock, bytes.length);
+            } catch (BlockFullException e)
+            {
+                vFile.block.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
+                vFile.block.addDataBlock(dataBlock, bytes.length);
+            }
         }
     }
 
@@ -221,7 +233,6 @@ public class VFile extends VObject<FileBlock>
 
         /**
          * @param bytes to put into dataBlock
-         *
          * @throws DiskFullException
          * @throws IOException
          * @throws InvalidBlockAddressException
@@ -245,7 +256,14 @@ public class VFile extends VObject<FileBlock>
                 buf.put(dataBlock.getContent(), 0, lastBlockSize);
                 buf.put(bytes, 0, index);
                 dataBlock.setContent(buf.array());
-                vFile.block.addDataBlock(dataBlock, content.length);
+                try
+                {
+                    vFile.block.addDataBlock(dataBlock, content.length);
+                } catch (BlockFullException e)
+                {
+                    vFile.block.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
+                    vFile.block.addDataBlock(dataBlock, content.length);
+                }
             }
 
             // adding DataBlocks until no bytes left to store
@@ -304,8 +322,7 @@ public class VFile extends VObject<FileBlock>
             try
             {
                 return next < vFile.block.count();
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 return false;
             }
@@ -333,8 +350,7 @@ public class VFile extends VObject<FileBlock>
                 ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, len));
                 next++;
                 return buf;
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 return ByteBuffer.wrap(null);
             }
@@ -381,7 +397,7 @@ public class VFile extends VObject<FileBlock>
         {
             try
             {
-                 int size = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, 4)).getInt();
+                int size = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, 4)).getInt();
                 byte[] compressedBytes = new byte[size];
                 ByteBuffer buf = ByteBuffer.wrap(compressedBytes);
                 int index = 0;
@@ -389,7 +405,7 @@ public class VFile extends VObject<FileBlock>
                 while (index < compressedBytes.length)
                 {
                     // the current DataBlock is not fully read yet
-                    if(byteOffset != 0)
+                    if (byteOffset != 0)
                     {
                         next--;
                     }
@@ -401,8 +417,7 @@ public class VFile extends VObject<FileBlock>
                 }
 
                 return buf;
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 return ByteBuffer.wrap(null);
             }

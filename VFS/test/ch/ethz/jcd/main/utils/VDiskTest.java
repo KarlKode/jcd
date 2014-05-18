@@ -1,6 +1,7 @@
 package ch.ethz.jcd.main.utils;
 
 import ch.ethz.jcd.main.exceptions.*;
+import ch.ethz.jcd.main.exceptions.command.ResolveException;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
@@ -296,8 +297,22 @@ public class VDiskTest
         vDisk.delete(src);
         list = vDisk.list(usr);
         assertTrue(list.isEmpty());
-        assertNull(vDisk.resolve("/usr/src/linux/arch/x86_64/boot/"));
-        assertNull(vDisk.resolve("/usr/src/"));
+        try
+        {
+            vDisk.resolve("/usr/src/linux/arch/x86_64/boot/");
+            fail("Exception was expected for non existand file/directory.");
+        } catch (ResolveException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchFileOrDirectoryException);
+        }
+        try
+        {
+            assertNull(vDisk.resolve("/usr/src/"));
+            fail("Exception was expected for non existand file/directory.");
+        } catch (ResolveException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchFileOrDirectoryException);
+        }
     }
 
     @Test

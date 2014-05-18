@@ -143,14 +143,6 @@ public class BitMapBlock extends Block
     }
 
     /**
-     * Set all Blocks as unused
-     */
-    public void reset() throws IOException
-    {
-        this.initialize();
-    }
-
-    /**
      * Check if a Block is unused
      *
      * @param blockAddress block blockAddress of the Block that should be checked
