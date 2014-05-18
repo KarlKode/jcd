@@ -14,32 +14,28 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class VStatsTest
-{
+public class VStatsTest {
     public static long VDISK_BLOCK_COUNT = 2048;
     public static int USED_BLOCKS_WHEN_EMPTY = 3;
     public final File vdiskFile = new File("data/vdisk.vdisk");
 
     @Before
     public void setUp()
-            throws InvalidBlockAddressException, InvalidSizeException, InvalidBlockCountException, VDiskCreationException, IOException
-    {
-        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, false);
+            throws InvalidBlockAddressException, InvalidSizeException, InvalidBlockCountException, VDiskCreationException, IOException {
+        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, false, false);
     }
 
     @Test
     public void testDiskSize()
-            throws IOException
-    {
+            throws IOException {
         VDisk vDisk = new VDisk(vdiskFile);
         VStats vStats = vDisk.stats();
         assertEquals(VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, vStats.diskSize());
     }
 
     @Test
-    public void testFreeSpace( )
-            throws Exception
-    {
+    public void testFreeSpace()
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
@@ -55,9 +51,8 @@ public class VStatsTest
     }
 
     @Test
-    public void testUsedSpace( )
-            throws Exception
-    {
+    public void testUsedSpace()
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
@@ -73,9 +68,8 @@ public class VStatsTest
     }
 
     @Test
-    public void testFreeBlocks( )
-            throws Exception
-    {
+    public void testFreeBlocks()
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();
@@ -91,9 +85,8 @@ public class VStatsTest
     }
 
     @Test
-    public void testUsedBlocks( )
-            throws Exception
-    {
+    public void testUsedBlocks()
+            throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VStats vStats = vDisk.stats();

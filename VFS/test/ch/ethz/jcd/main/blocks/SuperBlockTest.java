@@ -10,8 +10,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class SuperBlockTest
-{
+public class SuperBlockTest {
     private static final int BLOCK_ADDRESS = 0;
     private static final int BLOCK_COUNT = 2;
     private static final int ROOT_DIRECTORY = 1234;
@@ -19,8 +18,7 @@ public class SuperBlockTest
     private SuperBlock block;
 
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File tmpFile = File.createTempFile("test", "vfs");
         tmpFile.deleteOnExit();
         fileManager = new FileManager(tmpFile);
@@ -32,100 +30,81 @@ public class SuperBlockTest
     }
 
     @Test
-    public void testConstructor() throws Exception
-    {
+    public void testConstructor() throws Exception {
         new SuperBlock(fileManager, 0);
-        try
-        {
+        try {
             new SuperBlock(null, 0);
             fail("Exception was expected for invalid file manager");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
-        try
-        {
+        try {
             new SuperBlock(fileManager, -1);
             fail("Exception was expected for invalid block address");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
-        try
-        {
+        try {
             new SuperBlock(fileManager, 1);
             fail("Exception was expected for invalid super block address");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
     }
 
     @Test
-    public void testGetBlockCount() throws Exception
-    {
+    public void testGetBlockCount() throws Exception {
         assertEquals(BLOCK_COUNT, block.getBlockCount());
     }
 
     @Test
-    public void testSetBlockCount() throws Exception
-    {
+    public void testSetBlockCount() throws Exception {
         int newBlockCount = BLOCK_COUNT + 1;
         block.setBlockCount(newBlockCount);
         assertEquals(newBlockCount, block.getBlockCount());
-        try
-        {
+        try {
             block.setBlockCount(-1);
             fail("Exception was expected for invalid block count");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
     }
 
     @Test
-    public void testGetRootDirectoryBlock() throws Exception
-    {
+    public void testGetRootDirectoryBlock() throws Exception {
         assertEquals(ROOT_DIRECTORY, block.getRootDirectoryBlock());
     }
 
     @Test
-    public void testSetRootDirectoryBlock() throws Exception
-    {
+    public void testSetRootDirectoryBlock() throws Exception {
         int newRootDirectory = ROOT_DIRECTORY + 1;
         block.setRootDirectoryBlock(newRootDirectory);
         assertEquals(newRootDirectory, block.getRootDirectoryBlock());
     }
 
     @Test
-    public void testGetFirstBitMapBlock() throws Exception
-    {
+    public void testGetFirstBitMapBlock() throws Exception {
         assertEquals(SuperBlock.BIT_MAP_BLOCK_ADDRESS, block.getFirstBitMapBlock());
     }
 
     @Test
-    public void testGetLastBitMapBlock() throws Exception
-    {
+    public void testGetLastBitMapBlock() throws Exception {
         assertEquals(SuperBlock.BIT_MAP_BLOCK_ADDRESS, block.getLastBitMapBlock());
     }
 
     @Test
-    public void testGetFirstDataBlock() throws Exception
-    {
-        assertEquals(SuperBlock.BIT_MAP_BLOCK_ADDRESS + (int)(Math.ceil((double)block.getBlockCount() / VUtil.BLOCK_SIZE * 8)), block.getFirstDataBlock());
+    public void testGetFirstDataBlock() throws Exception {
+        assertEquals(SuperBlock.BIT_MAP_BLOCK_ADDRESS + (int) (Math.ceil((double) block.getBlockCount() / VUtil.BLOCK_SIZE * 8)), block.getFirstDataBlock());
         //assertEquals(SuperBlock.DATA_BLOCK_BEGIN_ADDRESS == block.getFirstDataBlock(), block.getBlockCount() < VUtil.BLOCK_SIZE);
     }
 
     @Test
-    public void testSetState() throws Exception
-    {
-        block.setVDiskState(0);
-        assertEquals(0, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_STATE));
-        block.setVDiskState(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_STATE));
+    public void testSetState() throws Exception {
+        block.setVDiskFlags(0);
+        assertEquals(0, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_FLAGS));
+        block.setVDiskFlags(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE, fileManager.readInt(0, SuperBlock.OFFSET_VDISK_FLAGS));
 
-        try
-        {
-            block.setVDiskState(-1);
+        try {
+            block.setVDiskFlags(-1);
             fail("Exception was expected for invalid VDisk state");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
     }
 }

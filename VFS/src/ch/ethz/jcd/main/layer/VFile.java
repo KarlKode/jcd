@@ -16,16 +16,14 @@ import java.util.Iterator;
  * VFile is a concrete implementation of VObject coming with additional features such as
  * read(), write(), copy(), delete()
  */
-public class VFile extends VObject<FileBlock>
-{
+public class VFile extends VObject<FileBlock> {
     /**
      * Instantiation of a new VFile.
      *
      * @param block  containing the byte structure of the VFile
      * @param parent of the VFile
      */
-    public VFile(FileBlock block, VDirectory parent)
-    {
+    public VFile(FileBlock block, VDirectory parent) {
         super(block, parent);
     }
 
@@ -41,19 +39,15 @@ public class VFile extends VObject<FileBlock>
      */
     @Override
     public VObject copy(VUtil vUtil, VDirectory destination, String name)
-            throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException
-    {
+            throws BlockFullException, IOException, InvalidBlockAddressException, DiskFullException, InvalidBlockSizeException, InvalidNameException {
         FileBlock fileBlock = vUtil.allocateFileBlock();
 
-        for (DataBlock src : this.block.getDataBlockList())
-        {
+        for (DataBlock src : this.block.getDataBlockList()) {
             DataBlock dest = vUtil.allocateDataBlock();
             dest.setContent(src.getContent());
-            try
-            {
+            try {
                 fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
-            } catch (BlockFullException e)
-            {
+            } catch (BlockFullException e) {
                 fileBlock.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
                 fileBlock.addDataBlock(dest, VUtil.BLOCK_SIZE);
             }
@@ -74,14 +68,11 @@ public class VFile extends VObject<FileBlock>
      */
     @Override
     public void delete(VUtil vUtil)
-            throws IOException
-    {
-        for (DataBlock b : block.getDataBlockList())
-        {
+            throws IOException {
+        for (DataBlock b : block.getDataBlockList()) {
             vUtil.free(b);
         }
-        for (DataBlockListBlock dataBlockListBlock : block.getDataBlockListBlockList())
-        {
+        for (DataBlockListBlock dataBlockListBlock : block.getDataBlockListBlockList()) {
             vUtil.free(dataBlockListBlock);
         }
         this.parent.removeEntry(this);
@@ -97,10 +88,8 @@ public class VFile extends VObject<FileBlock>
      */
     @Override
     public VObject resolve(String path)
-            throws IOException
-    {
-        if (path == null || path.length() <= 0 || path.startsWith(VDisk.PATH_SEPARATOR) || path.endsWith(VDisk.PATH_SEPARATOR))
-        {
+            throws IOException {
+        if (path == null || path.length() <= 0 || path.startsWith(VDisk.PATH_SEPARATOR) || path.endsWith(VDisk.PATH_SEPARATOR)) {
             return null;
         }
 
@@ -121,19 +110,15 @@ public class VFile extends VObject<FileBlock>
      * @return true if the given object ist equal to this, false otherwise
      */
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         boolean equal = true;
 
-        if (obj != null && obj instanceof VFile)
-        {
-            try
-            {
+        if (obj != null && obj instanceof VFile) {
+            try {
                 equal = this.getPath().equals(((VFile) obj).getPath());
                 equal = equal && this.block.size() == ((VFile) obj).block.size();
                 equal = equal && this.getName().equals(((VFile) obj).getName());
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 equal = false;
             }
         }
@@ -147,10 +132,8 @@ public class VFile extends VObject<FileBlock>
      * @return the input stream
      */
     public VFileInputStream inputStream(VUtil vUtil, boolean compressed)
-            throws IOException
-    {
-        if (compressed)
-        {
+            throws IOException {
+        if (compressed) {
             return new CompressedVFileInputStream(vUtil, this);
         }
         return new VFileInputStream(vUtil, this);
@@ -161,12 +144,7 @@ public class VFile extends VObject<FileBlock>
      *
      * @return the iterator
      */
-    public VFileOutputStream iterator(boolean compressed)
-    {
-        if (compressed)
-        {
-            return new CompressedVFileOutputStream(this);
-        }
+    public VFileOutputStream iterator() {
         return new VFileOutputStream(this);
     }
 
@@ -175,8 +153,7 @@ public class VFile extends VObject<FileBlock>
      * the virtual file system. Useful when doing imports to avoid loading big
      * files completely into memory.
      */
-    public class VFileInputStream
-    {
+    public class VFileInputStream {
         protected VUtil vUtil;
         protected VFile vFile;
 
@@ -187,8 +164,7 @@ public class VFile extends VObject<FileBlock>
          * @param vFile to apply the input stream
          */
         private VFileInputStream(VUtil vUtil, VFile vFile)
-                throws IOException
-        {
+                throws IOException {
             this.vUtil = vUtil;
             this.vFile = vFile;
 
@@ -209,16 +185,13 @@ public class VFile extends VObject<FileBlock>
          * @throws BlockFullException
          */
         public void put(byte[] bytes)
-                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException
-        {
+                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException {
             // adding a new DataBlock
             DataBlock dataBlock = vUtil.allocateDataBlock();
             dataBlock.setContent(bytes);
-            try
-            {
+            try {
                 vFile.block.addDataBlock(dataBlock, bytes.length);
-            } catch (BlockFullException e)
-            {
+            } catch (BlockFullException e) {
                 vFile.block.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
                 vFile.block.addDataBlock(dataBlock, bytes.length);
             }
@@ -230,8 +203,7 @@ public class VFile extends VObject<FileBlock>
      * the virtual file system. Useful when doing imports to avoid loading big
      * files completely into memory.
      */
-    public class CompressedVFileInputStream extends VFileInputStream
-    {
+    public class CompressedVFileInputStream extends VFileInputStream {
         /**
          * Visibility is set to private to ensure correct instantiation
          *
@@ -239,8 +211,7 @@ public class VFile extends VObject<FileBlock>
          * @param vFile to apply the input stream
          */
         private CompressedVFileInputStream(VUtil vUtil, VFile vFile)
-                throws IOException
-        {
+                throws IOException {
             super(vUtil, vFile);
         }
 
@@ -253,14 +224,12 @@ public class VFile extends VObject<FileBlock>
          * @throws BlockFullException
          */
         public void put(byte[] bytes)
-                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException
-        {
+                throws DiskFullException, IOException, InvalidBlockAddressException, InvalidBlockSizeException, BlockFullException, BlockEmptyException {
             int lastBlockSize = (int) block.size() % VUtil.BLOCK_SIZE;
             int freeBytes = VUtil.BLOCK_SIZE - lastBlockSize;
             int index = 0;
 
-            if (lastBlockSize != 0)
-            {
+            if (lastBlockSize != 0) {
                 // fill last DataBlock
                 index = Math.min(freeBytes, bytes.length);
                 DataBlock dataBlock = vFile.block.removeLastDataBlock();
@@ -269,19 +238,16 @@ public class VFile extends VObject<FileBlock>
                 buf.put(dataBlock.getContent(), 0, lastBlockSize);
                 buf.put(bytes, 0, index);
                 dataBlock.setContent(buf.array());
-                try
-                {
+                try {
                     vFile.block.addDataBlock(dataBlock, content.length);
-                } catch (BlockFullException e)
-                {
+                } catch (BlockFullException e) {
                     vFile.block.addDataBlockListBlock(vUtil.allocateDataBlockListBlock());
                     vFile.block.addDataBlock(dataBlock, content.length);
                 }
             }
 
             // adding DataBlocks until no bytes left to store
-            while (index < bytes.length)
-            {
+            while (index < bytes.length) {
                 int len = Math.min(VUtil.BLOCK_SIZE, bytes.length - index);
                 super.put(Arrays.copyOfRange(bytes, index, index + len));
                 index += len;
@@ -294,8 +260,7 @@ public class VFile extends VObject<FileBlock>
      * file system. Useful when doing exports to avoid loading big files completely
      * into memory.
      */
-    public class VFileOutputStream implements Iterator<ByteBuffer>
-    {
+    public class VFileOutputStream implements Iterator<ByteBuffer> {
         protected VFile vFile;
         protected int next = 0;
         protected int byteOffset = 0;
@@ -306,8 +271,7 @@ public class VFile extends VObject<FileBlock>
          *
          * @param vFile to apply the output stream
          */
-        private VFileOutputStream(VFile vFile)
-        {
+        private VFileOutputStream(VFile vFile) {
             this.vFile = vFile;
         }
 
@@ -315,13 +279,10 @@ public class VFile extends VObject<FileBlock>
          * @return true if there is a next element, false otherwise
          */
         @Override
-        public boolean hasNext()
-        {
-            try
-            {
+        public boolean hasNext() {
+            try {
                 return next < vFile.block.count();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 return false;
             }
         }
@@ -333,14 +294,11 @@ public class VFile extends VObject<FileBlock>
          * @return the read bytes
          */
         @Override
-        public ByteBuffer next()
-        {
-            try
-            {
+        public ByteBuffer next() {
+            try {
                 int len = VUtil.BLOCK_SIZE - byteOffset;
 
-                if (vFile.block.isLastDataBlock(next))
-                {
+                if (vFile.block.isLastDataBlock(next)) {
                     int remainder = (int) vFile.block.size() % VUtil.BLOCK_SIZE;
                     len = remainder > 0 ? remainder - byteOffset : len;
                 }
@@ -348,8 +306,7 @@ public class VFile extends VObject<FileBlock>
                 ByteBuffer buf = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, len));
                 next++;
                 return buf;
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 return ByteBuffer.wrap(null);
             }
         }
@@ -359,66 +316,8 @@ public class VFile extends VObject<FileBlock>
          * exception.
          */
         @Override
-        public void remove()
-        {
+        public void remove() {
             throw new UnsupportedOperationException();
-        }
-    }
-
-
-    /**
-     * The VFileOutputStream is used to buffered read a file stored in the virtual
-     * file system. Useful when doing exports to avoid loading big files completely
-     * into memory.
-     */
-    public class CompressedVFileOutputStream extends VFileOutputStream
-    {
-        /**
-         * Visibility is set to private to ensure the iterator is instantiated
-         * correctly
-         *
-         * @param vFile to apply the output stream
-         */
-        private CompressedVFileOutputStream(VFile vFile)
-        {
-            super(vFile);
-        }
-
-        /**
-         * This method read the next DataBlock and extract the bytes stored in
-         * it.
-         *
-         * @return the read bytes
-         */
-        @Override
-        public ByteBuffer next()
-        {
-            try
-            {
-                int size = ByteBuffer.wrap(block.getDataBlock(next).getContent(byteOffset, 4)).getInt();
-                byte[] compressedBytes = new byte[size];
-                ByteBuffer buf = ByteBuffer.wrap(compressedBytes);
-                int index = 0;
-
-                while (index < compressedBytes.length)
-                {
-                    // the current DataBlock is not fully read yet
-                    if (byteOffset != 0)
-                    {
-                        next--;
-                    }
-                    byte[] bytes = super.next().array();
-                    byteOffset = Math.min(bytes.length, compressedBytes.length - index);
-                    buf.put(bytes, 0, byteOffset);
-                    index += byteOffset;
-                    byteOffset %= VUtil.BLOCK_SIZE;
-                }
-
-                return buf;
-            } catch (IOException e)
-            {
-                return ByteBuffer.wrap(null);
-            }
         }
     }
 }

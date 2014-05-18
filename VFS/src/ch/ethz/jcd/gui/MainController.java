@@ -1,6 +1,7 @@
 package ch.ethz.jcd.gui;
 
 import ch.ethz.jcd.dialog.*;
+import ch.ethz.jcd.main.exceptions.DiskFullException;
 import ch.ethz.jcd.main.exceptions.command.ExportException;
 import ch.ethz.jcd.main.exceptions.command.ImportException;
 import ch.ethz.jcd.main.exceptions.command.MkDirException;
@@ -9,7 +10,6 @@ import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VFile;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
-import ch.ethz.jcd.main.utils.VStats;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -42,8 +42,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 
-public class MainController
-{
+public class MainController {
     //reference to all selected files in the listview
     private final List<VObject> selectedFiles = new ArrayList<VObject>();
     private Executor exec;
@@ -117,21 +116,18 @@ public class MainController
     //true, if the drag&drag operation initialized in this application
     private boolean inAppDragOperation;
 
-    private void refreshTreeView() throws ResolveException, IOException
-    {
+    private void refreshTreeView() throws ResolveException, IOException {
         VDirectory root = (VDirectory) vdisk.resolve("/");
 
         Stack<TreeItem<VDirectory>> dirs = new Stack<TreeItem<VDirectory>>();
         TreeItem<VDirectory> rootNode = new TreeItem<VDirectory>(root);
         dirs.add(rootNode);
 
-        while (!dirs.isEmpty())
-        {
+        while (!dirs.isEmpty()) {
             final TreeItem<VDirectory> currNode = dirs.pop();
 
             currNode.getValue().getEntries().forEach(a -> {
-                if (a instanceof VDirectory)
-                {
+                if (a instanceof VDirectory) {
                     final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
                     tmp.setExpanded(true);
                     dirs.add(tmp);
@@ -145,129 +141,106 @@ public class MainController
     }
 
     @FXML
-    void onActionMenuItemCreateVFS(ActionEvent event)
-    {
+    void onActionMenuItemCreateVFS(ActionEvent event) {
         newVDisk();
     }
 
     @FXML
-    void onActionMenuItemLoadVFS(ActionEvent event)
-    {
-        try
-        {
+    void onActionMenuItemLoadVFS(ActionEvent event) {
+        try {
             openVDisk();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    void onActionMenuItemClose(ActionEvent event)
-    {
+    void onActionMenuItemClose(ActionEvent event) {
         Platform.exit();
     }
 
     @FXML
-    void onActionMenuItemAdd(ActionEvent event)
-    {
+    void onActionMenuItemAdd(ActionEvent event) {
         importFiles();
     }
 
     @FXML
-    void onActionMenuItemDelete(ActionEvent event)
-    {
+    void onActionMenuItemDelete(ActionEvent event) {
         deleteSelectedFiles();
     }
 
     @FXML
-    void onActionMenuItemRename(ActionEvent event)
-    {
+    void onActionMenuItemRename(ActionEvent event) {
         renameSelectedFile();
     }
 
     @FXML
-    void onActionMenuItemFind(ActionEvent event)
-    {
+    void onActionMenuItemFind(ActionEvent event) {
         openFindDialog();
     }
 
     @FXML
-    void onTextChangedTextFieldPath(ActionEvent event)
-    {
+    void onTextChangedTextFieldPath(ActionEvent event) {
 
     }
 
     @FXML
-    void onActionButtonGotoLocation(ActionEvent event)
-    {
+    void onActionButtonGotoLocation(ActionEvent event) {
 
     }
 
     @FXML
-    void onActionMenuItemCopy(ActionEvent event)
-    {
+    void onActionMenuItemCopy(ActionEvent event) {
         copySelectedFiles();
     }
 
     @FXML
-    void onActionMenuItemPaste(ActionEvent event) throws IOException
-    {
+    void onActionMenuItemPaste(ActionEvent event) throws IOException {
         pasteSelectedFiles();
     }
 
     @FXML
-    void onActionButtonImport(ActionEvent event)
-    {
+    void onActionButtonImport(ActionEvent event) {
         importFiles();
     }
 
     @FXML
-    void onActionButtonExport(ActionEvent event)
-    {
-        try
-        {
+    void onActionButtonExport(ActionEvent event) {
+        try {
             exportFiles();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    void onActionMenuItemExport(ActionEvent event) throws IOException
-    {
+    void onActionMenuItemExport(ActionEvent event) throws IOException {
         exportFiles();
     }
 
     @FXML
-    void onActionMenuItemMove(ActionEvent event) throws IOException
-    {
+    void onActionMenuItemMove(ActionEvent event) throws IOException {
         moveSelectedFiles();
     }
 
     @FXML
-    void onActionButtonDelete(ActionEvent event)
-    {
+    void onActionButtonDelete(ActionEvent event) {
         deleteSelectedFiles();
     }
 
     @FXML
-    void onActionButtonFind(ActionEvent event)
-    {
+    void onActionButtonFind(ActionEvent event) {
         openFindDialog();
     }
 
     @FXML
-    void onActionButtonRename(ActionEvent event)
-    {
+    void onActionButtonRename(ActionEvent event) {
         renameSelectedFile();
     }
 
 
     @FXML
-    void onActionButtonNewFile(ActionEvent event)
-    {
+    void onActionButtonNewFile(ActionEvent event) {
         showInputDialog("New File ... ", "Filename:", "Filename", filename -> {
             this.vdisk.touch(selectedDirectory, filename);
             refreshListView(selectedDirectory);
@@ -276,22 +249,19 @@ public class MainController
 
     @FXML
     void OnMouseClickedlabelVStats(MouseEvent event) {
-        if(vdisk != null) {
+        if (vdisk != null) {
             this.labelVStats.setText(this.vdisk.stats().toString());
         }
     }
 
     @FXML
-    void onActionButtonNewDir(ActionEvent event)
-    {
+    void onActionButtonNewDir(ActionEvent event) {
         showInputDialog("New Directory ... ", "Directory name:", "Directory name", dirname -> {
             this.vdisk.mkdir(selectedDirectory, dirname);
 
-            try
-            {
+            try {
                 updateUI();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -299,60 +269,42 @@ public class MainController
 
 
     @FXML
-    void onKeyPressedMainPane(KeyEvent event) throws IOException
-    {
-        if (event.isControlDown())
-        {
-            if (event.getCode() == KeyCode.C)
-            {
+    void onKeyPressedMainPane(KeyEvent event) throws IOException {
+        if (event.isControlDown()) {
+            if (event.getCode() == KeyCode.C) {
                 copySelectedFiles();
-            } else if (event.getCode() == KeyCode.X)
-            {
+            } else if (event.getCode() == KeyCode.X) {
                 moveSelectedFiles();
-            } else if (event.getCode() == KeyCode.V)
-            {
+            } else if (event.getCode() == KeyCode.V) {
                 pasteSelectedFiles();
-            } else if (event.getCode() == KeyCode.D)
-            {
+            } else if (event.getCode() == KeyCode.D) {
                 deleteSelectedFiles();
-            } else if (event.getCode() == KeyCode.R)
-            {
+            } else if (event.getCode() == KeyCode.R) {
                 renameSelectedFile();
-            } else if (event.getCode() == KeyCode.F)
-            {
+            } else if (event.getCode() == KeyCode.F) {
                 openFindDialog();
-            } else if (event.getCode() == KeyCode.I)
-            {
+            } else if (event.getCode() == KeyCode.I) {
                 importFiles();
-            } else if (event.getCode() == KeyCode.E)
-            {
+            } else if (event.getCode() == KeyCode.E) {
                 exportFiles();
-            } else if (event.getCode() == KeyCode.ENTER)
-            {
+            } else if (event.getCode() == KeyCode.ENTER) {
                 enterDirectory();
-            } else if (event.getCode() == KeyCode.O)
-            {
+            } else if (event.getCode() == KeyCode.O) {
                 openVDisk();
-            } else if (event.getCode() == KeyCode.N)
-            {
+            } else if (event.getCode() == KeyCode.N) {
                 newVDisk();
             }
-        } else if (event.getCode() == KeyCode.DELETE)
-        {
+        } else if (event.getCode() == KeyCode.DELETE) {
             deleteSelectedFiles();
-        } else if (event.getCode() == KeyCode.BACK_SPACE)
-        {
+        } else if (event.getCode() == KeyCode.BACK_SPACE) {
             gotoParent();
-        } else if (event.getCode() == KeyCode.ENTER)
-        {
+        } else if (event.getCode() == KeyCode.ENTER) {
             enterDirectory();
         }
     }
 
-    private void newVDisk()
-    {
-        try
-        {
+    private void newVDisk() {
+        try {
             Stage dialogStage = new Stage();
 
             FXMLLoader loader = new FXMLLoader();
@@ -366,9 +318,8 @@ public class MainController
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
-            if (controller.getResult() == DialogResult.OK)
-            {
-                VDisk.format(controller.getVDiskFile(), controller.getSize(), false);
+            if (controller.getResult() == DialogResult.OK) {
+                VDisk.format(controller.getVDiskFile(), controller.getSize(), false, false);
                 vdisk = new VDisk(controller.getVDiskFile());
 
                 refreshTreeView();
@@ -377,58 +328,47 @@ public class MainController
 
                 labelVStats.setText(this.vdisk.stats().toString());
             }
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void openVDisk() throws ResolveException, IOException
-    {
+    private void openVDisk() throws ResolveException, IOException {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Load VDisk.. ");
 
         final File fileVdisk = fchooser.showOpenDialog(null);
-        if (fileVdisk != null)
-        {
-            try
-            {
+        if (fileVdisk != null) {
+            try {
                 this.vdisk = new VDisk(fileVdisk);
                 refreshTreeView();
                 this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
                 this.toolBarInterface.setDisable(false);
 
                 labelVStats.setText(this.vdisk.stats().toString());
-            } catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        } else
-        {
+        } else {
             //no file was chosen / user pressed esc
         }
     }
 
-    private void gotoParent()
-    {
-        if (selectedDirectory.getParent() != null)
-        {
+    private void gotoParent() {
+        if (selectedDirectory.getParent() != null) {
             selectedDirectory = selectedDirectory.getParent();
             selectVDirectory(selectedDirectory);
         }
     }
 
-    private void enterDirectory()
-    {
-        if (listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory)
-        {
+    private void enterDirectory() {
+        if (listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory) {
             selectedDirectory = (VDirectory) listViewFiles.getSelectionModel().getSelectedItem();
             selectVDirectory(selectedDirectory);
         }
     }
 
-    private void moveSelectedFiles()
-    {
+    private void moveSelectedFiles() {
         fileOp = FileOperation.MOVE;
 
         this.selectedFiles.clear();
@@ -437,56 +377,43 @@ public class MainController
         this.menuItemPaste.setDisable(false);
     }
 
-    private void importFiles()
-    {
+    private void importFiles() {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Import files .. ");
 
         final List<File> filesToImport = fchooser.showOpenMultipleDialog(null);
 
-        if (filesToImport != null)
-        {
-            try
-            {
-                new Task<Void>()
-                {
+        if (filesToImport != null) {
+            try {
+                new Task<Void>() {
                     @Override
-                    protected Void call() throws Exception
-                    {
+                    protected Void call() throws Exception {
                         importFiles(filesToImport);
                         return null;
                     }
                 }.call();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else
-        {
+        } else {
             //no file was chosen / user pressed esc
         }
     }
 
-    private void exportFiles() throws IOException, ExportException
-    {
+    private void exportFiles() throws IOException, ExportException {
         final DirectoryChooser dchooser = new DirectoryChooser();
         dchooser.setTitle("Export files .. ");
 
         final File exportDir = dchooser.showDialog(null);
 
-        if (exportDir != null)
-        {
-            new Task<Void>()
-            {
+        if (exportDir != null) {
+            new Task<Void>() {
                 @Override
-                protected Void call() throws IOException, ExportException
-                {
+                protected Void call() throws IOException, ExportException {
                     final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
 
-                    for (VObject d : items)
-                    {
-                        if (d instanceof VFile)
-                        {
+                    for (VObject d : items) {
+                        if (d instanceof VFile) {
                             File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
                             vdisk.exportToHost((VFile) d, f);
                         }
@@ -495,14 +422,12 @@ public class MainController
                     return null;
                 }
             }.call();
-        } else
-        {
+        } else {
             //no file was chosen / user pressed esc
         }
     }
 
-    private void copySelectedFiles()
-    {
+    private void copySelectedFiles() {
         fileOp = FileOperation.COPY;
 
         this.selectedFiles.clear();
@@ -511,53 +436,40 @@ public class MainController
         this.menuItemPaste.setDisable(false);
     }
 
-    private void pasteSelectedFiles() throws IOException
-    {
-        for (VObject vobj : this.selectedFiles)
-        {
-            try
-            {
-                if (fileOp == FileOperation.COPY)
-                {
-                    if (selectedDirectory.getEntries().contains(vobj))
-                    {
+    private void pasteSelectedFiles() throws IOException {
+        for (VObject vobj : this.selectedFiles) {
+            try {
+                if (fileOp == FileOperation.COPY) {
+                    if (selectedDirectory.getEntries().contains(vobj)) {
                         DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
-                        if (res == DialogResult.OK)
-                        {
+                        if (res == DialogResult.OK) {
                             showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
                                 vdisk.copy(vobj, selectedDirectory, filename);
                             });
                         }
-                    } else
-                    {
+                    } else {
                         vdisk.copy(vobj, selectedDirectory, vobj.getName());
                     }
-                } else
-                {
+                } else {
                     //moving the selectedFiles to the same directoy is senseless, thus we doesn't allow it
-                    if (!vobj.getParent().equals(selectedDirectory))
-                    {
-                        if (selectedDirectory.getEntries().contains(vobj))
-                        {
+                    if (!vobj.getParent().equals(selectedDirectory)) {
+                        if (selectedDirectory.getEntries().contains(vobj)) {
                             DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
-                            if (res == DialogResult.OK)
-                            {
+                            if (res == DialogResult.OK) {
                                 showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
                                     vdisk.move(vobj, selectedDirectory, filename);
                                 });
                             }
-                        } else
-                        {
+                        } else {
                             vdisk.move(vobj, selectedDirectory, vobj.getName());
                         }
                     }
                 }
 
 
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -570,19 +482,14 @@ public class MainController
     }
 
 
-    private void updateUI() throws IOException
-    {
-        Platform.runLater(new Runnable()
-        {
+    private void updateUI() throws IOException {
+        Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 ignoreSelectionChanged = true;
-                try
-                {
+                try {
                     refreshTreeView();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ignoreSelectionChanged = false;
@@ -593,10 +500,8 @@ public class MainController
     }
 
 
-    private void openFindDialog()
-    {
-        try
-        {
+    private void openFindDialog() {
+        try {
             Stage dialogStage = new Stage();
 
             FXMLLoader loader = new FXMLLoader();
@@ -611,15 +516,13 @@ public class MainController
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     @FXML
-    void onDragDetectedListViewFiles(MouseEvent event)
-    {
+    void onDragDetectedListViewFiles(MouseEvent event) {
         inAppDragOperation = true;
 
         //for in Application Move/Copy Operation
@@ -630,17 +533,13 @@ public class MainController
         List<File> tmpFilesForExport = new ArrayList<File>();
 
         // export just selected VFiles, our API doesn't support VDirectories
-        for (VObject vobject : selectedVFiles)
-        {
-            if (vobject instanceof VFile)
-            {
+        for (VObject vobject : selectedVFiles) {
+            if (vobject instanceof VFile) {
                 File tempFile = null;
 
-                try
-                {
+                try {
                     tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + vobject.getName());
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
@@ -653,11 +552,9 @@ public class MainController
 
         TransferMode mode;
 
-        if (Keys.isCtrlPressed())
-        {
+        if (Keys.isCtrlPressed()) {
             mode = TransferMode.COPY;
-        } else
-        {
+        } else {
             mode = TransferMode.MOVE;
         }
 
@@ -666,41 +563,34 @@ public class MainController
     }
 
     @FXML
-    void onDragDoneListViewFiles(DragEvent event)
-    {
+    void onDragDoneListViewFiles(DragEvent event) {
         inAppDragOperation = false;
         System.out.println("MainController.onDragDoneListViewFiles");
     }
 
-    private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException
-    {
+    private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException, DiskFullException {
         Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
 
-        for (File file : files)
-        {
+        for (File file : files) {
             items.add(new Pair<File, VDirectory>(file, selectedDirectory));
         }
 
-        while (!items.isEmpty())
-        {
+        while (!items.isEmpty()) {
             Pair<File, VDirectory> tmpItem = items.pop();
             File tmpFile = tmpItem.getKey();
             VDirectory tmpVDir = tmpItem.getValue();
             TreeItem<VDirectory> treeVDir = getTreeItem(tmpVDir);
 
-            if (tmpFile.isDirectory())
-            {
+            if (tmpFile.isDirectory()) {
                 VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
                 treeVDir.getChildren().add(new TreeItem<VDirectory>(newVDir));
 
-                for (File file : tmpFile.listFiles())
-                {
+                for (File file : tmpFile.listFiles()) {
                     items.add(new Pair<File, VDirectory>(file, newVDir));
                 }
-            } else
-            {
+            } else {
                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-                if(tmpVDir.equals(selectedDirectory)){
+                if (tmpVDir.equals(selectedDirectory)) {
                     listViewFiles.getItems().add(file);
                 }
             }
@@ -708,46 +598,36 @@ public class MainController
     }
 
     @FXML
-    void onDragDroppedListViewFiles(DragEvent event)
-    {
+    void onDragDroppedListViewFiles(DragEvent event) {
         Dragboard db = event.getDragboard();
         System.out.println("MainController.onDragDroppedListViewFiles");
 
         boolean success = false;
 
-        if (db.hasFiles())
-        {
+        if (db.hasFiles()) {
             success = true;
 
-            try
-            {
-                new Task<Void>()
-                {
+            try {
+                new Task<Void>() {
                     @Override
-                    protected Void call() throws Exception
-                    {
-                        if (inAppDragOperation)
-                        {
+                    protected Void call() throws Exception {
+                        if (inAppDragOperation) {
                             //dirty, should be removed with Copy Command
-                            if (event.getTransferMode() == TransferMode.COPY)
-                            {
+                            if (event.getTransferMode() == TransferMode.COPY) {
                                 fileOp = FileOperation.COPY;
-                            } else
-                            {
+                            } else {
                                 fileOp = FileOperation.MOVE;
                             }
 
                             pasteSelectedFiles();
-                        } else
-                        {
+                        } else {
                             importFiles(db.getFiles());
                         }
 
                         return null;
                     }
                 }.call();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -756,27 +636,22 @@ public class MainController
         event.consume();
     }
 
-    private TreeItem<VDirectory> getTreeItem(VDirectory vdir)
-    {
+    private TreeItem<VDirectory> getTreeItem(VDirectory vdir) {
         Stack<VDirectory> path = new Stack<VDirectory>();
         VDirectory tmp = vdir;
         TreeItem<VDirectory> dir = treeViewNavigation.getRoot();
 
         path.add(tmp);
-        while (tmp.getParent() != null)
-        {
+        while (tmp.getParent() != null) {
             path.add(tmp.getParent());
             tmp = tmp.getParent();
         }
 
-        while (!path.isEmpty())
-        {
+        while (!path.isEmpty()) {
             VDirectory t = path.pop();
 
-            for (TreeItem<VDirectory> item : dir.getChildren())
-            {
-                if (item.getValue().equals(t))
-                {
+            for (TreeItem<VDirectory> item : dir.getChildren()) {
+                if (item.getValue().equals(t)) {
                     dir = item;
                     break;
                 }
@@ -787,43 +662,35 @@ public class MainController
     }
 
 
-    private void selectVDirectory(VDirectory selected)
-    {
+    private void selectVDirectory(VDirectory selected) {
         treeViewNavigation.getSelectionModel().select(getTreeItem(selected));
     }
 
 
     @FXML
-    void onDragOverTreeViewNavigation(DragEvent event)
-    {
+    void onDragOverTreeViewNavigation(DragEvent event) {
         Dragboard db = event.getDragboard();
 
-        if (db.hasFiles())
-        {
+        if (db.hasFiles()) {
             event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-        } else
-        {
+        } else {
             event.consume();
         }
     }
 
     @FXML
-    void onDragOverListViewFiles(DragEvent event)
-    {
+    void onDragOverListViewFiles(DragEvent event) {
         Dragboard db = event.getDragboard();
 
-        if (db.hasFiles())
-        {
+        if (db.hasFiles()) {
             event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-        } else
-        {
+        } else {
             event.consume();
         }
     }
 
     @FXML
-    void initialize()
-    {
+    void initialize() {
         assert toolBarInterface != null : "fx:id=\"toolBarInterface\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemImport != null : "fx:id=\"menuItemImport\" was not injected: check your FXML file 'Main.fxml'.";
         assert menuItemDelete != null : "fx:id=\"menuItemDelete\" was not injected: check your FXML file 'Main.fxml'.";
@@ -850,89 +717,67 @@ public class MainController
         assert buttonNewDir != null : "fx:id=\"buttonNewDir\" was not injected: check your FXML file 'Main.fxml'.";
 
         //i had to implement the drag drop logic in TreeCell, otherwise i'd have no chance to get the target directory
-        treeViewNavigation.setCellFactory(new Callback<TreeView<VDirectory>, TreeCell<VDirectory>>()
-        {
+        treeViewNavigation.setCellFactory(new Callback<TreeView<VDirectory>, TreeCell<VDirectory>>() {
             @Override
-            public TreeCell<VDirectory> call(TreeView<VDirectory> directoryTreeView)
-            {
-                TreeCell<VDirectory> treeCell = new TreeCell<VDirectory>()
-                {
-                    protected void updateItem(VDirectory item, boolean empty)
-                    {
+            public TreeCell<VDirectory> call(TreeView<VDirectory> directoryTreeView) {
+                TreeCell<VDirectory> treeCell = new TreeCell<VDirectory>() {
+                    protected void updateItem(VDirectory item, boolean empty) {
                         super.updateItem(item, empty);
 
-                        if (!empty && item != null)
-                        {
-                            try
-                            {
+                        if (!empty && item != null) {
+                            try {
                                 setText(item.getName());
-                            } catch (IOException e)
-                            {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             setGraphic(getTreeItem().getGraphic());
-                        } else
-                        {
+                        } else {
                             setText(null);
                             setGraphic(null);
                         }
                     }
                 };
 
-                treeCell.setOnDragOver(new EventHandler<DragEvent>()
-                {
+                treeCell.setOnDragOver(new EventHandler<DragEvent>() {
                     @Override
-                    public void handle(DragEvent event)
-                    {
+                    public void handle(DragEvent event) {
                         Dragboard db = event.getDragboard();
 
-                        if (db.hasFiles())
-                        {
+                        if (db.hasFiles()) {
                             event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                        } else
-                        {
+                        } else {
                             event.consume();
                         }
                     }
                 });
 
-                treeCell.setOnDragDropped(new EventHandler<DragEvent>()
-                {
+                treeCell.setOnDragDropped(new EventHandler<DragEvent>() {
 
                     @Override
-                    public void handle(DragEvent event)
-                    {
+                    public void handle(DragEvent event) {
                         Dragboard db = event.getDragboard();
 
                         boolean success = false;
 
-                        if (db.hasFiles())
-                        {
+                        if (db.hasFiles()) {
                             success = true;
 
                             selectedDirectory = treeCell.getItem();
 
-                            try
-                            {
-                                new Task<Void>()
-                                {
+                            try {
+                                new Task<Void>() {
                                     @Override
-                                    protected Void call() throws Exception
-                                    {
-                                        if (inAppDragOperation)
-                                        {
+                                    protected Void call() throws Exception {
+                                        if (inAppDragOperation) {
                                             //dirty, should be removed with Copy Command
-                                            if (event.getTransferMode() == TransferMode.COPY)
-                                            {
+                                            if (event.getTransferMode() == TransferMode.COPY) {
                                                 fileOp = FileOperation.COPY;
-                                            } else
-                                            {
+                                            } else {
                                                 fileOp = FileOperation.MOVE;
                                             }
 
                                             pasteSelectedFiles();
-                                        } else
-                                        {
+                                        } else {
                                             importFiles(db.getFiles());
                                         }
 
@@ -941,8 +786,7 @@ public class MainController
                                         return null;
                                     }
                                 }.call();
-                            } catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -957,16 +801,12 @@ public class MainController
         });
 
 
-        treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>()
-        {
+        treeViewNavigation.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<VDirectory>>() {
             @Override
-            public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue)
-            {
-                if (!ignoreSelectionChanged)
-                {
+            public void changed(ObservableValue<? extends TreeItem<VDirectory>> observable, TreeItem<VDirectory> oldValue, TreeItem<VDirectory> newValue) {
+                if (!ignoreSelectionChanged) {
                     //sometime got nullpointerexception, no clue why ..
-                    if (newValue != null)
-                    {
+                    if (newValue != null) {
                         selectedDirectory = newValue.getValue();
                         refreshListView(newValue.getValue());
                         selectVDirectory(selectedDirectory);
@@ -977,34 +817,26 @@ public class MainController
 
 
         listViewFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listViewFiles.setCellFactory(new Callback<ListView<VObject>, ListCell<VObject>>()
-        {
+        listViewFiles.setCellFactory(new Callback<ListView<VObject>, ListCell<VObject>>() {
             @Override
-            public ListCell<VObject> call(ListView<VObject> list)
-            {
+            public ListCell<VObject> call(ListView<VObject> list) {
                 return new DirectoryListCell();
             }
         });
         listViewFiles.getSelectionModel().selectedItemProperty().addListener((a) -> {
-            try
-            {
-                if (!ignoreSelectionChanged && ((ObservableValue<VObject>) a).getValue() != null)
-                {
+            try {
+                if (!ignoreSelectionChanged && ((ObservableValue<VObject>) a).getValue() != null) {
                     textFieldPath.setText(((ObservableValue<VObject>) a).getValue().getPath());
                 }
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
-        listViewFiles.setOnMouseClicked(new EventHandler<MouseEvent>()
-        {
+        listViewFiles.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
-            public void handle(MouseEvent mouseEvent)
-            {
-                if (mouseEvent.getClickCount() == 2)
-                {
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) {
                     enterDirectory();
                 }
             }
@@ -1012,8 +844,7 @@ public class MainController
 
         this.menuItemPaste.setDisable(true);
 
-        try
-        {
+        try {
             progressDialogStage = new Stage();
 
             FXMLLoader loader = new FXMLLoader();
@@ -1026,56 +857,43 @@ public class MainController
             progressDialogStage.initModality(Modality.APPLICATION_MODAL);
             progressDialogStage.initStyle(StageStyle.UNDECORATED);
             progressDialogStage.setScene(new Scene(root));
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void renameSelectedFile()
-    {
-        if (listViewFiles.getSelectionModel().getSelectedIndices().size() > 1)
-        {
+    private void renameSelectedFile() {
+        if (listViewFiles.getSelectionModel().getSelectedIndices().size() > 1) {
             showMessageDialog("Information", "Too many files selected", "Please select only one file!");
             return;
-        } else
-        {
+        } else {
             String objectname = "file";
 
-            if (listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory)
-            {
+            if (listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory) {
                 objectname = "directory";
             }
 
             showInputDialog("Rename " + objectname + "... ", "New " + objectname + "name: ", "new " + objectname + "name", (filename) -> {
                 vdisk.rename(listViewFiles.getSelectionModel().getSelectedItem(), filename);
 
-                try
-                {
+                try {
                     updateUI();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
         }
     }
 
-    private void deleteSelectedFiles()
-    {
-        try
-        {
-            new Task<Void>()
-            {
+    private void deleteSelectedFiles() {
+        try {
+            new Task<Void>() {
                 @Override
-                protected Void call() throws Exception
-                {
+                protected Void call() throws Exception {
                     final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
 
-                    for (VObject d : items)
-                    {
-                        if (d instanceof VFile)
-                        {
+                    for (VObject d : items) {
+                        if (d instanceof VFile) {
                             vdisk.delete(d);
                             selectedFiles.remove(d);
                         }
@@ -1086,33 +904,27 @@ public class MainController
             }.call();
 
             updateUI();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void refreshListView(VDirectory dir)
-    {
-        try
-        {
+    private void refreshListView(VDirectory dir) {
+        try {
             textFieldPath.setText(dir.getPath());
 
             listViewFiles.getItems().clear();
             List<VObject> items = dir.getEntries();
             listViewFiles.getItems().addAll(items);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private DialogResult showMessageDialog(String title, String message, String info)
-    {
+    private DialogResult showMessageDialog(String title, String message, String info) {
         DialogResult result = DialogResult.CANCEL;
 
-        try
-        {
+        try {
             Stage dialogStage = new Stage();
 
             FXMLLoader loader = new FXMLLoader();
@@ -1129,18 +941,15 @@ public class MainController
             dialogStage.showAndWait();
 
             result = controller.getResult();
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         return result;
     }
 
-    private void showInputDialog(String title, String labelString, String promptString, Consumer<String> actionOk)
-    {
-        try
-        {
+    private void showInputDialog(String title, String labelString, String promptString, Consumer<String> actionOk) {
+        try {
             Stage dialogStage = new Stage();
 
             FXMLLoader loader = new FXMLLoader();
@@ -1156,48 +965,37 @@ public class MainController
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
-            if (inputDialogController.getResult() == DialogResult.OK)
-            {
+            if (inputDialogController.getResult() == DialogResult.OK) {
                 actionOk.accept(inputDialogController.getInput());
             }
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public class DirectoryListCell extends ListCell<VObject>
-    {
-        public DirectoryListCell()
-        {
+    public class DirectoryListCell extends ListCell<VObject> {
+        public DirectoryListCell() {
             super();
         }
 
         @Override
-        protected void updateItem(VObject item, boolean empty)
-        {
+        protected void updateItem(VObject item, boolean empty) {
             super.updateItem(item, empty);
 
-            if (!empty)
-            {
-                try
-                {
+            if (!empty) {
+                try {
                     setText(item.getName());
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 Font f = getFont();
-                if (item instanceof VDirectory)
-                {
+                if (item instanceof VDirectory) {
                     setFont(Font.font(f.getName(), FontWeight.BOLD, f.getSize()));
-                } else
-                {
+                } else {
                     setFont(Font.font(f.getName(), FontWeight.NORMAL, f.getSize()));
                 }
-            } else
-            {
+            } else {
                 setText("");
             }
         }
