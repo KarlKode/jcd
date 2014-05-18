@@ -136,6 +136,7 @@ public class MainController {
 
     private boolean ignoreSelectionChanged = false;
 
+    //reference to all selected files in the listview
     private final List<VObject> selectedFiles = new ArrayList<VObject>();
 
     private FileOperation fileOp;
@@ -143,11 +144,9 @@ public class MainController {
     private Stage progressDialogStage;
 
     private ProgressDialogController progressDialogController;
+
+    //true, if the drag&drag operation initialized in this application
     private boolean inAppDragOperation;
-
-    public MainController() {
-
-    }
 
     private void refreshTreeView() throws ResolveException, IOException {
         VDirectory root = (VDirectory) vdisk.resolve("/");
@@ -233,7 +232,6 @@ public class MainController {
         pasteSelectedFiles();
     }
 
-
     @FXML
     void onActionButtonImport(ActionEvent event) {
         importFiles();
@@ -256,15 +254,6 @@ public class MainController {
     @FXML
     void onActionMenuItemMove(ActionEvent event) throws IOException {
         moveSelectedFiles();
-    }
-
-    private void moveSelectedFiles() {
-        fileOp = FileOperation.MOVE;
-
-        this.selectedFiles.clear();
-        this.selectedFiles.addAll(this.listViewFiles.getSelectionModel().getSelectedItems());
-
-        this.menuItemPaste.setDisable(false);
     }
 
     @FXML
@@ -401,6 +390,14 @@ public class MainController {
         }
     }
 
+    private void moveSelectedFiles() {
+        fileOp = FileOperation.MOVE;
+
+        this.selectedFiles.clear();
+        this.selectedFiles.addAll(this.listViewFiles.getSelectionModel().getSelectedItems());
+
+        this.menuItemPaste.setDisable(false);
+    }
 
     private void importFiles() {
         final FileChooser fchooser = new FileChooser();
@@ -917,8 +914,8 @@ public class MainController {
 
                     for(VObject d : items){
                         if(d instanceof VFile){
-                            System.out.println(d.getName());
                             vdisk.delete(d);
+                            selectedFiles.remove(d);
                         }
                     }
 
