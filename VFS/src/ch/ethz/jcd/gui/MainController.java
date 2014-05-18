@@ -719,13 +719,12 @@ public class MainController
         {
             success = true;
 
-            try
+            new Task<Void>()
             {
-                new Task<Void>()
+                @Override
+                protected Void call()
                 {
-                    @Override
-                    protected Void call() throws Exception
-                    {
+                    try{
                         if (inAppDragOperation)
                         {
                             //dirty, should be removed with Copy Command
@@ -742,14 +741,13 @@ public class MainController
                         {
                             importFiles(db.getFiles());
                         }
-
-                        return null;
+                    }catch(IOException ex) {
+                        ex.printStackTrace();
                     }
-                }.call();
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+
+                    return null;
+                }
+            }.call();
         }
 
         event.setDropCompleted(success);
