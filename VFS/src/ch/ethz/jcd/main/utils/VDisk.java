@@ -282,7 +282,7 @@ public class VDisk
         {
             FileOutputStream stream = new FileOutputStream(destination);
             VFileOutputStream iterator = source.iterator(vUtil.isCompressed());
-
+        
             while (iterator.hasNext())
             {
                 if (compressed)

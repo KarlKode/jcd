@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 
 public class FileManager
 {
@@ -104,5 +105,12 @@ public class FileManager
     public void close() throws IOException
     {
         rand.close();
+    }
+
+
+    public FileChannel getFileChannel(long address, int offset) throws IOException {
+        rand.seek(address + offset);
+
+        return rand.getChannel();
     }
 }

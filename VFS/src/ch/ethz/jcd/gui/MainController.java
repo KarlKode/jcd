@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.file.OpenOption;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -708,6 +710,9 @@ public class MainController
             }
         }
     }
+
+    private ClipboardContent filesToCopyClipboard = new ClipboardContent();
+
 
     @FXML
     void onDragDroppedListViewFiles(DragEvent event)
