@@ -89,7 +89,7 @@
 </items>
 </ToolBar>
     <SplitPane dividerPositions="0.2" focusTraversable="false" VBox.vgrow="ALWAYS">
-<items><TreeView id="treeViewNavigation" fx:id="treeViewNavigation" maxHeight="1.7976931348623157E308" maxWidth="300" minHeight="-Infinity" minWidth="-Infinity" /><BorderPane prefHeight="1023.0" prefWidth="585.0">
+<items><TreeView id="treeViewNavigation" fx:id="treeViewNavigation" maxHeight="1.7976931348623157E308" maxWidth="300" minHeight="-Infinity" minWidth="-Infinity" onDragOver="#onDragOverTreeViewNavigation" /><BorderPane prefHeight="1023.0" prefWidth="585.0">
 <top><BorderPane id="panePath" fx:id="panePath" BorderPane.alignment="CENTER">
 <left><Label id="labelPath" fx:id="labelPath" contentDisplay="CENTER" focusTraversable="false" text="Path:" textAlignment="RIGHT" BorderPane.alignment="CENTER">
 <BorderPane.margin>
