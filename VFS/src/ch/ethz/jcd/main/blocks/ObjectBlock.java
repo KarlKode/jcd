@@ -1,5 +1,6 @@
 package ch.ethz.jcd.main.blocks;
 
+import ch.ethz.jcd.main.exceptions.FilenameTooLong;
 import ch.ethz.jcd.main.layer.VDirectory;
 import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.FileManager;
@@ -85,7 +86,7 @@ public abstract class ObjectBlock extends Block
         // TODO: Ugly length check!
         if (name == null || name.getBytes("UTF-8").length > LENGTH_NAME)
         {
-            throw new IllegalArgumentException();
+            throw new FilenameTooLong("Filename too long");
         }
 
         fileManager.writeString(getBlockOffset(), OFFSET_NAME, name);
