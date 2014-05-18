@@ -14,6 +14,8 @@ public class VFSApplicationPreProcessor
     static final String OPTION_NEW_DISK = "--new_disk";
     static final String OPTION_C = "-c";
     static final String OPTION_COMPRESSED = "--compressed";
+    static final String OPTION_E = "-e";
+    static final String OPTION_ENCRYPTED = "--encrypted";
     static final String OPTION_S = "-s";
     static final String OPTION_SIZE = "--size";
     static final int DEFAULT_SIZE = 1024;
@@ -26,6 +28,7 @@ public class VFSApplicationPreProcessor
 
             boolean newDisk = false;
             boolean compressed = false;
+            boolean encrypted = false;
             int file = args.length - 1;
             int size = DEFAULT_SIZE;
             int i = 0;
@@ -39,6 +42,9 @@ public class VFSApplicationPreProcessor
                 } else if (args[i].equals(OPTION_C) || args[i].equals(OPTION_COMPRESSED))
                 {
                     compressed = true;
+                } else if (args[i].equals(OPTION_E) || args[i].equals(OPTION_ENCRYPTED))
+                {
+                    encrypted = true;
                 } else if (args[i].equals(OPTION_N) || args[i].equals(OPTION_NEW_DISK))
                 {
                     newDisk = true;
@@ -63,7 +69,7 @@ public class VFSApplicationPreProcessor
 
             if (newDisk)
             {
-                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed);
+                VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * size, compressed, encrypted);
             }
 
             return new VDisk(vdiskFile);

@@ -32,7 +32,7 @@ public class VFSServer
             // TODO: Create new VDisk if it does not exist yet
             if (!vdiskFile.exists())
             {
-                VDisk.format(vdiskFile, 1024 * 1024, false);
+                VDisk.format(vdiskFile, 1024 * 1024, false, false);
             }
 
             try
