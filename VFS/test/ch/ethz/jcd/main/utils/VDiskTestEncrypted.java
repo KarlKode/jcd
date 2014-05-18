@@ -16,20 +16,22 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
-public class VDiskTest {
+public class VDiskTestEncrypted {
+    private static final String ENCRYPTION_KEY = "test key";
     public static long VDISK_BLOCK_COUNT = 256000;
     public final File vdiskFile = new File("/tmp/vdisk.vdisk");
 
     @Before
     public void setUp()
             throws InvalidBlockAddressException, InvalidSizeException, InvalidBlockCountException, VDiskCreationException, IOException {
-        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, false, false);
+        VDisk.format(vdiskFile, VUtil.BLOCK_SIZE * VDISK_BLOCK_COUNT, false, true);
     }
 
     @Test
     public void testDispose()
             throws FileNotFoundException {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         vDisk.dispose();
         assertFalse("disposing the VDisk failed", vdiskFile.exists());
     }
@@ -38,6 +40,7 @@ public class VDiskTest {
     public void testList()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         HashMap<String, VObject> list = vDisk.list(root);
 
@@ -65,6 +68,7 @@ public class VDiskTest {
     public void testMkdir()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
@@ -87,6 +91,7 @@ public class VDiskTest {
     public void testTouch()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
@@ -114,6 +119,7 @@ public class VDiskTest {
     public void testRename()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
@@ -151,6 +157,7 @@ public class VDiskTest {
     public void testMove()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory home = vDisk.mkdir(root, "home");
         VDirectory phgamper = vDisk.mkdir(home, "phgamper");
@@ -198,6 +205,7 @@ public class VDiskTest {
     public void testCopy()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory confd = vDisk.mkdir(etc, "conf.d");
@@ -266,6 +274,7 @@ public class VDiskTest {
     public void testDelete()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
 
@@ -308,6 +317,7 @@ public class VDiskTest {
     public void testImportFromHost()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
 
@@ -332,6 +342,7 @@ public class VDiskTest {
     public void testExportFromHost()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory bin = vDisk.mkdir(root, "bin");
         VFile foo = vDisk.touch(bin, "foo.c");
@@ -346,6 +357,7 @@ public class VDiskTest {
     public void testImportExport()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VFile cat = vDisk.importFromHost(new File("data/simons_cat.jpg"), root);
         File out = new File("data/cat.jpg");
@@ -380,6 +392,7 @@ public class VDiskTest {
     public void testResolve()
             throws Exception {
         VDisk vDisk = new VDisk(vdiskFile);
+        vDisk.setEncryptionKey(ENCRYPTION_KEY);
         VDirectory root = (VDirectory) vDisk.resolve("/");
         VDirectory etc = vDisk.mkdir(root, "etc");
         VDirectory initd = vDisk.mkdir(etc, "init.d");
