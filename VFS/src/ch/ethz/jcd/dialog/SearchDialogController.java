@@ -65,7 +65,7 @@ public class SearchDialogController
         }
 
 
-        HashMap<VFile, String> result = vdisk.find(pattern, ((VDirectory) vdisk.resolve(textFieldDirectory.getText())), checkBoxSubdirectories.isSelected());
+        HashMap<VObject, String> result = vdisk.find(pattern, ((VDirectory) vdisk.resolve(textFieldDirectory.getText())), checkBoxSubdirectories.isSelected());
 
         listViewResults.getItems().clear();
         listViewResults.getItems().addAll(result.keySet());

@@ -117,6 +117,8 @@ public class MainController
     //true, if the drag&drag operation initialized in this application
     private boolean inAppDragOperation;
 
+    private boolean operationInProgress = false;
+
     private void refreshTreeView() throws ResolveException, IOException
     {
         VDirectory root = (VDirectory) vdisk.resolve("/");

@@ -3,6 +3,7 @@ package ch.ethz.jcd.application.commands;
 import ch.ethz.jcd.application.AbstractVFSApplication;
 import ch.ethz.jcd.main.exceptions.command.CommandException;
 import ch.ethz.jcd.main.layer.VFile;
+import ch.ethz.jcd.main.layer.VObject;
 import ch.ethz.jcd.main.utils.VDisk;
 
 import java.util.HashMap;
@@ -103,7 +104,7 @@ public class VFSfind extends AbstractVFSCommand
      *
      * @param list to print
      */
-    private void out(HashMap<VFile, String> list)
+    private void out(HashMap<VObject, String> list)
     {
         for (String value : list.values())
         {

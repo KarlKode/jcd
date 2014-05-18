@@ -104,23 +104,21 @@ public class VDirectory extends VObject<DirectoryBlock>
      * @return HashMap filled with all search results
      * @throws IOException
      */
-    public HashMap<VFile, String> find(Pattern regex, boolean recursive)
+    public HashMap<VObject, String> find(Pattern regex, boolean recursive)
             throws IOException
     {
-        HashMap<VFile, String> map = new HashMap<>();
+        HashMap<VObject, String> map = new HashMap<>();
 
         for (VObject entry : this.getEntries())
         {
             if (entry instanceof VDirectory && recursive)
             {
                 map.putAll(((VDirectory) entry).find(regex, recursive));
-            } else if (entry instanceof VFile)
+            }
+            Matcher matcher = regex.matcher(entry.getName());
+            if (matcher.find())
             {
-                Matcher matcher = regex.matcher(entry.getName());
-                if (matcher.find())
-                {
-                    map.put((VFile) entry, entry.getPath());
-                }
+                map.put(entry, entry.getPath());
             }
         }
 

@@ -355,7 +355,7 @@ public class VDisk
      * @param recursive indicates whether including sub folders or not
      * @return HashMap filled with all search results
      */
-    public HashMap<VFile, String> find(Pattern regex, VDirectory folder, boolean recursive)
+    public HashMap<VObject, String> find(Pattern regex, VDirectory folder, boolean recursive)
             throws FindException
     {
         try
