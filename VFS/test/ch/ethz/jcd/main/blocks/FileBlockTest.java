@@ -49,6 +49,7 @@ public class FileBlockTest
     {
         new FileBlock(fileManager, 0);
         new FileBlock(fileManager, BLOCK_ADDRESS);
+        assertEquals(1, block.getDataBlockListBlocks());
         new FileBlock(fileManager, Integer.MAX_VALUE);
         try
         {

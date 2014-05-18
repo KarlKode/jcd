@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBlock extends ObjectBlock
-{
+public class FileBlock extends ObjectBlock {
     public static final int SIZE_FILE_SIZE = 8;
     public static final int SIZE_DATA_BLOCK_LIST = 4;
     public static final int SIZE_DATA_BLOCK_LIST_ENTRY = 4;
@@ -21,11 +20,9 @@ public class FileBlock extends ObjectBlock
     public static final int OFFSET_DATA_BLOCK_LIST = OFFSET_FILE_SIZE + SIZE_FILE_SIZE;
     public static final int OFFSET_FIRST_DATA_BLOCK_LIST_ENTRY = OFFSET_DATA_BLOCK_LIST + SIZE_DATA_BLOCK_LIST;
 
-    public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException, IOException
-    {
+    public FileBlock(FileManager fileManager, int blockAddress) throws IllegalArgumentException, IOException {
         super(fileManager, blockAddress);
         setType(ObjectBlock.TYPE_FILE);
-        setDataBlockListBlocks(0);
     }
 
     /**
@@ -36,34 +33,29 @@ public class FileBlock extends ObjectBlock
      * @throws BlockFullException
      * @throws IOException
      */
-    public void addDataBlock(DataBlock dataBlock, int usedBlockBytes) throws BlockFullException, IOException
-    {
+    public void addDataBlock(DataBlock dataBlock, int usedBlockBytes) throws BlockFullException, IOException {
         // Check for valid arguments
-        if (dataBlock == null || usedBlockBytes <= 0)
-        {
+        if (dataBlock == null || usedBlockBytes <= 0) {
             throw new IllegalArgumentException();
         }
 
         // Calculate the new size
         long oldSize = size();
-        if (oldSize != 0 && oldSize % VUtil.BLOCK_SIZE != 0)
-        {
+        if (oldSize != 0 && oldSize % VUtil.BLOCK_SIZE != 0) {
             oldSize += VUtil.BLOCK_SIZE - (oldSize % VUtil.BLOCK_SIZE);
         }
         long newSize = oldSize + usedBlockBytes;
 
         // Is there a dataBlockListBlock for the new file size? No -> Add a new dataBlockListBlock
         int usedDataBlocks = getUsedDataBlocks(oldSize);
-        if (usedDataBlocks >= getMaxDataBlocks())
-        {
+        if (usedDataBlocks >= getMaxDataBlocks()) {
             throw new BlockFullException();
         }
 
         // Get the correct dataBlockListBlock
         int dataBlockListBlockIndex = usedDataBlocks / DataBlockListBlock.getCapacity();
         DataBlockListBlock dataBlockListBlock = getDataBlockListBlock(dataBlockListBlockIndex);
-        if (dataBlockListBlock.getUsedBlocks() == DataBlockListBlock.getCapacity())
-        {
+        if (dataBlockListBlock.getUsedBlocks() == DataBlockListBlock.getCapacity()) {
             throw new BlockFullException();
         }
 
@@ -76,11 +68,9 @@ public class FileBlock extends ObjectBlock
         setSize(newSize);
     }
 
-    public DataBlockListBlock getDataBlockListBlock(int dataBlockListBlockIndex) throws IOException
-    {
+    public DataBlockListBlock getDataBlockListBlock(int dataBlockListBlockIndex) throws IOException {
         // check if the block address of the dataBlockListBlock is valid
-        if (dataBlockListBlockIndex < 0 || dataBlockListBlockIndex >= getDataBlockListBlocks())
-        {
+        if (dataBlockListBlockIndex < 0 || dataBlockListBlockIndex >= getDataBlockListBlocks()) {
             throw new IllegalArgumentException();
         }
 
@@ -90,13 +80,11 @@ public class FileBlock extends ObjectBlock
         return new DataBlockListBlock(fileManager, dataBlockListBlockAddress);
     }
 
-    public int getDataBlockListBlocks() throws IOException
-    {
+    public int getDataBlockListBlocks() throws IOException {
         return fileManager.readInt(getBlockOffset(), OFFSET_DATA_BLOCK_LIST);
     }
 
-    private void setDataBlockListBlocks(int dataBlockListBlocks) throws IOException
-    {
+    private void setDataBlockListBlocks(int dataBlockListBlocks) throws IOException {
         fileManager.writeInt(getBlockOffset(), OFFSET_DATA_BLOCK_LIST, dataBlockListBlocks);
     }
 
@@ -106,12 +94,10 @@ public class FileBlock extends ObjectBlock
      * @return DataBlock to remove
      * @throws IOException
      */
-    public DataBlock removeLastDataBlock() throws IOException, BlockEmptyException
-    {
+    public DataBlock removeLastDataBlock() throws IOException, BlockEmptyException {
         long currentSize = size();
 
-        if (currentSize == 0)
-        {
+        if (currentSize == 0) {
             throw new BlockEmptyException();
         }
 
@@ -119,27 +105,23 @@ public class FileBlock extends ObjectBlock
         DataBlockListBlock dataBlockListBlock = getDataBlockListBlock(getDataBlockListBlocks() - 1);
 
         // Get the block address of the last data block
-        if (dataBlockListBlock.getUsedBlocks() == 0)
-        {
+        if (dataBlockListBlock.getUsedBlocks() == 0) {
             throw new BlockEmptyException();
         }
         int dataBlockAddress = dataBlockListBlock.getDataBlockAddress(dataBlockListBlock.getUsedBlocks() - 1);
         dataBlockListBlock.setUsedBlocks(dataBlockListBlock.getUsedBlocks() - 1);
 
         // Remove the dataBlockListBlock from the fileBlock if the dataBlockListBlock is empty
-        if (dataBlockListBlock.getUsedBlocks() == 0)
-        {
+        if (dataBlockListBlock.getUsedBlocks() == 0) {
             removeLastDataBlockListBlock();
         }
 
         // Update file size
         long oldSize = size();
-        if (oldSize % VUtil.BLOCK_SIZE == 0)
-        {
+        if (oldSize % VUtil.BLOCK_SIZE == 0) {
             // The block that will be removed was full -> new size is exactly BLOCK_SIZE smaller
             setSize(oldSize - VUtil.BLOCK_SIZE);
-        } else
-        {
+        } else {
             // The block that will be removed was not full -> new new size is exactly (SIZE OF BLOCK TO REMOVE) bytes smaller
             setSize(oldSize - (VUtil.BLOCK_SIZE - (oldSize % VUtil.BLOCK_SIZE)));
         }
@@ -147,8 +129,7 @@ public class FileBlock extends ObjectBlock
         return new DataBlock(fileManager, dataBlockAddress);
     }
 
-    private void removeLastDataBlockListBlock()
-    {
+    private void removeLastDataBlockListBlock() {
         // Not needed for the moment as we call removeLastDataBlock only just before adding a new block again.
         //throw new ToDoException();
     }
@@ -158,26 +139,22 @@ public class FileBlock extends ObjectBlock
      *
      * @return list of all DataBlocks
      */
-    public List<DataBlock> getDataBlockList() throws IOException
-    {
+    public List<DataBlock> getDataBlockList() throws IOException {
         int dataBlockCount = getUsedDataBlocks(size());
         List<DataBlock> list = new ArrayList<>(dataBlockCount);
 
-        for (int i = 0; i < dataBlockCount; i++)
-        {
+        for (int i = 0; i < dataBlockCount; i++) {
             list.add(this.getDataBlock(i));
         }
 
         return list;
     }
 
-    public List<DataBlockListBlock> getDataBlockListBlockList() throws IOException
-    {
+    public List<DataBlockListBlock> getDataBlockListBlockList() throws IOException {
         int dataBlockListBlockCount = getDataBlockListBlocks();
         List<DataBlockListBlock> dataBlockListBlocks = new ArrayList<>(dataBlockListBlockCount);
 
-        for (int i = 0; i < dataBlockListBlockCount; i++)
-        {
+        for (int i = 0; i < dataBlockListBlockCount; i++) {
             dataBlockListBlocks.add(getDataBlockListBlock(i));
         }
 
@@ -191,8 +168,7 @@ public class FileBlock extends ObjectBlock
      * @return the size of the file
      * @throws IOException
      */
-    public long size() throws IOException
-    {
+    public long size() throws IOException {
         return fileManager.readLong(getBlockOffset(), OFFSET_FILE_SIZE);
     }
 
@@ -200,8 +176,7 @@ public class FileBlock extends ObjectBlock
      * Writes the size of the file into its metadata.
      */
     public void setSize(long size)
-            throws IOException
-    {
+            throws IOException {
         fileManager.writeLong(getBlockOffset(), OFFSET_FILE_SIZE, size);
     }
 
@@ -211,8 +186,7 @@ public class FileBlock extends ObjectBlock
      * @return the number of DataBlocks
      * @throws IOException
      */
-    public int count() throws IOException
-    {
+    public int count() throws IOException {
         return getUsedDataBlocks(size());
     }
 
@@ -224,10 +198,8 @@ public class FileBlock extends ObjectBlock
      * @throws IOException
      * @throws IllegalArgumentException if the dataBlockIndex is out of Bounds
      */
-    public DataBlock getDataBlock(int dataBlockIndex) throws IOException, IllegalArgumentException
-    {
-        if (!isValidDataBlockIndex(dataBlockIndex))
-        {
+    public DataBlock getDataBlock(int dataBlockIndex) throws IOException, IllegalArgumentException {
+        if (!isValidDataBlockIndex(dataBlockIndex)) {
             throw new IllegalArgumentException();
         }
 
@@ -235,8 +207,7 @@ public class FileBlock extends ObjectBlock
         DataBlockListBlock dataBlockListBlock = getDataBlockListBlock(dataBlockIndex / DataBlockListBlock.getCapacity());
 
         int dataBlockListIndex = dataBlockIndex % DataBlockListBlock.getCapacity();
-        if (dataBlockListIndex >= dataBlockListBlock.getUsedBlocks())
-        {
+        if (dataBlockListIndex >= dataBlockListBlock.getUsedBlocks()) {
             throw new IllegalArgumentException();
         }
 
@@ -253,10 +224,8 @@ public class FileBlock extends ObjectBlock
      * @return true if the DataBlock at given index is the last one, false otherwise
      */
     public boolean isLastDataBlock(int dataBlockIndex)
-            throws IOException
-    {
-        if (!isValidDataBlockIndex(dataBlockIndex))
-        {
+            throws IOException {
+        if (!isValidDataBlockIndex(dataBlockIndex)) {
             throw new IllegalArgumentException();
         }
         return dataBlockIndex == count() - 1;
@@ -267,16 +236,14 @@ public class FileBlock extends ObjectBlock
      * @return true if the given dataBlockIndex is valid
      */
     public boolean isValidDataBlockIndex(int dataBlockIndex)
-            throws IOException
-    {
+            throws IOException {
         return !(dataBlockIndex < 0 || dataBlockIndex >= getMaxDataBlocks() || dataBlockIndex > count());
     }
 
     /**
      * @return whether the file is empty or not
      */
-    public boolean isEmpty() throws IOException
-    {
+    public boolean isEmpty() throws IOException {
         return !(size() > 0);
     }
 
@@ -287,16 +254,14 @@ public class FileBlock extends ObjectBlock
      * @return this FileBlock ported to a VFile
      */
     @Override
-    public VObject toVObject(VDirectory parent)
-    {
+    public VObject toVObject(VDirectory parent) {
         return new VFile(this, parent);
     }
 
     /**
      * @return the maximum number of DataBlocks fitting into a FileBlock
      */
-    private int getMaxDataBlocks() throws IOException
-    {
+    private int getMaxDataBlocks() throws IOException {
 
         return getDataBlockListBlocks() * DataBlockListBlock.getCapacity();
     }
@@ -308,16 +273,13 @@ public class FileBlock extends ObjectBlock
      * @param size actual disk size
      * @return number of used blocks
      */
-    private int getUsedDataBlocks(long size)
-    {
+    private int getUsedDataBlocks(long size) {
         return (int) Math.ceil((double) size / (double) VUtil.BLOCK_SIZE);
     }
 
-    public void addDataBlockListBlock(DataBlockListBlock dataBlockListBlock) throws IOException, BlockFullException
-    {
+    public void addDataBlockListBlock(DataBlockListBlock dataBlockListBlock) throws IOException, BlockFullException {
         // Check if there is space for an additional dataBlockListBlock
-        if ((VUtil.BLOCK_SIZE - OFFSET_FIRST_DATA_BLOCK_LIST_ENTRY) / SIZE_DATA_BLOCK_LIST_ENTRY <= getDataBlockListBlocks())
-        {
+        if ((VUtil.BLOCK_SIZE - OFFSET_FIRST_DATA_BLOCK_LIST_ENTRY) / SIZE_DATA_BLOCK_LIST_ENTRY <= getDataBlockListBlocks()) {
             throw new BlockFullException();
         }
 
@@ -328,8 +290,7 @@ public class FileBlock extends ObjectBlock
         setDataBlockListBlocks(getDataBlockListBlocks() + 1);
     }
 
-    public boolean equals(Object other)
-    {
+    public boolean equals(Object other) {
         return other instanceof Block && ((Block) other).blockAddress == blockAddress;
     }
 }
