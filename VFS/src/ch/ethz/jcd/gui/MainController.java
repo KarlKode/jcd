@@ -118,6 +118,7 @@ public class MainController
     private boolean inAppDragOperation;
 
     private boolean operationInProgress = false;
+    private ClipboardContent filesToCopyClipboard = new ClipboardContent();
 
     private void refreshTreeView() throws ResolveException, IOException
     {
@@ -127,13 +128,11 @@ public class MainController
         TreeItem<VDirectory> rootNode = new TreeItem<VDirectory>(root);
         dirs.add(rootNode);
 
-        while (!dirs.isEmpty())
-        {
+        while (!dirs.isEmpty()) {
             final TreeItem<VDirectory> currNode = dirs.pop();
 
             currNode.getValue().getEntries().forEach(a -> {
-                if (a instanceof VDirectory)
-                {
+                if (a instanceof VDirectory) {
                     final TreeItem<VDirectory> tmp = new TreeItem<VDirectory>((VDirectory) a);
                     tmp.setExpanded(true);
                     dirs.add(tmp);
@@ -155,11 +154,9 @@ public class MainController
     @FXML
     void onActionMenuItemLoadVFS(ActionEvent event)
     {
-        try
-        {
+        try {
             openVDisk();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -189,14 +186,12 @@ public class MainController
     }
 
     @FXML
-    void onActionMenuItemFind(ActionEvent event)
-    {
+    void onActionMenuItemFind(ActionEvent event) {
         openFindDialog();
     }
 
     @FXML
-    void onTextChangedTextFieldPath(ActionEvent event)
-    {
+    void onTextChangedTextFieldPath(ActionEvent event) {
 
     }
 
@@ -227,11 +222,9 @@ public class MainController
     @FXML
     void onActionButtonExport(ActionEvent event)
     {
-        try
-        {
+        try {
             exportFiles();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -266,10 +259,8 @@ public class MainController
         renameSelectedFile();
     }
 
-
     @FXML
-    void onActionButtonNewFile(ActionEvent event)
-    {
+    void onActionButtonNewFile(ActionEvent event) {
         showInputDialog("New File ... ", "Filename:", "Filename", filename -> {
             this.vdisk.touch(selectedDirectory, filename);
             refreshListView(selectedDirectory);
@@ -278,7 +269,7 @@ public class MainController
 
     @FXML
     void OnMouseClickedlabelVStats(MouseEvent event) {
-        if(vdisk != null) {
+        if (vdisk != null) {
             this.labelVStats.setText(this.vdisk.stats().toString());
         }
     }
@@ -297,60 +288,44 @@ public class MainController
         });
     }
 
-
     @FXML
-    void onKeyPressedMainPane(KeyEvent event) throws IOException
-    {
-        if (event.isControlDown())
-        {
+    void onKeyPressedMainPane(KeyEvent event) throws IOException {
+        if (event.isControlDown()) {
             if (event.getCode() == KeyCode.C)
             {
                 copySelectedFiles();
-            } else if (event.getCode() == KeyCode.X)
-            {
+            } else if (event.getCode() == KeyCode.X) {
                 moveSelectedFiles();
-            } else if (event.getCode() == KeyCode.V)
-            {
+            } else if (event.getCode() == KeyCode.V) {
                 pasteSelectedFiles();
-            } else if (event.getCode() == KeyCode.D)
-            {
+            } else if (event.getCode() == KeyCode.D) {
                 deleteSelectedFiles();
-            } else if (event.getCode() == KeyCode.R)
-            {
+            } else if (event.getCode() == KeyCode.R) {
                 renameSelectedFile();
-            } else if (event.getCode() == KeyCode.F)
-            {
+            } else if (event.getCode() == KeyCode.F) {
                 openFindDialog();
-            } else if (event.getCode() == KeyCode.I)
-            {
+            } else if (event.getCode() == KeyCode.I) {
                 importFiles();
-            } else if (event.getCode() == KeyCode.E)
-            {
+            } else if (event.getCode() == KeyCode.E) {
                 exportFiles();
-            } else if (event.getCode() == KeyCode.ENTER)
-            {
+            } else if (event.getCode() == KeyCode.ENTER) {
                 enterDirectory();
-            } else if (event.getCode() == KeyCode.O)
-            {
+            } else if (event.getCode() == KeyCode.O) {
                 openVDisk();
-            } else if (event.getCode() == KeyCode.N)
-            {
+            } else if (event.getCode() == KeyCode.N) {
                 newVDisk();
             }
         } else if (event.getCode() == KeyCode.DELETE)
         {
             deleteSelectedFiles();
-        } else if (event.getCode() == KeyCode.BACK_SPACE)
-        {
+        } else if (event.getCode() == KeyCode.BACK_SPACE) {
             gotoParent();
-        } else if (event.getCode() == KeyCode.ENTER)
-        {
+        } else if (event.getCode() == KeyCode.ENTER) {
             enterDirectory();
         }
     }
 
-    private void newVDisk()
-    {
+    private void newVDisk() {
         try
         {
             Stage dialogStage = new Stage();
@@ -391,20 +366,17 @@ public class MainController
         final File fileVdisk = fchooser.showOpenDialog(null);
         if (fileVdisk != null)
         {
-            try
-            {
+            try {
                 this.vdisk = new VDisk(fileVdisk);
                 refreshTreeView();
                 this.treeViewNavigation.getSelectionModel().select(this.treeViewNavigation.getRoot());
                 this.toolBarInterface.setDisable(false);
 
                 labelVStats.setText(this.vdisk.stats().toString());
-            } catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        } else
-        {
+        } else {
             //no file was chosen / user pressed esc
         }
     }
@@ -418,17 +390,14 @@ public class MainController
         }
     }
 
-    private void enterDirectory()
-    {
-        if (listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory)
-        {
+    private void enterDirectory() {
+        if (listViewFiles.getSelectionModel().getSelectedItems().size() == 1 && listViewFiles.getSelectionModel().getSelectedItem() instanceof VDirectory) {
             selectedDirectory = (VDirectory) listViewFiles.getSelectionModel().getSelectedItem();
             selectVDirectory(selectedDirectory);
         }
     }
 
-    private void moveSelectedFiles()
-    {
+    private void moveSelectedFiles() {
         fileOp = FileOperation.MOVE;
 
         this.selectedFiles.clear();
@@ -437,8 +406,7 @@ public class MainController
         this.menuItemPaste.setDisable(false);
     }
 
-    private void importFiles()
-    {
+    private void importFiles() {
         final FileChooser fchooser = new FileChooser();
         fchooser.setTitle("Import files .. ");
 
@@ -457,8 +425,7 @@ public class MainController
                         return null;
                     }
                 }.call();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else
@@ -467,26 +434,20 @@ public class MainController
         }
     }
 
-    private void exportFiles() throws IOException, ExportException
-    {
+    private void exportFiles() throws IOException, ExportException {
         final DirectoryChooser dchooser = new DirectoryChooser();
         dchooser.setTitle("Export files .. ");
 
         final File exportDir = dchooser.showDialog(null);
 
-        if (exportDir != null)
-        {
-            new Task<Void>()
-            {
+        if (exportDir != null) {
+            new Task<Void>() {
                 @Override
-                protected Void call() throws IOException, ExportException
-                {
+                protected Void call() throws IOException, ExportException {
                     final ObservableList<VObject> items = listViewFiles.getSelectionModel().getSelectedItems();
 
-                    for (VObject d : items)
-                    {
-                        if (d instanceof VFile)
-                        {
+                    for (VObject d : items) {
+                        if (d instanceof VFile) {
                             File f = new File(exportDir.getAbsolutePath() + "/" + d.getName());
                             vdisk.exportToHost((VFile) d, f);
                         }
@@ -495,14 +456,12 @@ public class MainController
                     return null;
                 }
             }.call();
-        } else
-        {
+        } else {
             //no file was chosen / user pressed esc
         }
     }
 
-    private void copySelectedFiles()
-    {
+    private void copySelectedFiles() {
         fileOp = FileOperation.COPY;
 
         this.selectedFiles.clear();
@@ -513,51 +472,39 @@ public class MainController
 
     private void pasteSelectedFiles() throws IOException
     {
-        for (VObject vobj : this.selectedFiles)
-        {
-            try
-            {
-                if (fileOp == FileOperation.COPY)
-                {
-                    if (selectedDirectory.getEntries().contains(vobj))
-                    {
+        for (VObject vobj : this.selectedFiles) {
+            try {
+                if (fileOp == FileOperation.COPY) {
+                    if (selectedDirectory.getEntries().contains(vobj)) {
                         DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
-                        if (res == DialogResult.OK)
-                        {
+                        if (res == DialogResult.OK) {
                             showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
                                 vdisk.copy(vobj, selectedDirectory, filename);
                             });
                         }
-                    } else
-                    {
+                    } else {
                         vdisk.copy(vobj, selectedDirectory, vobj.getName());
                     }
-                } else
-                {
+                } else {
                     //moving the selectedFiles to the same directoy is senseless, thus we doesn't allow it
-                    if (!vobj.getParent().equals(selectedDirectory))
-                    {
-                        if (selectedDirectory.getEntries().contains(vobj))
-                        {
+                    if (!vobj.getParent().equals(selectedDirectory)) {
+                        if (selectedDirectory.getEntries().contains(vobj)) {
                             DialogResult res = showMessageDialog("Information", "File already exists!", "Rename it, and copy it?");
 
-                            if (res == DialogResult.OK)
-                            {
+                            if (res == DialogResult.OK) {
                                 showInputDialog("New Filename ... ", "Filename: ", "filename", (filename) -> {
                                     vdisk.move(vobj, selectedDirectory, filename);
                                 });
                             }
-                        } else
-                        {
+                        } else {
                             vdisk.move(vobj, selectedDirectory, vobj.getName());
                         }
                     }
                 }
 
 
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -568,7 +515,6 @@ public class MainController
 
         updateUI();
     }
-
 
     private void updateUI() throws IOException
     {
@@ -588,9 +534,7 @@ public class MainController
         });
     }
 
-
-    private void openFindDialog()
-    {
+    private void openFindDialog() {
         try
         {
             Stage dialogStage = new Stage();
@@ -626,17 +570,13 @@ public class MainController
         List<File> tmpFilesForExport = new ArrayList<File>();
 
         // export just selected VFiles, our API doesn't support VDirectories
-        for (VObject vobject : selectedVFiles)
-        {
-            if (vobject instanceof VFile)
-            {
+        for (VObject vobject : selectedVFiles) {
+            if (vobject instanceof VFile) {
                 File tempFile = null;
 
-                try
-                {
+                try {
                     tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + vobject.getName());
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
@@ -649,11 +589,9 @@ public class MainController
 
         TransferMode mode;
 
-        if (Keys.isCtrlPressed())
-        {
+        if (Keys.isCtrlPressed()) {
             mode = TransferMode.COPY;
-        } else
-        {
+        } else {
             mode = TransferMode.MOVE;
         }
 
@@ -662,8 +600,7 @@ public class MainController
     }
 
     @FXML
-    void onDragDoneListViewFiles(DragEvent event)
-    {
+    void onDragDoneListViewFiles(DragEvent event) {
         inAppDragOperation = false;
         System.out.println("MainController.onDragDoneListViewFiles");
     }
@@ -671,31 +608,26 @@ public class MainController
     private void importFiles(List<File> files) throws MkDirException, ImportException, ResolveException, IOException, DiskFullException {
         Stack<Pair<File, VDirectory>> items = new Stack<Pair<File, VDirectory>>();
 
-        for (File file : files)
-        {
+        for (File file : files) {
             items.add(new Pair<File, VDirectory>(file, selectedDirectory));
         }
 
-        while (!items.isEmpty())
-        {
+        while (!items.isEmpty()) {
             Pair<File, VDirectory> tmpItem = items.pop();
             File tmpFile = tmpItem.getKey();
             VDirectory tmpVDir = tmpItem.getValue();
             TreeItem<VDirectory> treeVDir = getTreeItem(tmpVDir);
 
-            if (tmpFile.isDirectory())
-            {
+            if (tmpFile.isDirectory()) {
                 VDirectory newVDir = vdisk.mkdir(tmpVDir, tmpFile.getName());
                 treeVDir.getChildren().add(new TreeItem<VDirectory>(newVDir));
 
-                for (File file : tmpFile.listFiles())
-                {
+                for (File file : tmpFile.listFiles()) {
                     items.add(new Pair<File, VDirectory>(file, newVDir));
                 }
-            } else
-            {
+            } else {
                 VFile file = vdisk.importFromHost(tmpFile, tmpVDir);
-                if(tmpVDir.equals(selectedDirectory)){
+                if (tmpVDir.equals(selectedDirectory)) {
                     listViewFiles.getItems().add(file);
                 }
             }

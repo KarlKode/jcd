@@ -217,12 +217,21 @@ public class VDisk {
      * @param destination directory where to import
      */
     public VFile importFromHost(File source, VDirectory destination)
-            throws ImportException, DiskFullException, IOException {
-        long fileSize = source.length();
-        int blockCount = vUtil.getSuperBlock().getBlockCount();
-        int blocksUsed = vUtil.getBitMapBlock().getUsedBlocks();
-        long freeSpace = (blockCount - blocksUsed) * VUtil.BLOCK_SIZE;
 
+            throws ImportException, DiskFullException {
+        long fileSize = source.length();
+
+        int blockCount = 0;
+        int blocksUsed = 0;
+
+        try {
+            blockCount = vUtil.getSuperBlock().getBlockCount();
+            blocksUsed = vUtil.getBitMapBlock().getUsedBlocks();
+        } catch (Exception ex) {
+            throw new ImportException(ex);
+        }
+
+        long freeSpace = (blockCount - blocksUsed) * VUtil.BLOCK_SIZE;
         if (fileSize > freeSpace) {
             throw new DiskFullException();
         }
